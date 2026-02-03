@@ -6,6 +6,8 @@ const Quotations = lazy(() => import("@/pages/Quotations/Quotations"));
 const PurchaseRequest = lazy(() => import("@/pages/PurchaseRequest/PurchaseRequest"))
 const AddProduct =  lazy(() => import("@/pages/Products/AddProduct"));
 const CreateQuotation = lazy(() => import("@/pages/Quotations/CreateQuotation"));
+const CreatePurchaseRequest = lazy(() => import("@/pages/PurchaseRequest/CreatePurchaseRequest"));
+
 
 export const routesData = [ 
   {
@@ -56,9 +58,9 @@ export const routesData = [
   },
    {
     id:6,
-    name:"Create Quotations",
-    path:"/create_quote",
-    component: CreateQuotation,
+    name:"Create Purchase Request",
+    path:"/create_purchase_request",
+    component: CreatePurchaseRequest,
     hidden:true,
     active_icon:"/images/icon-park-solid_shopping-bag.svg",
     inactive_icon:'/images/icon-park-solid_shopping-bag-gray.svg',

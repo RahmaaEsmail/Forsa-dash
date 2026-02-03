@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectLabel } from '../../ui/select'
 import { SelectGroup, SelectTrigger, SelectValue } from '@radix-ui/react-select'
 import { Input } from '../../ui/input'
 
-export default function QuotationsFilter({ setFilter, filter }) {
+export default function PurchaseRequestFilter({ setFilter, filter }) {
 
   function handleReset() {
     setFilter({

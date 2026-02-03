@@ -1,9 +1,5 @@
 import axios from "axios";
 import { config } from "./config";
-
-const controller = new AbortController();
-
-
 export const apiInstance = axios.create({
   baseURL: config.BASE_URL,
   headers: {
@@ -26,9 +22,12 @@ apiInstance.interceptors.request.use((req) => {
 
 
 apiInstance.interceptors.response.use((res) => res , (error) => {
-  if(error?.response?.status == 401) {
+  console.log("interceptor", error);
+  if(error?.status == 401) {
     localStorage.removeItem(config.localStorageTokenName)
     localStorage.removeItem(config.localStorageUserData)
+    window.location.href = "/login";
+    window.location.reload();
   }
   return Promise.reject(error);
 })

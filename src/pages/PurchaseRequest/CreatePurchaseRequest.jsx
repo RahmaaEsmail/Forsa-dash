@@ -3,8 +3,9 @@ import PageHeader from '../../components/shared/PageHeader'
 import { Button } from '../../components/ui/button'
 import CreateQuotationForm from '../../components/pages/PurchaseRequests/CreatePurchaseRequestForm'
 import { FormProvider, useForm } from 'react-hook-form'
+import PurchaseRequestsTabs from '../../components/pages/PurchaseRequests/PurchaseRequestsTabs'
 
-export default function CreateQuotation() {
+export default function CreatePurchaseRequest() {
   const method = useForm({
     defaultValues: {
       client: "",
@@ -37,7 +38,9 @@ export default function CreateQuotation() {
       </PageHeader>
       <form  onSubmit={method.handleSubmit()}>
       <CreateQuotationForm/>
-      </form>
+      </form>  
+
+      <PurchaseRequestsTabs />
     </div>
     </FormProvider>
   )

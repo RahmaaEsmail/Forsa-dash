@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -14,6 +14,11 @@ import CustomEmptyData from "../../../shared/CustomEmptyData";
 import { Edit, Eye, Fullscreen, PackageSearch, Trash } from "lucide-react";
 import dayjs from "dayjs";
 import { Button } from "../../../ui/button";
+import { DeleteModal } from "../../../shared/DeleteModal";
+import useDeleteProduct from "../../../../hooks/products/useDeleteProduct";
+import useUpdateActiveStatus from "../../../../hooks/products/useUpdateActiveStatus";
+import { ActiveInActiveStatusModal } from "../../../shared/ActiveInActiveStatusModal";
+import { useNavigate } from "react-router-dom";
 
 const thBase =
   "p-6 text-center! text-base font-bold! text-secondary! whitespace-nowrap";
@@ -24,6 +29,22 @@ const rowBase =
 
 export default function ProductTable({ data = product_data }) {
   const columnsCount = 9; // ✅ نفس عدد الأعمدة في TableHead
+   
+  const navigate = useNavigate();
+
+  const [openDeleteModal , setOpenDeleteModal] = useState(false);
+  const [openUpdateStatusModal , setOpenUpdateStatusModal] = useState(false);
+  
+  const {mutate : deleteProduct , isPending ,isSuccess} = useDeleteProduct()
+  const {mutate : updateStatusProduct , isPending  : isPendingStatus, isSuccess : isSuccessStatus} = useUpdateActiveStatus()
+
+  function handleDeleteProduct() {
+    deleteProduct(openDeleteModal?.id);
+  }
+
+  function handleUpdateStatus() {
+    updateStatusProduct();
+  }
 
   return (
     <div className="bg-white px-5! rounded-main overflow-hidden border border-border/60">
@@ -77,7 +98,7 @@ export default function ProductTable({ data = product_data }) {
                 </TableCell>
 
                 <TableCell className={`${tdBase} text-center`}>
-                  {prod?.skus ?? "---"}
+                  {prod?.model ?? "---"}
                 </TableCell>
 
                  <TableCell className={`${tdBase} text-center`}>
@@ -94,15 +115,21 @@ export default function ProductTable({ data = product_data }) {
 
                 <TableCell className={`${tdBase} text-center`}>
                  <div className="flex gap-1 items-center">
-                  <Button title="Edit Product" variant="ghost" size="icon">
+                  <Button 
+                  onClick={() => navigate(`/add_product?id=${prod?.id}`)}
+                  title="Edit Product" variant="ghost" size="icon">
                     <Edit />
                   </Button>
 
-                  <Button title="Delete Product"  variant="ghost" size="icon">
+                  <Button 
+                  onClick={() => setOpenDeleteModal(prod)}
+                  title="Delete Product"  variant="ghost" size="icon">
                     <Trash />
                   </Button>
 
-                  <Button title="Hide Product" variant="ghost" size="icon">
+                  <Button
+                  onClick={() => setOpenUpdateStatusModal(prod)}
+                  title="Hide Product" variant="ghost" size="icon">
                     <Eye />
                   </Button>
 
@@ -114,7 +141,7 @@ export default function ProductTable({ data = product_data }) {
               </TableRow>
             ))
           ) : (
-            <TableRow className="border-b-0">
+            <TableRow className="border-b-0 w-full">
               <TableCell colSpan={columnsCount} className="p-6">
                 <CustomEmptyData
                   title="No Products Found"
@@ -128,6 +155,9 @@ export default function ProductTable({ data = product_data }) {
           )}
         </TableBody>
       </Table>
+
+      <DeleteModal isSuccess={isSuccess} isLoading={isPending} onDelete={handleDeleteProduct} open={openDeleteModal} setOpen={setOpenDeleteModal} title={`This is a  product #${openDeleteModal?.name}?`} desc={"Are you sure you want to delete this item? This action cannot be undone."}/>
+      <ActiveInActiveStatusModal isSuccess={isSuccessStatus} isLoading={isPendingStatus} onSuccess={handleUpdateStatus} open={openUpdateStatusModal} setOpen={setOpenUpdateStatusModal} title={`This is a  product #${openUpdateStatusModal?.name}?`}/>
     </div>
   );
 }

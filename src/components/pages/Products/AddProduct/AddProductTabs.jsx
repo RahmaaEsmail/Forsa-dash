@@ -9,6 +9,8 @@ import { addProductSchema } from "../../../../validations/basidProductSchema";
 import { useProductStore } from "../../../../store/zustand/productStore";
 import { toast } from "sonner";
 import useAddProduct from "../../../../hooks/products/useAddProduct";
+import { useLocation } from "react-router-dom";
+import useProductDetails from "../../../../hooks/products/useProductDetails";
 
 const ProductGeneralInfo = lazy(() =>
   import("@/components/pages/Products/AddProduct/ProductGeneralInfo")
@@ -27,24 +29,35 @@ const tabs = [
 export default function AddProductTabs() {
   // add product react query
   const {isPending , mutate} = useAddProduct()
-  // zustand 
-  const {all_products , add_product} = useProductStore();
   const defaultTab = useMemo(() => tabs[0]?.id ?? "1", []);
   const [selectedTabId, setSelectedTabId] = useState(defaultTab);
   
+  const location =useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const id = searchParams.get("id");
+  
+    const {mutate : productDetailsMutate , data , isPending : isPendingProductDetails} = useProductDetails()
+     
+    useEffect(() => {
+      if(id) {
+        mutate(id);
+      }
+    } , [id])
+
   const method = useForm({
     mode:"onBlur",
    defaultValues: {
       // General
-      name_ar: "",
-      name_en: "",
+      name_ar: data?.data?.name_ar || data?.data?.name || "",
+      name_en: data?.data?.name_ar || data?.data?.name || "",
       product_code: "",
       product_sku: "",
       category: "",
       subcategory: "",
       brand: "",
       unit_of_measure: "",
-      desc: "",
+      description_ar: "",
+      description_en: "",
       image: null,
 
       // Pricing
@@ -76,12 +89,12 @@ export default function AddProductTabs() {
   formData.append("description[ar]", values?.description_ar); 
   formData.append("description[en]", values?.description_en); 
   formData.append("brand", values?.brand); 
-  formData.append("model", ""); 
+  formData.append("model", values?.product_sku); 
   formData.append("category_id", 1); 
   formData.append("currency", values?.currency); 
   formData.append("cost_price", values?.cost_price); 
   formData.append("selling_price", values?.selling_price);
-  formData.append("default_discount_rule", values?.default_discount_rule ?? "");
+  formData.append("default_discount_rule", values?.discount_role ?? "");
   formData.append("default_supplier_id","");
   formData.append("minimum_stock",values?.min_stock);
   formData.append("max_stock",values?.max_stock);
@@ -89,7 +102,8 @@ export default function AddProductTabs() {
   formData.append("storage_location_code",values?.storage_location_code);
   formData.append("image",values?.image)
   formData.append("has_variants",false)
-  formData.append("is_active",true)
+  formData.append("is_active",1)
+  formData.append("units[0]",1)
   formData.append("image",values?.image)
 
   values?.attachment?.length > 0 && 
@@ -100,13 +114,6 @@ export default function AddProductTabs() {
 
   mutate({
     body : formData,
-  }, {
-    onSuccess : (res) => {
-      console.log("res success",res);
-    },
-    onError :(res) => {
-      console.log("res error",res);
-    }
   })
  }
 
@@ -117,7 +124,6 @@ export default function AddProductTabs() {
    toast.error(errors[keys[0]]?.message)
   }
   
-  console.log(all_products);
 
   return (
     <FormProvider {...method}>

@@ -13,8 +13,9 @@ export const basicProductDataSchema = z.object({
   category: requiredText("category"),
   subcategory: requiredText("subcategory"),
   brand: requiredText('brand'),
-  unit_of_measure: requiredText('unit_of_measure'),
-  desc: z.string().optional(),
+  unit_of_measure: z.string().optional(),
+  description_ar : z.string().optional(),
+  description_en : z.string().optional(),
   image: z.any().refine(file => file instanceof File, "Image is Required").optional()
 })
 

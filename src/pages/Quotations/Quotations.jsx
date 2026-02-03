@@ -2,9 +2,9 @@ import React from 'react'
 import PageHeader from '../../components/shared/PageHeader'
 import { Button } from '../../components/ui/button'
 import { Download } from 'lucide-react'
-import QuotationsFilter from '../../components/pages/Quotations/QuotationsFilter'
-import QuotationStats from '../../components/pages/Quotations/QuotationStats'
-import QuotationTable from '../../components/pages/Quotations/QuotationTable'
+import QuotationsFilter from '../../components/pages/PurchaseRequests/PurchaseRequestFilter'
+import QuotationStats from '../../components/pages/PurchaseRequests/PurchaseRequestStats'
+import QuotationTable from '../../components/pages/PurchaseRequests/PurchaseRequestTable'
 import { useNavigate } from 'react-router-dom'
 
 export default function Quotations() {

@@ -8,4 +8,5 @@ export const userEndpoints = {
    // products
    get_products:"products",
    add_product:"products",
+   active_status:"products/1/toggle-active",
 }

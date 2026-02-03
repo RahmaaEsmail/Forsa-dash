@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Plus } from "lucide-react";
 import PageHeader from "../../components/shared/PageHeader";
@@ -29,9 +29,9 @@ export default function Products() {
     search: filters?.name || undefined,
   });
 
-  function handlePageChange(pageNum) {
+  const  handlePageChange = useCallback((pageNum) => {
     setPage(pageNum);
-  }
+  },[])
 
   return (
     <div className="flex pb-6 flex-col gap-10">

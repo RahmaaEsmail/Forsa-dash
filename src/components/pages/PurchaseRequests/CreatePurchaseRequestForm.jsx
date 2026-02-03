@@ -5,7 +5,7 @@ import CustomSelect from "../../shared/CustomSelect"
 import { useForm, useFormContext } from "react-hook-form"
 import { DatePickerInput } from "../../shared/CustomInputDate"
 
-export default function CreateQuotationForm() {
+export default function CreatePurchaseRequestForm() {
   const {register ,handleSubmit, control , formState :{errors}} = useFormContext()
   
   const onSubmit = (data) => {

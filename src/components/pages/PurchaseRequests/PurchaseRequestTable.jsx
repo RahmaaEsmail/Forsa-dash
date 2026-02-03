@@ -4,7 +4,7 @@ import { quotationsData } from '../../../utils/quotationsData';
 import { Input } from '../../ui/input';
 import { Star } from 'lucide-react';
 
-export default function QuotationTable() {
+export default function PurchaseRequestTable() {
   const columns = [
     {
       key: "reference",

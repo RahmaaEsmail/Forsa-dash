@@ -6,7 +6,6 @@ import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { configs } from "../../../store/config";
 import { replace, useNavigate } from "react-router-dom";
 import useLogin from "../../../hooks/auth/useLogin";
 import { toast } from "sonner";
@@ -44,13 +43,10 @@ export default function LoginForm() {
   const { mutate, isPending } = useLogin()
 
   function onSubmit(data) {
-    console.log(data);
     mutate(
       { body: data },
       {
         onSuccess: (res) => {
-          console.log("res", res);
-
           if (!res?.success) {
             toast.error(res?.error?.message || "Login failed");
             return;

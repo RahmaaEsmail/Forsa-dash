@@ -50,7 +50,7 @@ export default function AddProductForm() {
             <img
               src={imagePreview}
               alt="Preview"
-              className="w-full h-full object-cover rounded-main"
+              className="w-56 h-56 object-cover rounded-main"
             />
           ) : (
             <div className="w-full flex flex-col gap-2 rounded-main justify-center items-center h-full border border-dashed border-primary">
@@ -159,10 +159,18 @@ export default function AddProductForm() {
       </div>
 
       <CustomTextarea
-        errors={errors?.desc}
+        errors={errors?.description_ar}
         placeholder="Short description..."
-        name={"desc"}
-        label={"Short description"}
+        name={"description_ar"}
+        label={"Short description in arabic"}
+        register={register}
+      />
+
+       <CustomTextarea
+        errors={errors?.description_en}
+        placeholder="Short description..."
+        name={"description_en"}
+        label={"Short description in english"}
         register={register}
       />
 

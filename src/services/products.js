@@ -33,3 +33,31 @@ export const handleAddProduct =  async({body , signal}) => {
   })
   return response?.data;
 }
+
+export const handleDeleteProduct = async({id , signal}) => {
+  const response = await apiInstance.delete(`${userEndpoints.get_products}/${id}` , {
+    signal
+  })
+  return response?.data;
+}
+
+export const handleProductStatus = async({signal}) => {
+  const response = await apiInstance.post(`${userEndpoints.active_status}` , {
+    signal
+  })
+  return response?.data;
+}
+
+export const handleUpdateProduct = async({id,signal}) => {
+  const response = await apiInstance.post(`${userEndpoints.get_products}/${id}` , {
+    signal
+  })
+  return response?.data;
+}
+
+export const handleProductDetails = async({id,signal}) => {
+  const response = await apiInstance.get(`${userEndpoints.get_products}/${id}` , {
+    signal
+  })
+  return response?.data;
+}
