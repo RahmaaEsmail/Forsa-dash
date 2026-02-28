@@ -157,7 +157,7 @@ useEffect(() => {
   }, [create_category_success,id, reset]);
 
   // Loading states
-  if (category_details_loading) return <Loading />;
+  if (category_details_loading && id) return <Loading />;
 
   return (
     <Card className="flex flex-col gap-7 p-8">
