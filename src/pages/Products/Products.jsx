@@ -29,6 +29,10 @@ export default function Products() {
     search: filters?.name || undefined,
   });
 
+ useEffect(() => {
+  console.log("data",data?.data);
+ } ,[data])
+
   const  handlePageChange = useCallback((pageNum) => {
     setPage(pageNum);
   },[])

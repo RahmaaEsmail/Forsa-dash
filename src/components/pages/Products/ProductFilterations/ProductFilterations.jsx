@@ -82,13 +82,13 @@ export default function ProductFilterations({ setFilter, filter }) {
             <ChevronDown size={15} />
           </SelectTrigger>
 
-          <SelectContent>
+          {/* <SelectContent>
             <SelectGroup>
               <SelectLabel>Visibility</SelectLabel>
               <SelectItem value="published">Published</SelectItem>
               <SelectItem value="internal">Internal</SelectItem>
             </SelectGroup>
-          </SelectContent>
+          </SelectContent> */}
         </Select>
       </div>
 

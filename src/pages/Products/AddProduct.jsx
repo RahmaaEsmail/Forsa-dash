@@ -17,13 +17,13 @@ export default function AddProduct() {
    
   useEffect(() => {
     if(id) {
-      mutate(id);
+      mutate({id});
     }
   } , [id])
 
   return (
   isPending ? <Loading />  :  <div className='flex flex-col gap-10 pb-6'>
-      <PageHeader title={id ? `Edit Product #${data?.data?.name}` : "Add new Product"} subTitle={"Create a new building material item, define its category, pricing, and procurement details."}
+      <PageHeader title={id ? `Edit Product #${data?.data?.name?.en}` : "Add new Product"} subTitle={"Create a new building material item, define its category, pricing, and procurement details."}
       >
         <Button
           onClick={() => navigate(`/products`)}

@@ -13,11 +13,11 @@ const tabs = [
     name: "Products",
     component: <PurchaseProducts />,
   },
-  {
-    id: 2,
-    name: "Profit",
-    component: <PurchaseProfits />,
-  }
+  // {
+  //   id: 2,
+  //   name: "Profit",
+  //   component: <PurchaseProfits />,
+  // }
 ]
 
 export default function PurchaseRequestsTabs() {

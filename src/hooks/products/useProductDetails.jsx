@@ -8,17 +8,11 @@ export default function useProductDetails() {
 
   return useMutation({
     mutationKey: "productDetails",
-    mutationFn: (id, signal) => handleProductDetails({ id, signal }),
+    mutationFn: ({id, signal}) => handleProductDetails({ id, signal }),
     onSuccess: (res) => {
-      console.log(res);
-      if (res?.success || res?.data?.status == "success") {
-        queryClient.invalidateQueries({
-          queryKey: ["products"],
-          exact: false,
-        })
-      }
     },
     onError: (res) => {
+      console.log("res",res);
       toast.error(res?.message || res?.data?.message || res?.response?.error?.data?.message)
     }
   })

@@ -48,8 +48,8 @@ export const handleProductStatus = async({signal}) => {
   return response?.data;
 }
 
-export const handleUpdateProduct = async({id,signal}) => {
-  const response = await apiInstance.post(`${userEndpoints.get_products}/${id}` , {
+export const handleUpdateProduct = async({id, body,signal}) => {
+  const response = await apiInstance.post(`${userEndpoints.get_products}/${id}` ,body, {
     signal
   })
   return response?.data;

@@ -9,4 +9,20 @@ export const userEndpoints = {
    get_products:"products",
    add_product:"products",
    active_status:"products/1/toggle-active",
+
+
+   // purchase
+   get_purchase_request :"purchase-requests",
+
+   // suppliers
+   supplier:"suppliers",
+
+   // categories
+   categories :"categories",
+
+   // units
+   units :"units",
+
+   // customers
+   customers: "customers"
 }

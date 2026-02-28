@@ -3,4 +3,5 @@ export const config = {
    localStorageTokenName : "FORSADASHTOKENNAME",
    localStorageRefreshTokenName : "FORSADASHREFRESHTOKENNAME",
    localStorageUserData : "FORSADASHUSERDATA",
+   
 }

@@ -12,8 +12,8 @@ function useAddProduct() {
     mutationFn : ({body,signal}) => handleAddProduct({body,signal}) ,
     onSuccess:(res) => {
       console.log("res success from query", res);
-      if(res?.data?.success) {
-        toast.success(res?.data?.meta?.message);
+      if(res?.data?.success || res?.success) {
+        toast.success(res?.data?.meta?.message || res?.meta?.message);
         navigate("/products");
         queryClient.invalidateQueries({
           queryKey : ["products"] ,

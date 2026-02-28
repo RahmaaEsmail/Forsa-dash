@@ -7,7 +7,7 @@ export default function useUpdateProduct() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey : "updateProduct",
-    mutationFn :(id , signal) => handleUpdateProduct({id , signal}),
+    mutationFn :({id ,body, signal}) => handleUpdateProduct({id,body , signal}),
     onSuccess:(res) => {
       console.log(res);
       if(res?.success || res?.data?.status == "success") {

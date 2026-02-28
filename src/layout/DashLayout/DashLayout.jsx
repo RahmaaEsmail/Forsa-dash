@@ -3,31 +3,35 @@ import Sidebar from '../Sidebar/Sidebar'
 import Header from '../Header/Header'
 import { Outlet, useLocation } from 'react-router-dom'
 import ActivityLog from '../ActivityLog/ActivityLog';
+import { SidebarProvider } from '../../context/SidebarContext';
+
+const withActivityLog = (pathname) => {
+  const noLog = ['/', '/products', '/suppliers', '/create-unit', '/units', '/categories', '/add_product'];
+  if (noLog.includes(pathname)) return false;
+  if (pathname.includes('product-details') || pathname.includes('supplier')) return false;
+  return true;
+};
 
 export default function DashLayout() {
   const location = useLocation();
-  
-  if(location.pathname == "/" || location.pathname=="/products" || location.pathname == "/add_product") {  
+  const showActivityLog = withActivityLog(location.pathname);
+
   return (
-    <div>
-      <Sidebar />
-      <div className='ml-75 mr-10  mx-auto'>
-        <Header />
-        <main className='mt-10 min-h-screen overflow-auto'><Outlet/></main>
-      </div>
-    </div>
-  )
-}
+    <SidebarProvider>
+      <div className='min-h-screen bg-[#F8F9FB]'>
+        {/* Fixed sidebar – slides in on mobile, always visible on md+ */}
+        <Sidebar />
 
- return (
-    <div>
-      <Sidebar />
-      <div className='ml-70 mr-85'>
-        <Header />
-        <main className='mt-10 min-h-screen overflow-auto'><Outlet/></main>
-      </div>
+        {/* Main content column */}
+        <div className={`transition-all duration-300 md:ml-75    md:mr-10  px-4 md:px-0`}>
+          <Header />
+          <main className='mt-10 min-h-screen overflow-auto'>
+            <Outlet />
+          </main>
+        </div>
 
-      <ActivityLog />
-    </div>
+        {/* {showActivityLog && <ActivityLog isDrawer={true} />} */}
+      </div>
+    </SidebarProvider>
   )
 }

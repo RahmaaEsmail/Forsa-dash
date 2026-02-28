@@ -11,6 +11,7 @@ import useLogin from "../../../hooks/auth/useLogin";
 import { toast } from "sonner";
 import { config } from "../../../api/config";
 import { apiInstance } from "../../../api/apiInstance";
+import Cookies from "js-cookie";
 
 const formSchema = z.object({
   email: z
@@ -59,6 +60,7 @@ export default function LoginForm() {
             JSON.stringify(res?.data || {})
           );
           localStorage.setItem(config.localStorageTokenName , res?.meta?.access_token)
+          Cookies.set(config.localStorageRefreshTokenName , res?.meta?.refresh_token)
           apiInstance.defaults.headers.common.Authorization =
             `Bearer ${res?.meta?.access_token || ""}`;
 

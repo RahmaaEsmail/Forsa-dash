@@ -28,11 +28,12 @@ export default function Links() {
                   ].join(" ")}
                 >
                   <div className="flex items-center gap-3">
-                    <img
+                    {<route.icon size={24} className={`${isActive ? "text-primary" :"text-gray-500"}`} />}
+                    {/* <img
                       src={isActive ? route?.active_icon : route?.inactive_icon}
                       alt={route?.name}
                       className="h-6 w-6"
-                    />
+                    /> */}
 
                     <span
                       className={[

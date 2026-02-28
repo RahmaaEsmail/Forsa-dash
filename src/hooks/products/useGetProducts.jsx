@@ -7,6 +7,7 @@ function useGetProducts({ page, per_page, search, category_id, visibility }) {
     queryKey : ["products",{page,per_page,search,category_id ,visibility}],
     queryFn : ({signal}) => handleGetAllProducts({ page, per_page, search, category_id, visibility , signal }),
     staleTime: 5 * 60 * 1000,
+     keepPreviousData: true,
   })
  return query;
 }

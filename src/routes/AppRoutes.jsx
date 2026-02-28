@@ -24,7 +24,6 @@ export default function AppRoutes() {
           />)}
         </Route>
       </Route>
-
     </Routes>
   )
 }
