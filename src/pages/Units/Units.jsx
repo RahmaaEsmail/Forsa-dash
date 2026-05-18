@@ -21,7 +21,7 @@ export default function UnitsPage() {
 
   const [addNewModal , setAddNewModal] = useState(false);
   // data
-  const per_page = 4;
+  const per_page =10;
   const {
     data: all_units,
     isLoading: units_loading,

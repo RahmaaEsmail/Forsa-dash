@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Pagination({
   page = 1,
-  per_page = 5,
+  per_page = 10,
   total = 0,
   onPageChange,
 }) {

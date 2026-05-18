@@ -45,9 +45,9 @@ export default function CustomerDetails() {
           <Button onClick={() => navigate("/customers")} variant="outline" className="shadow-sm">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </Button>
-          {/* <Button onClick={() => navigate(`/create-customer?id=${id}`)} className="bg-primary hover:bg-primary/90 shadow-sm">
+          <Button onClick={() => navigate(`/create-customer?id=${id}`)} className="bg-primary hover:bg-primary/90 shadow-sm">
             <Edit className="w-4 h-4 mr-2" /> Edit Profile
-          </Button> */}
+          </Button>
         </div>
       </PageHeader>
 

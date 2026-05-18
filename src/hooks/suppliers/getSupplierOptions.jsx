@@ -14,7 +14,7 @@ export default function getSupplierOptions() {
     queryFn: ({ signal }) => handleGetAllSupplier({
       signal,
       page,
-      per_page : 4,
+      per_page : 10,
       search,
     }),
     staleTime: 1000 * 60 * 5, // 5 minutes

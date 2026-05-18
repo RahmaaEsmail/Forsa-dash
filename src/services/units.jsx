@@ -1,7 +1,7 @@
 import { apiInstance } from "../api/apiInstance"
 import { userEndpoints } from "../api/userEndpoints"
 
-export const handleGetAllUnits = async ({ signal, per_page = 4, is_active , sort_order,page, search } = {}) => {
+export const handleGetAllUnits = async ({ signal, per_page = 10, is_active , sort_order,page, search } = {}) => {
   const response = await apiInstance.get(userEndpoints?.units, {
     params: {
       per_page , page,

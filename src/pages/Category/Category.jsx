@@ -18,7 +18,7 @@ export default function Category() {
 
 
   // data
-  const per_page = 4;
+  const per_page = 10;
   const {
     data: categories,
     isLoading: categories_loading,

@@ -36,7 +36,7 @@ export default function CustomerMainInfo() {
           <>
             <CustomInput label={"First Name"} name={"first_name"} register={register} errors={errors?.first_name} isRequired />
             <CustomInput label={"Last Name"} name={"last_name"} register={register} errors={errors?.last_name} isRequired />
-            <CustomInput label={"Sales User ID"} name={"sales_user_id"} register={register} errors={errors?.sales_user_id} type="number" />
+            {/* <CustomInput label={"Sales User ID"} name={"sales_user_id"} register={register} errors={errors?.sales_user_id} type="number" /> */}
           </>
         )}
       </div>

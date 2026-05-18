@@ -4,7 +4,7 @@ export const useUnitStore = create((set) => ({
    filters: {
     search: "",
     page: 1,
-    per_page: 4,
+    per_page: 10,
     sort_order: "asc",
     is_active : false
   },

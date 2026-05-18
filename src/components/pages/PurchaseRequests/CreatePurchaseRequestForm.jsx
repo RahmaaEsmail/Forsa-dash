@@ -21,22 +21,15 @@ export default function CreatePurchaseRequestForm() {
   const delivery_lat = watch("delivery_lat");
   const delivery_lng = watch("delivery_lng");
   
-  const onSubmit = (data) => {
-    console.log("FORM DATA:", data)
-  }
-
-  const handleCreateCustomer = (searchValue) => {
-    setNewCustomerName(searchValue);
-    setIsCustomerModalOpen(true);
-  };
+  const pr_number = watch("pr_number");
 
   return (
     <Card className="px-5">
       <h2 className="text-secondary text-large font-bold">
-        Request Reference #New
+        Request Reference {pr_number ? `#${pr_number}` : "#New"}
       </h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 mt-4">
         <div className="grid grid-cols-2 gap-8">
           <SearchableAsyncSelect
             control={control}
@@ -50,12 +43,12 @@ export default function CreatePurchaseRequestForm() {
             // createLabel="Create New Client"
           />
 
-          <CustomInput
+          {/* <CustomInput
             register={register}
             name="requested_by"
             placeholder="e.g shahd"
             label="Requested by"
-          />
+          /> */}
 
           <div className="flex flex-col gap-2">
              <label className="font-normal text-secondary text-lg">Project Location</label>
@@ -77,13 +70,13 @@ export default function CreatePurchaseRequestForm() {
              </div>
           </div>
 
-          <DatePickerInput
+          {/* <DatePickerInput
             control={control}
             name="approval_date"
             placeholder="June 01, 2025"
             label="Approval Date"
             required
-          />
+          /> */}
 
           <DatePickerInput
             control={control}
@@ -91,8 +84,17 @@ export default function CreatePurchaseRequestForm() {
             placeholder="June 01, 2025"
             label="Request Date"
           />
+
+          <div className="col-span-2">
+            <label className="font-normal text-secondary text-lg mb-2 block">General Notes</label>
+            <textarea
+              {...register("notes")}
+              className="w-full bg-input-bg rounded-lg p-4 min-h-[100px] border border-transparent focus:border-primary/20 outline-none transition-all"
+              placeholder="Enter any additional information or requirements..."
+            />
+          </div>
         </div>
-      </form>
+      </div>
       
       <CreateCustomerModal 
         open={isCustomerModalOpen} 

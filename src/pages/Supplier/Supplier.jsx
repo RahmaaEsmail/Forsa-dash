@@ -38,12 +38,12 @@ export default function Supplier() {
           "Manage all Suppliers, control visibility, and keep suppliers data up to date."
         }
       >
-        {/* <Button
+        <Button
           onClick={() => navigate("/create-supplier")}
           className={"px-3!"}>
           <Plus />
           <span>Add new Supplier</span>
-        </Button> */}
+        </Button>
       </PageHeader>
 
        <SupplierFilterations />
@@ -52,7 +52,7 @@ export default function Supplier() {
         loading={fetch_suppliers}
       />
 
-      <Pagination page={page} per_page={4} total={totals}  onPageChange={handlePageChange}/>
+      <Pagination page={page} per_page={10} total={totals}  onPageChange={handlePageChange}/>
     </div>
   )
 }

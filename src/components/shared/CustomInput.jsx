@@ -2,7 +2,7 @@ import React from 'react'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 
-export default function CustomInput({label,errors , register, type="text" , name , isRequired , placeholder}) {
+export default function CustomInput({label,errors , register, type="text" , name , isRequired , placeholder, ...props}) {
   return (
    <div className='flex flex-col gap-2'>
           <Label className={"font-normal text-secondary text-lg"}>
@@ -10,8 +10,13 @@ export default function CustomInput({label,errors , register, type="text" , name
           </Label>
           <Input
           {...register(name)}
-          placeholder={placeholder} type={type} className={"rounded-lg! bg-input-bg p-6 placeholder:text-[#858B9E]"} />
+          placeholder={placeholder} 
+          type={type} 
+          className={"rounded-lg! bg-input-bg p-6 placeholder:text-[#858B9E]"}
+          {...props}
+          />
         {errors && <p className='text-sm text-red-500'>{errors?.message}</p>}
         </div>
   )
 }
+

@@ -15,7 +15,6 @@ export default function useDeletePurchaseRequest() {
         toast.success(data?.meta?.message);
         queryClient.invalidateQueries({
           queryKey: QUERY_KEYS.purchase_key,
-          exact: true,
         })
       }
     },

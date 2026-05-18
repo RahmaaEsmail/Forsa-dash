@@ -53,7 +53,7 @@ function mapProductToForm(product) {
     image: product?.image ?? null, // ✅ غالبًا URL في edit
 
     // Pricing
-    currency: product?.currency ?? "",
+    currency:  "SAR",
     cost_price: product?.cost_price ?? "",
     selling_price: product?.selling_price ?? "",
     discount_role: product?.default_discount_rule ?? "",
@@ -160,7 +160,7 @@ export default function AddProductTabs() {
 
     formData.append("name[en]", values?.name_en ?? "");
     formData.append("name[ar]", values?.name_ar ?? "");
-    formData.append("description", values?.description ?? "");
+    formData.append("description[en]", values?.description ?? "");
 
     formData.append("brand", values?.brand ?? "");
     formData.append("model", values?.product_sku ?? "");

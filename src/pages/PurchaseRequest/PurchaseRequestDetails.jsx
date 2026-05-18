@@ -36,10 +36,15 @@ import PurchaseDetailsLogistics from '../../components/pages/PurchaseRequests/Pu
 import PurchaseDetailsAdministrative from '../../components/pages/PurchaseRequests/PurchaseDetails/PurchaseDetailsAdministrative';
 import PurchaseDetailsStats from '../../components/pages/PurchaseRequests/PurchaseDetails/PurchaseDetailsStats';
 import PurchaseDetailsTimeline from '../../components/pages/PurchaseRequests/PurchaseDetails/PurchaseDetailsTimeline';
+import CreateRFQModal from '../../components/pages/PurchaseRequests/CreateRFQModal';
+import { Button } from '../../components/ui/button';
+import { FilePlus } from 'lucide-react';
+import { useState } from 'react';
 
 export default function PurchaseRequestDetails() {
   const { id } = useParams();
   const { mutate, data, isPending } = usePurchaseDetails();
+  const [isRFQModalOpen, setIsRFQModalOpen] = useState(false);
   const pr = data?.data;
 
   useEffect(() => {
@@ -92,11 +97,24 @@ export default function PurchaseRequestDetails() {
     <div className="container mx-auto px-4 py-6 max-w-7xl">
       <Card className="p-6 space-y-8 animate-in fade-in duration-500">
         {/* Header Section */}
-        <PurchaseDetailsHeader
-          getStatusIcon={getStatusIcon}
-          getStatusVariant={getPurchaseStatusVariant}
-          pr={pr}
-        />
+        <div className="flex justify-between items-start">
+          <PurchaseDetailsHeader
+            getStatusIcon={getStatusIcon}
+            getStatusVariant={getPurchaseStatusVariant}
+            pr={pr}
+          />
+          <div className="flex gap-2">
+            {pr?.status === 'approved' && (
+              <Button 
+                onClick={() => navigate(`/purchase-requests/${pr.id}/rfqs`)}
+                className="flex items-center gap-2"
+              >
+                <FilePlus className="w-4 h-4" />
+                RFQ
+              </Button>
+            )}
+          </div>
+        </div>
 
         <PurchaseDetailsStatus pr={pr} />
 

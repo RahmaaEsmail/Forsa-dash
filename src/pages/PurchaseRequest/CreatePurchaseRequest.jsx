@@ -8,6 +8,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { handleAddPurchaseRequest } from '../../services/purchase-request'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
+import { useNavigate } from 'react-router-dom'
 
 export default function CreatePurchaseRequest() {
   const queryClient = useQueryClient();
@@ -20,6 +21,7 @@ export default function CreatePurchaseRequest() {
       delivery_lng: 46.6753,
       approval_date: new Date(),
       request_date: new Date(),
+      pr_number: "",
       items: [
         {
           item_id: "",
@@ -32,15 +34,19 @@ export default function CreatePurchaseRequest() {
       ]
     },
   })
-
+  const navigate = useNavigate();
   const { mutate, isPending } = useMutation({
     mutationFn: handleAddPurchaseRequest,
-    onSuccess: () => {
-      toast.success("Purchase Request created successfully!");
+    onSuccess: (res) => {
+      if(res?.success) {
+        toast.success(res?.message || "Purchase Request created successfully!");
+        navigate(`/purchaseRequest`)
+      }
       queryClient.invalidateQueries(["purchase-requests"]);
       method.reset();
     },
     onError: (err) => {
+      console.log("err",err);
       toast.error(err.response?.data?.message || err.message || "Failed to create PR.");
     }
   });
@@ -57,8 +63,8 @@ export default function CreatePurchaseRequest() {
         delivery_lat: Number(values.delivery_lat) || 24.7136,
         delivery_lng: Number(values.delivery_lng) || 46.6753,
         delivery_address: values.delivery_address || "",
-        required_date: values.request_date ? format(values.request_date, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
-        notes: "Customer needs materials", 
+        required_date: values.request_date ? format(new Date(values.request_date), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
+        notes: values.notes || "", 
         items: values.items.map(item => ({
             item_id: Number(item.item_id),
             quantity: Number(item.quantity) || 0,

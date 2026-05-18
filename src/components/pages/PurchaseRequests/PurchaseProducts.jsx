@@ -11,7 +11,7 @@ import { Input } from '../../ui/input'
 import { Textarea } from '../../ui/textarea'
 
 export default function PurchaseProducts() {
-  const { control, register } = useFormContext();
+  const { control, register, setValue, watch } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "items"
@@ -21,10 +21,28 @@ export default function PurchaseProducts() {
   const [newProductName, setNewProductName] = useState("");
   const [activeItemIndex, setActiveItemIndex] = useState(null);
 
+  const watchItems = watch("items") || [];
+
   const handleCreateProduct = (searchValue, index) => {
     setNewProductName(searchValue);
     setActiveItemIndex(index);
     setIsProductModalOpen(true);
+  };
+
+  const handleProductSelect = (product, index) => {
+    if (product) {
+      setValue(`items.${index}.specifications`, product.description || "");
+      if (product.units && product.units.length > 0) {
+        setValue(`items.${index}.unit_id`, String(product.units[0].id));
+      } else {
+        setValue(`items.${index}.unit_id`, "");
+      }
+      setValue(`items.${index}.target_price`, product.selling_price || product.cost_price || "");
+    } else {
+      setValue(`items.${index}.specifications`, "");
+      setValue(`items.${index}.unit_id`, "");
+      setValue(`items.${index}.target_price`, "");
+    }
   };
 
   const columns = [
@@ -39,6 +57,7 @@ export default function PurchaseProducts() {
             placeholder="Search product..."
             fetchFn={handleGetAllProducts}
             queryKeyPrefix="products"
+            onSelectOption={(prod) => handleProductSelect(prod, index)}
             // onCreateNew={(search) => handleCreateProduct(search, index)}
             // createLabel="Create New Product"
           />
@@ -47,15 +66,19 @@ export default function PurchaseProducts() {
     },
     {
       title: "Description / Specs",
-      render: (_, __, index) => (
-        <div className="min-w-[150px]">
-          <Input 
-            {...register(`items.${index}.specifications`)} 
-            placeholder="Specs" 
-             className="bg-input-bg border-none min-h-[50px] rounded-md"
-          />
-        </div>
-      )
+      render: (_, __, index) => {
+        const isProductSelected = !!watchItems[index]?.item_id;
+        return (
+          <div className="min-w-[150px]">
+            <Input 
+              {...register(`items.${index}.specifications`)} 
+              placeholder="Specs" 
+              className="bg-input-bg border-none min-h-[50px] rounded-md"
+              disabled={isProductSelected}
+            />
+          </div>
+        );
+      }
     },
     {
       title: "Qty",
@@ -73,31 +96,39 @@ export default function PurchaseProducts() {
     {
       title: "UoM",
       width: "150px",
-      render: (_, __, index) => (
-        <div className="min-w-[150px] text-left">
-          <SearchableAsyncSelect
-            control={control}
-            name={`items.${index}.unit_id`}
-            placeholder="Unit"
-            fetchFn={handleGetAllUnits}
-            queryKeyPrefix="units"
-          />
-        </div>
-      )
+      render: (_, __, index) => {
+        const isProductSelected = !!watchItems[index]?.item_id;
+        return (
+          <div className="min-w-[150px] text-left">
+            <SearchableAsyncSelect
+              control={control}
+              name={`items.${index}.unit_id`}
+              placeholder="Unit"
+              fetchFn={handleGetAllUnits}
+              queryKeyPrefix="units"
+              disabled={isProductSelected}
+            />
+          </div>
+        );
+      }
     },
     {
       title: "Target Price",
       width: "120px",
-      render: (_, __, index) => (
-        <div className="min-w-[100px]">
-          <Input 
-            type="number" 
-            {...register(`items.${index}.target_price`, { valueAsNumber: true })} 
-            className="bg-input-bg border-none min-h-[50px] rounded-md text-center"
-            placeholder="Price"
-          />
-        </div>
-      )
+      render: (_, __, index) => {
+        const isProductSelected = !!watchItems[index]?.item_id;
+        return (
+          <div className="min-w-[100px]">
+            <Input 
+              type="number" 
+              {...register(`items.${index}.target_price`, { valueAsNumber: true })} 
+              className="bg-input-bg border-none min-h-[50px] rounded-md text-center"
+              placeholder="Price"
+              disabled={isProductSelected}
+            />
+          </div>
+        );
+      }
     },
     {
       title: "Notes",

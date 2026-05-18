@@ -3,11 +3,11 @@ import React from 'react'
 import { handleGetAllPurchaseRequest } from '../../services/purchase-request'
 import { QUERY_KEYS } from '../../constants'
 
-export default function purchaseRequestOptions() {
+export default function purchaseRequestOptions(params) {
   return (
      queryOptions({
-       queryKey: QUERY_KEYS.purchase_key,
-       queryFn : ({signal}) => handleGetAllPurchaseRequest({signal}),
+       queryKey: [...QUERY_KEYS.purchase_key, params],
+       queryFn : ({signal}) => handleGetAllPurchaseRequest({signal, params}),
        staleTime : 1000 * 60 * 3,
        refetchOnWindowFocus : false,
        retry : 3,

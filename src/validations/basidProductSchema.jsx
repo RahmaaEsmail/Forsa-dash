@@ -79,7 +79,7 @@ export const makeBasicProductDataSchema = (mode) =>
 
 export const productPriceValidation = z
   .object({
-    currency: z.string({ required_error: "Currency is required" }),
+    // currency: z.string({ required_error: "Currency is required" }),
     cost_price: optionalNumber("cost_price"),
     selling_price: optionalNumber("selling_price"),
     discount_role: optionalNumber("discount_role"),

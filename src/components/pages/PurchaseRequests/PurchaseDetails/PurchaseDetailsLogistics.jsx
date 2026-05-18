@@ -15,24 +15,37 @@ export default function PurchaseDetailsLogistics({pr}) {
         {pr?.delivery_address && (
           <div className="relative pl-6 border-l-2 border-primary/20 py-1">
             <div className="absolute -left-2.25 top-0 w-4 h-4 rounded-full bg-primary border-4 border-white shadow-sm" />
-            <span className="text-muted-foreground block mb-1 uppercase text-[10px] font-bold">
-              Delivery Address
+            <span className="text-muted-foreground block mb-1 uppercase text-[10px] font-bold tracking-wider">
+              Project Location
             </span>
             <p className="font-semibold text-slate-800 leading-snug">{pr?.delivery_address}</p>
             {(pr?.delivery_lat || pr?.delivery_lng) && (
               <div className="flex gap-2 mt-2">
                 {pr?.delivery_lat && (
-                  <Badge variant="secondary" className="text-[10px] text-gray-300">
+                  <Badge variant="secondary" className="text-[10px] text-gray-400 font-normal">
                     Lat: {pr?.delivery_lat}
                   </Badge>
                 )}
                 {pr?.delivery_lng && (
-                  <Badge variant="secondary" className="text-[10px] text-gray-300">
+                  <Badge variant="secondary" className="text-[10px] text-gray-400 font-normal">
                     Lng: {pr?.delivery_lng}
                   </Badge>
                 )}
               </div>
             )}
+          </div>
+        )}
+
+        {pr?.customer && (
+          <div className="relative pl-6 border-l-2 border-slate-200 py-1">
+            <div className="absolute -left-2.25 top-0 w-4 h-4 rounded-full bg-slate-300 border-4 border-white shadow-sm" />
+            <span className="text-muted-foreground block mb-1 uppercase text-[10px] font-bold tracking-wider">
+              Client / Customer
+            </span>
+            <p className="font-semibold text-slate-800 leading-snug">
+              {pr.customer.company_name || pr.customer.name || "Individual Client"}
+            </p>
+            <p className="text-xs text-slate-400 mt-1">{pr.customer.email || pr.customer.mobile}</p>
           </div>
         )}
 

@@ -38,13 +38,13 @@ export default function CustomersTabs() {
       is_active: true,
       addresses: [{
         type: "both",
-        label: "",
+        label: "Main Office",
         address_line_1: "",
         address_line_2: "",
         city: "",
         state: "",
         postal_code: "",
-        country: "",
+        country: "Saudi Arabia",
         is_default: true
       }],
       contacts: [{
@@ -59,9 +59,9 @@ export default function CustomersTabs() {
       }],
       payment_terms: [{
         payment_term_id: "",
-        credit_limit: 0,
-        credit_days: 0,
-        credit_status: "none",
+        credit_limit: "",
+        credit_days: "",
+        credit_status: "approved",
         is_default: true
       }]
     }
@@ -88,15 +88,15 @@ export default function CustomersTabs() {
         is_active: d.is_active ?? true,
         addresses: d.addresses?.length ? d.addresses.map(a => ({
           type: a.type || "both",
-          label: a.label || "",
+          label: a.label || "Main Office",
           address_line_1: a.address_line_1 || "",
           address_line_2: a.address_line_2 || "",
           city: a.city || "",
           state: a.state || "",
           postal_code: a.postal_code || "",
-          country: a.country || "",
+          country: a.country || "Saudi Arabia",
           is_default: !!a.is_default
-        })) : [{ type: "both", label: "", address_line_1: "", address_line_2: "", city: "", state: "", postal_code: "", country: "", is_default: true }],
+        })) : [{ type: "both", label: "Main Office", address_line_1: "", address_line_2: "", city: "", state: "", postal_code: "", country: "Saudi Arabia", is_default: true }],
         contacts: d.contacts?.length ? d.contacts.map(c => ({
           name: c.name || "",
           position: c.position || "",
@@ -108,12 +108,12 @@ export default function CustomersTabs() {
           receive_notifications: !!c.receive_notifications
         })) : [{ name: "", position: "", email: "", phone: "", mobile: "", whatsapp: "", is_primary: true, receive_notifications: true }],
         payment_terms: d.payment_terms?.length ? d.payment_terms.map(p => ({
-          payment_term_id: p.payment_term_id || "",
-          credit_limit: p.credit_limit || 0,
-          credit_days: p.credit_days || 0,
-          credit_status: p.credit_status || "none",
+          payment_term_id: (p.payment_term_id || p.id)?.toString() || "",
+          credit_limit: p.credit_limit || "",
+          credit_days: p.credit_days || "",
+          credit_status: p.credit_status || "approved",
           is_default: !!p.is_default
-        })) : [{ payment_term_id: "", credit_limit: 0, credit_days: 0, credit_status: "none", is_default: true }]
+        })) : [{ payment_term_id: "", credit_limit: "", credit_days: "", credit_status: "approved", is_default: true }]
       });
     }
   }, [customerDetails, method]);
@@ -142,10 +142,14 @@ export default function CustomersTabs() {
   }, [customerType, selectedTabId]);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: customerId ? (data) => handleUpdateCustomer({ id: customerId, body: data }) : handleAddCustomer,
+    mutationFn: (payload) =>
+      customerId
+        ? handleUpdateCustomer({ id: customerId, body: payload })
+        : handleAddCustomer({ body: payload }),
     onSuccess: (res) => {
         toast.success(res?.message || "Customer saved successfully!");
         queryClient.invalidateQueries(["customers"]);
+        queryClient.invalidateQueries(["customer", customerId]);
         navigate("/customers");
     },
     onError: (err) => {
@@ -177,7 +181,7 @@ export default function CustomersTabs() {
         payload.sales_user_id = undefined;
     }
     
-    mutate({ body: payload });
+    mutate(payload);
   }
 
   if (customerId && isFetchingDetails) {
@@ -192,12 +196,12 @@ export default function CustomersTabs() {
     <FormProvider {...method}>
       <form onSubmit={method.handleSubmit(onValid)}>
         <Tabs className="gap-0" value={selectedTabId} onValueChange={setSelectedTabId}>
-          <TabsList className="bg-white rounded-tl-lg p-0 h-12 rounded-b-none rounded-tr-lg w-fit">
+          <TabsList className="bg-white rounded-tl-lg p-0 h-12 rounded-b-none rounded-tr-lg w-fit overflow-x-auto max-w-full">
             {tabs.map((item) => (
               <TabsTrigger
                 key={item.id}
                 value={item.id}
-                className="flex-1 shadow-none! data-[state=active]:shadow-none! rounded-none p-4 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-b-primary data-[state=active]:text-secondary data-[state=active]:font-bold text-[#B2B8CF] text-base"
+                className="flex-1 shadow-none! data-[state=active]:shadow-none! rounded-none p-4 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-b-primary data-[state=active]:text-secondary data-[state=active]:font-bold text-[#B2B8CF] text-base whitespace-nowrap"
               >
                 {item.name}
               </TabsTrigger>
@@ -205,11 +209,11 @@ export default function CustomersTabs() {
           </TabsList>
 
           {tabs.map((item) => (
-            <TabsContent key={item.id} value={item.id} className="mt-0 ">
+            <TabsContent key={item.id} value={item.id} className="mt-0">
               <Card className="rounded-tl-none px-8 rounded-tr-lg rounded-b-lg shadow-none border-[#E6EFF5] min-h-[300px]">
                 <Suspense
                   fallback={
-                    <div className="h-full py-6 w-full flex justify-center">
+                    <div className="h-full py-6 w-full flex justify-center items-center">
                       <Circles height="50" width="50" color="#C94544" ariaLabel="circles-loading" visible />
                     </div>
                   }
@@ -223,7 +227,7 @@ export default function CustomersTabs() {
           <div className="flex mt-5 w-fit ms-auto gap-2 items-center">
             <Button
               type="button"
-              className="border border-primary bg-white text-primary hover:bg-primary hover:text-white"
+              variant="outline"
               onClick={() => navigate("/customers")}
               disabled={isPending}
             >

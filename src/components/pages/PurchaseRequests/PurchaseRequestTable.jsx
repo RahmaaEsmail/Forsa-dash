@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import CustomTable from '../../shared/CustomTable';
 import { Input } from '../../ui/input';
-import { Delete, Edit, Eye, Fullscreen, MessageCircle, Star, Trash2 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import purchaseRequestOptions from '../../../hooks/purchaseRequest/purchaseRequestOptions';
-import Loading from '../../shared/Loading';
-import { Button } from '../../ui/button';
+import { Delete, Edit, Eye, FilePlus, Fullscreen, MessageCircle, Star, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '../../ui/button';
+import Loading from '../../shared/Loading';
 import { DeleteModal } from '../../shared/DeleteModal';
 import useDeletePurchaseRequest from '../../../hooks/purchaseRequest/useDeletePurchaseRequest';
 import ChangePurchaseStatusModal from './ChangePurchaseStatusModal';
+import Pagination from '../../shared/Pagination';
+import CreateRFQModal from './CreateRFQModal';
 
-export default function PurchaseRequestTable() {
-  const {
-    data: purchase_data,
-    isLoading: purchase_loading,
-  } = useQuery(purchaseRequestOptions());
+export default function PurchaseRequestTable({ page, setPage, purchase_data }) {
+  const purchase_loading = !purchase_data;
  const {
   mutate : delete_purchase,
   isPending : is_delete,
@@ -27,6 +24,7 @@ export default function PurchaseRequestTable() {
   // stats
   const [openDeleteModal , setOpenDeleteModal] =useState(false);
   const [openChangeStatus , setOpenChangeStatus] = useState(false);
+  const [isRFQModalOpen, setIsRFQModalOpen] = useState(false);
   const [rowData, setRowData] = useState({});
 
   function handleDeleteItem() {
@@ -110,7 +108,7 @@ export default function PurchaseRequestTable() {
       render: (_, row) => {
         return (
           <div className="flex flex-col gap-2">
-            <p className="break-words">{row?.customer?.first_name + " " + row?.customer?.last_name || "Unknown"}</p> {/* Added break-words */}
+           {(row?.customer?.first_name !== "" && row?.customer?.first_name!= null)&&  <p className="break-words">{row?.customer?.first_name + " " + row?.customer?.last_name || "Unknown"}</p>} {/* Added break-words */}
             <div className="flex gap-2 items-center">
               <MessageCircle size={15} />
               <a href={`mailto:${row?.customer?.email}`} target="_blank" className="break-words">
@@ -157,11 +155,11 @@ export default function PurchaseRequestTable() {
       render: (_,row) => {
         return (
           <div className='flex gap-2'>
-            {/* <Button
-              onClick={() => navigate(`/edit_purchase_request?id=${row?.id}`)}
+            <Button
+              onClick={() => navigate(`/edit_purchase_request/${row?.id}`)}
               title="Edit" variant="ghost" size="icon">
               <Edit />
-            </Button> */}
+            </Button>
 
             <Button
               onClick={() => navigate(`/purchase_request_details/${row?.id}`)}
@@ -186,6 +184,16 @@ export default function PurchaseRequestTable() {
               title="Change Status" variant="ghost" size="icon">
               <Eye />
             </Button>
+
+            {row?.status === 'approved' && (
+              <Button
+                onClick={() => {
+                  navigate(`/purchase-requests/${row.id}/rfqs`);
+                }}
+                title="RFQ" variant="ghost" size="icon" className="text-primary">
+                <FilePlus className="w-5 h-5" />
+              </Button>
+            )}
           </div>
         );
       }
@@ -216,6 +224,23 @@ export default function PurchaseRequestTable() {
       currentStatus={rowData?.status}
       id={rowData?.id}
       /> 
+
+      <CreateRFQModal 
+        open={isRFQModalOpen} 
+        onOpenChange={setIsRFQModalOpen} 
+        pr={rowData} 
+      />
+      
+      {purchase_data?.meta && (
+        <div className="mt-6 px-4">
+          <Pagination
+            page={purchase_data.meta.current_page}
+            per_page={purchase_data.meta.per_page}
+            total={purchase_data.meta.total}
+            onPageChange={(p) => setPage(p)}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -3,9 +3,13 @@ import React from 'react'
 import { Input } from '../../components/ui/input'
 import { Button } from '../../components/ui/button'
 import { useSidebar } from '../../context/SidebarContext'
+import useUnreadCount from '../../hooks/Notifications/useUnreadCount'
+import { NavLink } from 'react-router-dom'
 
 export default function Header() {
   const { toggle } = useSidebar();
+  const { data: unreadCountData } = useUnreadCount();
+  const unreadCount = unreadCountData?.data?.count || 0;
 
   return (
     <div className='bg-white rounded-main p-4 md:p-5 mt-6 md:mt-10 flex flex-wrap gap-3 justify-between items-center'>
@@ -40,10 +44,14 @@ export default function Header() {
 
       {/* Right: Bell + Export */}
       <div className="flex gap-3 items-center shrink-0">
-        <div className='relative'>
+        <NavLink to="/notifications" className='relative'>
           <img src="/images/bell.svg" alt="Notifications" className='h-7 w-6' />
-          <span className='w-5 h-5 rounded-full p-2 text-small bg-primary flex justify-center items-center text-white font-bold absolute -top-2 -right-2'>4</span>
-        </div>
+          {unreadCount > 0 && (
+            <span className='w-5 h-5 rounded-full p-2 text-[10px] bg-primary flex justify-center items-center text-white font-bold absolute -top-2 -right-2'>
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
+        </NavLink>
 
         <Button variant='default' className="text-small! py-2 font-bold flex gap-1 items-center" size='sm'>
           <span className='hidden sm:inline'>Export Data</span>

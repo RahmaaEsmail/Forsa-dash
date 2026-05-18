@@ -1,17 +1,30 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import CustomInput from "../../../shared/CustomInput";
+import CustomSelect from "../../../shared/CustomSelect";
+import { useQuery } from "@tanstack/react-query";
+import categoriesAllOptions from "../../../../hooks/categories/categoriesAllOptions";
 
 export default function SupplierMainInfo() {
   const {
     register,
+    control,
     formState: { errors },
   } = useFormContext();
+
+  const { data: allCategoriesOptions, isLoading } = useQuery(categoriesAllOptions());
+
+  const categoryOptions = React.useMemo(() => {
+    return allCategoriesOptions?.data?.map(item => ({
+      label: `${item?.name?.en} - ${item?.name?.ar}`,
+      value: item?.id.toString()
+    })) || [];
+  }, [allCategoriesOptions]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Basic */}
-      <CustomInput
+      {/* <CustomInput
         label={"Code"}
         register={register}
         name={"code"}
@@ -19,7 +32,7 @@ export default function SupplierMainInfo() {
         type="text"
         errors={errors}
         placeholder={"Enter Code"}
-      />
+      /> */}
 
       <CustomInput
         label={"Company Name"}
@@ -31,7 +44,7 @@ export default function SupplierMainInfo() {
         placeholder={"Enter Company Name"}
       />
 
-      <CustomInput
+      {/* <CustomInput
         label={"First Name"}
         register={register}
         name={"first_name"}
@@ -49,10 +62,10 @@ export default function SupplierMainInfo() {
         type="text"
         errors={errors}
         placeholder={"Enter Last Name"}
-      />
+      /> */}
 
       {/* Bilingual Name Object */}
-      <CustomInput
+      {/* <CustomInput
         label={"Name (EN)"}
         register={register}
         name={"name.en"}
@@ -70,7 +83,7 @@ export default function SupplierMainInfo() {
         type="text"
         errors={errors}
         placeholder={"أدخل الاسم بالعربي"}
-      />
+      /> */}
 
       {/* Contact (main) */}
       <CustomInput
@@ -114,7 +127,7 @@ export default function SupplierMainInfo() {
       />
 
       {/* Tax & Registration */}
-      <CustomInput
+      {/* <CustomInput
         label={"Tax Treatment"}
         register={register}
         name={"tax_treatment"}
@@ -122,7 +135,7 @@ export default function SupplierMainInfo() {
         type="text"
         errors={errors}
         placeholder={"e.g. VAT Registered"}
-      />
+      /> */}
 
       <CustomInput
         label={"VAT Number"}
@@ -145,7 +158,7 @@ export default function SupplierMainInfo() {
       />
 
       {/* Settings */}
-      <CustomInput
+      {/* <CustomInput
         label={"Language"}
         register={register}
         name={"language"}
@@ -163,10 +176,10 @@ export default function SupplierMainInfo() {
         type="text"
         errors={errors}
         placeholder={"e.g. SA"}
-      />
+      /> */}
 
       {/* Business Terms */}
-      <CustomInput
+      {/* <CustomInput
         label={"Lead Time (Days)"}
         register={register}
         name={"lead_time_days"}
@@ -184,7 +197,7 @@ export default function SupplierMainInfo() {
         type="number"
         errors={errors}
         placeholder={"e.g. 5000"}
-      />
+      /> */}
 
       <CustomInput
         label={"Rating"}
@@ -197,14 +210,16 @@ export default function SupplierMainInfo() {
       />
 
       {/* Category IDs (Array) */}
-      <CustomInput
-        label={"Category IDs"}
-        register={register}
-        name={"category_ids"}
-        isRequired={false}
-        type="text"
-        errors={errors}
-        placeholder={"e.g. 1,2,3"}
+      <CustomSelect
+        control={control}
+        name="categories"
+        multiple={true}
+        errors={errors?.categories}
+        label={"Categories"}
+        placeholder={isLoading ? "Loading categories..." : "Choose Categories"}
+        options={categoryOptions}
+        disabled={isLoading}
+        isLoading={isLoading}
       />
 
       {/* Notes */}

@@ -105,29 +105,26 @@ export default function SuppliersTable({ searc,  sortOrder, page,per_page,  data
       render: (_, row) => {
         return (
           <div className='flex gap-2 justify-center items-center'>
-            {/* <Button  
-            onClick={() => navigate(`/create-unit?id=${row?.id}&name=${`${row?.name}`}`)}
-            title="Edit" size='icon' variant='ghost'>
-              <Edit />
-            </Button> */}
+            <Button  
+              onClick={() => navigate(`/suppliers/${row?.id}/details`)}
+              title="View Details" size='icon' variant='ghost' className="hover:text-blue-600 hover:bg-blue-50">
+              <Eye className="w-4 h-4" />
+            </Button>
+
+            <Button  
+              onClick={() => navigate(`/create-supplier?id=${row?.id}`)}
+              title="Edit" size='icon' variant='ghost' className="hover:text-amber-600 hover:bg-amber-50">
+              <Edit className="w-4 h-4" />
+            </Button>
 
             <Button
               onClick={() => {
                 setRowData(row)
                 setDeleteModal(true)
               }}
-              title="Delete" size='icon' variant='ghost'>
-              <Trash />
+              title="Delete" size='icon' variant='ghost' className="hover:text-red-600 hover:bg-red-50">
+              <Trash className="w-4 h-4" />
             </Button>
-
-            {/* <Button
-              onClick={() => {
-                setRowData(row)
-                setChangeStatusModal(true)
-              }}
-              title="Change Status" size='icon' variant='ghost'>
-              <Eye />
-            </Button> */}
           </div>
         )
       }

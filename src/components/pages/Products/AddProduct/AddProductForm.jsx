@@ -240,7 +240,7 @@ export default function AddProductForm() {
   const all_units_options = useMemo(() => {
     return (
       all_units?.data?.map((item) => ({
-        label: item?.name,
+        label: `${item?.name?.en}-${item?.name?.ar}`,
         value: item?.id,
       })) ?? []
     );
@@ -394,13 +394,13 @@ export default function AddProductForm() {
       </div>
 
       <div className="grid grid-cols-2 gap-7">
-        <CustomInput
+        {/* <CustomInput
           errors={errors?.brand}
           label={"Brand"}
           placeholder={"e.g. Emirates Steel"}
           register={register}
           name="brand"
-        />
+        /> */}
 
         <CustomSelect
           control={control}

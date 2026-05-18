@@ -3,16 +3,21 @@ import PageHeader from '../../components/shared/PageHeader'
 import { Plus } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import CustomersTabs from '../../components/pages/Customers/AddCustomer/CustomersTabs'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 export default function AddCustomer() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("id");
+
   return (
     <div className="flex pb-6 flex-col gap-10">
       <PageHeader
-        title={"Create Customer"}
+        title={editId ? "Edit Customer" : "Create Customer"}
         subTitle={
-          "Manage all Customers, control visibility, and keep customer data up to date."
+          editId
+            ? "Modify customer information, contacts, addresses, and credit terms."
+            : "Manage all Customers, control visibility, and keep customer data up to date."
         }
       >
         <Button

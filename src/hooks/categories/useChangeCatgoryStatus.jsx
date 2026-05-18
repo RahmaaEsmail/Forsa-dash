@@ -16,7 +16,7 @@ export default function useChangeCategoryStatus() {
       if (data?.success) {
         toast.success(data?.meta?.message);
         queryClient.invalidateQueries({
-          queryKey: [...QUERY_KEYS.categories_key , {search , sort_order, page , per_page : 4}],
+          queryKey: [...QUERY_KEYS.categories_key , {search , sort_order, page , per_page : 10}],
           exact: true,
         })
       }

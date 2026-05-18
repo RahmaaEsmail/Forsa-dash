@@ -13,6 +13,8 @@ export const userEndpoints = {
 
    // purchase
    get_purchase_request :"purchase-requests",
+   payment_terms: "payment-terms",
+   rfqs: "rfqs",
 
    // suppliers
    supplier:"suppliers",
@@ -24,5 +26,44 @@ export const userEndpoints = {
    units :"units",
 
    // customers
-   customers: "customers"
+   customers: "customers",
+
+   // currencies
+   currencies: "currencies",
+
+   // settings
+   list_settings:"settings",
+
+   // customer payment
+   list_customer_payment:"customer-payments",
+
+   // notifications
+   notifications: "notifications",
+   unread_notifications_count: "notifications/unread-count",
+   mark_all_notifications_read: "notifications/mark-all-read",
+   mark_notification_read: "notifications/:id/mark-read",
+  
+   // users
+   users:"users",
+
+   // roles
+   roles: "roles",
+   permissions: "permissions",
+
+   // quotations
+   quotations_list:"quotations",
+
+   // delivery_notes:
+   delivery_notes:'delivery-notes',
+
+   // delivery_types
+   deliver_types:"delivery-types",
+
+   // GRNS
+   grns:"grns",
+
+   // payment_terms
+
+   // customer_invoices
+   get_customer_invoices :"customer-invoices",
 }

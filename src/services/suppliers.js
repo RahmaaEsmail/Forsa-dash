@@ -14,6 +14,10 @@ export const handleGetAllSupplier = async ({ signal, per_page, page, search }) =
   return response?.data;
 }
 
+export const handleGetSupplierDetails = async ({ id, signal }) => {
+  const response = await apiInstance.get(`${userEndpoints.supplier}/${id}`, { signal });
+  return response?.data;
+}
 
 export const handleAddSupplier = async ({ signal, body }) => {
   const response = await apiInstance.post(`${userEndpoints.supplier}`,body,
@@ -22,9 +26,15 @@ export const handleAddSupplier = async ({ signal, body }) => {
   return response?.data;
 }
 
-
 export const handleDeleteSupplier = async ({ signal, id }) => {
   const response = await apiInstance.delete(`${userEndpoints.supplier}/${id}`,
+    { signal }
+  );
+  return response?.data;
+}
+
+export const handleUpdateSupplier = async ({ signal, id, body }) => {
+  const response = await apiInstance.post(`${userEndpoints.supplier}/${id}`, body,
     { signal }
   );
   return response?.data;

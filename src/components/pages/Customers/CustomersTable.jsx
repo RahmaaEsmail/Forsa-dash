@@ -77,11 +77,11 @@ export default function CustomersTable({ data, loading }) {
       render: (_, row) => {
         return (
           <div className='flex gap-2 justify-center items-center'>
-            {/* <Button  
+            <Button  
               onClick={() => navigate(`/create-customer?id=${row?.id}`)}
               title="Edit" size='icon' variant='ghost'>
               <Edit />
-            </Button> */}
+            </Button>
 
             <Button
               onClick={() => {

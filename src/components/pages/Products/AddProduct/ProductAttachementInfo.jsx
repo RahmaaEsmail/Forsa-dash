@@ -5,11 +5,14 @@ import { Controller, useFormContext } from "react-hook-form";
 export default function ProductAttachementInfo() {
   const {
     control,
+    watch,
     formState: { errors },
   } = useFormContext();
 
+  const existingAttachments = watch("attachment") || [];
+
   const accept =
-    ".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg";
+    ".pdf";
 
   const formatSize = (bytes = 0) => {
     const kb = bytes / 1024;
@@ -29,10 +32,39 @@ export default function ProductAttachementInfo() {
         Attach datasheets, test certificates, or any other supporting documents.
       </p>
 
+      {/* Existing Attachments Section */}
+      {existingAttachments.length > 0 && (
+        <div className="mb-4 bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
+          <h4 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <FileText className="w-4 h-4 text-primary" />
+            Existing Documents
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {existingAttachments.map((file, i) => (
+              <div key={i} className="flex items-center justify-between px-3 py-2 bg-slate-50 rounded-lg border border-slate-100 group hover:border-primary/20 transition-colors">
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <div className="w-8 h-8 rounded bg-white flex items-center justify-center border border-slate-100 text-primary flex-shrink-0">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="text-xs font-semibold text-slate-700 truncate">
+                      {file.name || file.path?.split('/').pop() || 'Document'}
+                    </span>
+                    <a href={file.url} target="_blank" rel="noreferrer" className="text-[10px] text-primary hover:underline">
+                      View Original
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <Controller
         control={control}
-        name="attachment" // خليه Array: File[]
-        defaultValue={[]} // مهم
+        name="attachment_files"
+        defaultValue={[]}
         render={({ field }) => {
           const files = Array.isArray(field.value) ? field.value : [];
 
@@ -45,7 +77,7 @@ export default function ProductAttachementInfo() {
 
           return (
             <>
-              <label htmlFor="attachment_file" className="cursor-pointer">
+              <label htmlFor="attachment_files_file" className="cursor-pointer">
                 <div className="w-full flex flex-col gap-2 rounded-main justify-center items-center h-50 border border-dashed border-primary">
                   <Upload className="w-10 h-10 font-bold" />
                   <div className="flex flex-col gap-2 items-center text-center">
@@ -62,7 +94,7 @@ export default function ProductAttachementInfo() {
                 </div>
 
                 <input
-                  id="attachment_file"
+                  id="attachment_files_file"
                   type="file"
                   multiple
                   className="hidden"
@@ -72,10 +104,8 @@ export default function ProductAttachementInfo() {
                     const selected = Array.from(e.target.files || []);
                     if (selected.length === 0) return;
 
-                    // ✅ merge مع القديم (ولو عايز replace بس: field.onChange(selected))
                     const merged = [...files, ...selected];
 
-                    // ✅ منع الدوبلكيت بالاسم+الحجم (اختياري)
                     const deduped = merged.filter(
                       (f, idx, arr) =>
                         idx ===
@@ -86,18 +116,15 @@ export default function ProductAttachementInfo() {
 
                     field.onChange(deduped);
 
-                    // مهم عشان تقدر تختار نفس الملف تاني
                     e.target.value = "";
                   }}
                 />
               </label>
 
-              {/* Errors */}
-              {errors?.attachment?.message ? (
-                <p className="text-sm text-red-500">{errors.attachment.message}</p>
+              {errors?.attachment_files?.message ? (
+                <p className="text-sm text-red-500">{errors.attachment_files.message}</p>
               ) : null}
 
-              {/* Files List */}
               {files.length > 0 ? (
                 <div className="mt-2 rounded-main border border-border/60 bg-white">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">

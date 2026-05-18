@@ -50,17 +50,19 @@ export default function ProductInventoryForm() {
 
         <CustomInput
           name={"min_stock"}
+          type="number"
           label={"Minimum stock"}
           register={register}
           errors={errors?.min_stock}
-          placeholder={"e.g. 10 tons"}
+          placeholder={"e.g. 10"}
         />
         <CustomInput
           name={"max_stock"}
+          type="number"
           label={"Maximum stock"}
           register={register}
           errors={errors?.max_stock}
-          placeholder={"e.g. 10 tons"}
+          placeholder={"e.g. 100"}
         />
         <CustomInput
           name={"avg_time"}

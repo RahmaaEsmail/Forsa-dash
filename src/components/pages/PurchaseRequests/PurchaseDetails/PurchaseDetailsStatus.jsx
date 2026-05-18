@@ -1,5 +1,6 @@
 import { CheckCircle2, XCircle, Clock, FileText, AlertCircle, Ban, UserCheck, UserX } from 'lucide-react';
 import React from 'react';
+import { Badge } from '../../../ui/badge';
 
 export default function PurchaseDetailsStatus({ pr }) {
   

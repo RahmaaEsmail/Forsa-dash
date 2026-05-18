@@ -60,12 +60,12 @@ export default function AddProductPrice() {
       onSubmit={handleSubmit(onSubmit)}
       className='flex flex-col gap-7'>
       <div className='grid grid-cols-3 gap-7'>
-        <CustomSelect isRequired={true} control={control} options={uniqueCurrencyOptions} errors={errors?.currency} label={"Currency"} name={"currency"} placeholder={"e.g 1300"} />
+        {/* <CustomSelect isRequired={true} control={control} options={uniqueCurrencyOptions} errors={errors?.currency} label={"Currency"} name={"currency"} placeholder={"e.g 1300"} /> */}
         <CustomInput register={register} errors={errors?.cost_price} label={"Cost Price"} name={"cost_price"} placeholder={"e.g 1300"} />
         <CustomInput register={register} errors={errors?.selling_price} label={"Selling Price"} name={"selling_price"} placeholder={"e.g 1300"} />
       </div>
 
-      <CustomInput register={register} errors={errors?.discount_role} label={"Default Discount Rule"} name={"discount_role"} placeholder={"e.g 1300"} />
+      <CustomInput register={register} type="number" errors={errors?.discount_role} label={"Default Discount Rule"} name={"discount_role"} placeholder={"e.g 10"} />
  
     </form>
   )

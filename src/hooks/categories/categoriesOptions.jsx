@@ -8,11 +8,11 @@ export default function categoriesOptions() {
   const { filters } = useCategoriesStore();
   const { search, page, sort_order } = filters;
   return queryOptions({
-    queryKey: [...QUERY_KEYS.categories_key, { search, sort_order, page, per_page : 4 }],
+    queryKey: [...QUERY_KEYS.categories_key, { search, sort_order, page, per_page : 10 }],
     queryFn: ({ signal }) => handleGetAllCategories({
       signal,
       page,
-      per_page : 4,
+      per_page : 10,
       search,
       sort_order
     }),

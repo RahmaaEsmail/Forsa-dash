@@ -77,14 +77,14 @@ export default function ProductDetails() {
                 {product.status}
               </span>
             </div>
-            <div>
+            {product?.minimum_stock &&  <div>
               <p className="text-sm text-gray-500">Min Stock</p>
               <p className="font-medium">{product.minimum_stock}</p>
-            </div>
-            <div>
+            </div>}
+          {product?.max_stock &&  <div>
               <p className="text-sm text-gray-500">Max Stock</p>
               <p className="font-medium">{product.max_stock}</p>
-            </div>
+            </div>}
           </div>
 
           <div className="mt-4">
@@ -92,7 +92,7 @@ export default function ProductDetails() {
             <div className="flex gap-2">
               {product.units.map((unit) => (
                 <span key={unit.id} className="border px-3 py-1 rounded-full text-sm">
-                  {unit.name}
+                  {unit.name?.en} - {unit?.name?.ar}
                 </span>
               ))}
             </div>

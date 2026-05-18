@@ -1,95 +1,3 @@
-// import React from "react";
-// import { Controller } from "react-hook-form";
-// import { Label } from "../ui/label";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectGroup,
-//   SelectItem,
-//   SelectLabel,
-//   SelectTrigger,
-//   SelectValue,
-// } from "../ui/select";
-
-// export default function CustomSelect({
-//   control,
-//   name,
-//   label,
-//   placeholder,
-//   options = [],
-//   isRequired,
-//   errors,
-//   disabled,
-//   isLoading,
-// }) {
-//   const isSelectDisabled = disabled || isLoading;
-
-//   const finalPlaceholder = isLoading
-//     ? "Loading..."
-//     : placeholder || "Select...";
-
-//   const hasOptions = Array.isArray(options) && options.length > 0;
-
-//   return (
-//     <div className="flex flex-col gap-2">
-//       {label && (
-//         <Label className={"font-normal text-secondary text-lg"}>
-//           {label} {isRequired ? <span className="text-red-500">*</span> : null}
-//         </Label>
-//       )}
-
-//       <Controller
-//         control={control}
-//         name={name}
-//         render={({ field }) => {
-//           return (
-//             <Select
-//               disabled={isSelectDisabled}
-//               value={field.value != null ? String(field.value) : ""}
-//               onValueChange={(val) => field.onChange(val)}
-//             >
-//               <SelectTrigger className="w-full rounded-lg bg-input-bg p-6">
-//                 <SelectValue placeholder={finalPlaceholder} />
-//               </SelectTrigger>
-
-//               <SelectContent>
-//                 <SelectGroup>
-//                   {label && <SelectLabel>{label}</SelectLabel>}
-
-//                   {isLoading ? (
-//                     <SelectItem value="__loading__" disabled>
-//                       Loading...
-//                     </SelectItem>
-//                   ) : hasOptions ? (
-//                     options.map((item) => (
-//                       <SelectItem
-//                         key={String(item.value)}
-//                         value={String(item.value)}
-//                         textValue={item.textValue || String(item.label)}
-//                       >
-//                         {item.label}
-//                       </SelectItem>
-//                     ))
-//                   ) : (
-//                     <SelectItem value="__empty__" disabled>
-//                       No options found
-//                     </SelectItem>
-//                   )}
-//                 </SelectGroup>
-//               </SelectContent>
-//             </Select>
-//           );
-//         }}
-//       />
-
-//       {errors?.message ? (
-//         <p className="text-sm text-red-500">{errors.message}</p>
-//       ) : null}
-//     </div>
-//   );
-// }
-
-
 import React from "react";
 import { Controller } from "react-hook-form";
 import { Label } from "../ui/label";
@@ -115,7 +23,7 @@ import {
   CommandItem,
 } from "../ui/command";
 
-import { Check } from "lucide-react";
+import { Check, ChevronDown, X } from "lucide-react";
 
 const cn = (...classes) => classes.filter(Boolean).join(" ");
 
@@ -129,7 +37,7 @@ export default function CustomSelect({
   errors,
   disabled,
   isLoading,
-  multiple = false, // ✅ NEW: single or multiple
+  multiple = false,
 }) {
   const isSelectDisabled = disabled || isLoading;
 
@@ -156,7 +64,6 @@ export default function CustomSelect({
         control={control}
         name={name}
         render={({ field }) => {
-          // ✅ normalize values
           const singleValue =
             field.value != null && !Array.isArray(field.value)
               ? String(field.value)
@@ -166,9 +73,6 @@ export default function CustomSelect({
             ? field.value.map((v) => String(v))
             : [];
 
-          // =========================
-          // ✅ SINGLE SELECT MODE
-          // =========================
           if (!multiple) {
             return (
               <Select
@@ -176,11 +80,11 @@ export default function CustomSelect({
                 value={singleValue}
                 onValueChange={(val) => field.onChange(val)}
               >
-                <SelectTrigger className="w-full rounded-lg bg-input-bg p-6">
+                <SelectTrigger className="w-full rounded-lg bg-input-bg p-6 h-12 border-none ring-0 focus:ring-0">
                   <SelectValue placeholder={finalPlaceholder} />
                 </SelectTrigger>
 
-                <SelectContent>
+                <SelectContent className="z-[9999]">
                   <SelectGroup>
                     {label && <SelectLabel>{label}</SelectLabel>}
 
@@ -209,11 +113,7 @@ export default function CustomSelect({
             );
           }
 
-          // =========================
-          // ✅ MULTI SELECT MODE
-          // =========================
-          const selectedLabels = multiValue.map((v) => getLabelByValue(v));
-
+          // MULTI SELECT MODE
           const toggleValue = (v) => {
             const valueStr = String(v);
             const exists = multiValue.includes(valueStr);
@@ -224,9 +124,9 @@ export default function CustomSelect({
             field.onChange(next);
           };
 
-          const removeValue = (v) => {
-            const valueStr = String(v);
-            field.onChange(multiValue.filter((x) => x !== valueStr));
+          const clearAll = (e) => {
+            e.stopPropagation();
+            field.onChange([]);
           };
 
           return (
@@ -237,45 +137,59 @@ export default function CustomSelect({
                   variant="outline"
                   disabled={isSelectDisabled}
                   className={cn(
-                    "w-full justify-between rounded-lg bg-input-bg p-6 h-5",
+                    "w-full justify-between rounded-lg bg-input-bg p-6 h-12 border-none hover:bg-input-bg hover:text-current",
                     !multiValue.length ? "text-muted-foreground" : ""
                   )}
                 >
-                  <div className="flex flex-wrap gap-2 items-center">
+                  <div className="flex items-center gap-2 overflow-hidden mr-2">
                     {isLoading ? (
-                      <span className="text-muted-foreground">Loading...</span>
+                      <span>Loading...</span>
                     ) : multiValue.length ? (
-                      selectedLabels.map((lbl, idx) => (
+                      <div className="flex items-center gap-2 overflow-hidden">
                         <Badge
-                          key={`${lbl}-${idx}`}
                           variant="secondary"
-                          className="px-2 py-1 text-white!"
+                          className="px-2 py-0.5 bg-primary text-white border-none shrink-0"
                         >
-                          {lbl}
+                          {getLabelByValue(multiValue[0])}
                         </Badge>
-                      ))
+                        {multiValue.length > 1 && (
+                          <span className="text-xs font-bold text-primary shrink-0">
+                            +{multiValue.length - 1} more
+                          </span>
+                        )}
+                      </div>
                     ) : (
-                      <span className="text-muted-foreground">
-                        {finalPlaceholder}
-                      </span>
+                      <span className="truncate">{finalPlaceholder}</span>
                     )}
                   </div>
 
-                  <span className="text-muted-foreground">▾</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {multiValue.length > 0 && (
+                      <div 
+                        onClick={clearAll}
+                        className="p-1 hover:bg-muted rounded-full transition-colors"
+                      >
+                        <X className="h-3 w-3 text-muted-foreground" />
+                      </div>
+                    )}
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  </div>
                 </Button>
               </PopoverTrigger>
 
-              <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                <Command>
-                  <CommandInput placeholder="Search..." />
+              <PopoverContent className="w-[--radix-popover-trigger-width] p-0 z-[9999] border-none shadow-2xl rounded-xl">
+                <Command className="rounded-xl">
+                  <CommandInput placeholder="Search..." className="border-none focus:ring-0" />
 
                   {!hasOptions && !isLoading ? (
-                    <CommandEmpty>No options found</CommandEmpty>
+                    <CommandEmpty className="p-4 text-center text-sm text-muted-foreground">
+                      No options found
+                    </CommandEmpty>
                   ) : null}
 
-                  <CommandGroup>
+                  <CommandGroup className="max-h-[300px] overflow-auto p-2">
                     {isLoading ? (
-                      <div className="p-3 text-sm text-muted-foreground">
+                      <div className="p-3 text-sm text-muted-foreground animate-pulse">
                         Loading...
                       </div>
                     ) : (
@@ -288,37 +202,39 @@ export default function CustomSelect({
                             key={v}
                             value={item.textValue || String(item.label)}
                             onSelect={() => toggleValue(v)}
-                            className="cursor-pointer"
+                            className={cn(
+                              "flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors mb-1",
+                              isSelected ? "bg-primary/10 text-primary font-bold" : "hover:bg-muted"
+                            )}
                           >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                isSelected ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                            {item.label}
+                            <div className={cn(
+                              "h-4 w-4 rounded border flex items-center justify-center transition-all",
+                              isSelected ? "bg-primary border-primary" : "border-muted-foreground/30"
+                            )}>
+                              {isSelected && <Check className="h-3 w-3 text-white stroke-[4]" />}
+                            </div>
+                            <span className="flex-1 truncate">{item.label}</span>
                           </CommandItem>
                         );
                       })
                     )}
                   </CommandGroup>
-
-                  {/* ✅ Optional: show selected chips with remove */}
-                  {multiValue.length ? (
-                    <div className="border-t p-3 flex flex-wrap gap-2">
-                      {multiValue.map((v) => (
-                        <Badge
-                          key={v}
-                          variant="secondary"
-                          className="px-2 py-1 text-white! cursor-pointer"
-                          onClick={() => removeValue(v)}
-                          title="Click to remove"
-                        >
-                          {getLabelByValue(v)} ✕
-                        </Badge>
-                      ))}
+                  
+                  {multiValue.length > 0 && (
+                    <div className="p-3 border-t bg-muted/10 flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase text-muted-foreground">
+                        {multiValue.length} Selected
+                      </span>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 text-xs text-danger hover:text-danger hover:bg-danger/10"
+                        onClick={() => field.onChange([])}
+                      >
+                        Clear All
+                      </Button>
                     </div>
-                  ) : null}
+                  )}
                 </Command>
               </PopoverContent>
             </Popover>
@@ -327,7 +243,9 @@ export default function CustomSelect({
       />
 
       {errors?.message ? (
-        <p className="text-sm text-red-500">{errors.message}</p>
+        <p className="text-sm text-red-500 font-medium px-1 mt-1">
+          {errors.message}
+        </p>
       ) : null}
     </div>
   );
