@@ -22,7 +22,7 @@ import useDeleteNotification from "@/hooks/Notifications/useDeleteNotification";
 import useUnreadCount from "@/hooks/Notifications/useUnreadCount";
 import CustomSelect from "@/components/shared/CustomSelect";
 import { useQuery } from "@tanstack/react-query";
-import getCustomerOptions from "@/hooks/Customers/getCustomerOptions";
+import getCustomerOptions from "@/hooks/customers/getCustomerOptions";
 import { Bell, Check, Trash2, Eye, Plus, Mail, MessageSquare, CheckCheck, Loader2, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
