@@ -31,6 +31,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 export default function Notifications() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+
   
   const { data: notifications, isLoading: isListLoading } = useListNotifications({ page: currentPage });
   const { data: unreadCountData } = useUnreadCount();
