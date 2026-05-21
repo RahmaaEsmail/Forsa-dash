@@ -22,11 +22,6 @@ export default function App() {
     error: userDataErrorObj,
   } = useQuery(userProfileOptions());
 
-  useEffect(() => {
-    console.log("userData", userData);
-    console.log("userDataError", userDataError);
-    console.log("userDataErrorObj", userDataErrorObj);
-  } ,[userDataErrorObj , userDataError , userData])
 
   useEffect(() => {
     console.log("userData",userData);

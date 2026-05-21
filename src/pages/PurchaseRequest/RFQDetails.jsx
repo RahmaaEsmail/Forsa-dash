@@ -317,7 +317,598 @@
 // }
 
 
-import React from "react";
+// import React from "react";
+// import { useNavigate, useParams } from "react-router-dom";
+// import {
+//   ArrowLeft,
+//   BadgeDollarSign,
+//   Building2,
+//   CalendarDays,
+//   CheckCircle2,
+//   Clock3,
+//   CreditCard,
+//   FileText,
+//   Hash,
+//   Mail,
+//   MapPin,
+//   Package,
+//   Pencil,
+//   Phone,
+//   ReceiptText,
+//   Send,
+//   Truck,
+//   UserRound,
+// } from "lucide-react";
+
+// import { useRFQDetails } from "../../hooks/rfqs/useRFQs";
+
+// import { Button } from "@/components/ui/button";
+// import {
+//   Card,
+//   CardContent,
+//   CardDescription,
+//   CardHeader,
+//   CardTitle,
+// } from "@/components/ui/card";
+// import { Badge } from "@/components/ui/badge";
+// import { Separator } from "@/components/ui/separator";
+// import { Skeleton } from "@/components/ui/skeleton";
+// import {
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableHead,
+//   TableHeader,
+//   TableRow,
+// } from "@/components/ui/table";
+
+// const getRfq = (response) => {
+//   return response?.data?.data || response?.data || response || null;
+// };
+
+// const formatDate = (value) => {
+//   if (!value) return "—";
+
+//   const date = new Date(value);
+
+//   if (Number.isNaN(date.getTime())) return "—";
+
+//   return new Intl.DateTimeFormat("en-GB", {
+//     day: "2-digit",
+//     month: "short",
+//     year: "numeric",
+//   }).format(date);
+// };
+
+// const formatMoney = (value, currency) => {
+//   if (value === null || value === undefined || value === "") return "—";
+
+//   const number = Number(value);
+
+//   if (Number.isNaN(number)) return value;
+
+//   return `${number.toLocaleString("en-US", {
+//     minimumFractionDigits: 2,
+//     maximumFractionDigits: 2,
+//   })} ${currency?.symbol || currency?.code || ""}`;
+// };
+
+// const formatNumber = (value) => {
+//   if (value === null || value === undefined || value === "") return "—";
+
+//   const number = Number(value);
+
+//   if (Number.isNaN(number)) return value;
+
+//   return number.toLocaleString("en-US", {
+//     maximumFractionDigits: 2,
+//   });
+// };
+
+// const safeText = (value) => {
+//   if (value === null || value === undefined || value === "") return "—";
+//   return value;
+// };
+
+// const statusStyles = {
+//   draft: "bg-slate-100 text-slate-700 border-slate-200",
+//   pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+//   submitted: "bg-blue-100 text-blue-800 border-blue-200",
+//   approved: "bg-emerald-100 text-emerald-800 border-emerald-200",
+//   confirmed: "bg-emerald-100 text-emerald-800 border-emerald-200",
+//   cancelled: "bg-red-100 text-red-800 border-red-200",
+//   rejected: "bg-red-100 text-red-800 border-red-200",
+// };
+
+// const statusLabels = {
+//   draft: "Draft",
+//   pending: "Pending",
+//   submitted: "Submitted",
+//   approved: "Approved",
+//   confirmed: "Confirmed",
+//   cancelled: "Cancelled",
+//   rejected: "Rejected",
+// };
+
+// function StatusBadge({ status }) {
+//   return (
+//     <Badge
+//       variant="outline"
+//       className={`rounded-full px-3 py-1 text-xs font-semibold ${
+//         statusStyles[status] || "bg-muted text-muted-foreground"
+//       }`}
+//     >
+//       {statusLabels[status] || safeText(status)}
+//     </Badge>
+//   );
+// }
+
+// function InfoRow({ icon: Icon, label, value }) {
+//   return (
+//     <div className="flex items-start gap-3 rounded-2xl border bg-background p-4">
+//       <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-muted">
+//         <Icon className="size-4 text-muted-foreground" />
+//       </div>
+
+//       <div className="min-w-0">
+//         <p className="text-xs font-medium text-muted-foreground">{label}</p>
+//         <p className="mt-1 break-words text-sm font-semibold text-foreground">
+//           {safeText(value)}
+//         </p>
+//       </div>
+//     </div>
+//   );
+// }
+
+// function LoadingState() {
+//   return (
+//     <div className="space-y-6 p-6">
+//       <Skeleton className="h-12 w-64 rounded-2xl" />
+//       <div className="grid gap-5 lg:grid-cols-3">
+//         <Skeleton className="h-52 rounded-3xl" />
+//         <Skeleton className="h-52 rounded-3xl" />
+//         <Skeleton className="h-52 rounded-3xl" />
+//       </div>
+//       <Skeleton className="h-96 rounded-3xl" />
+//     </div>
+//   );
+// }
+
+// export default function RFQDetails() {
+//   const { rfqId } = useParams();
+//   const navigate = useNavigate();
+
+//   const { data: rfqResponse, isLoading, isError } = useRFQDetails(rfqId);
+
+//   const rfq = getRfq(rfqResponse);
+//   const currency = rfq?.currency;
+
+//   if (isLoading) {
+//     return <LoadingState />;
+//   }
+
+//   if (isError || !rfq) {
+//     return (
+//       <div className="flex min-h-[60vh] items-center justify-center p-6">
+//         <Card className="w-full max-w-md rounded-3xl text-center">
+//           <CardHeader>
+//             <CardTitle>RFQ not found</CardTitle>
+//             <CardDescription>
+//               We couldn’t load this RFQ details. Please try again.
+//             </CardDescription>
+//           </CardHeader>
+//           <CardContent>
+//             <Button onClick={() => navigate(-1)} className="rounded-2xl">
+//               <ArrowLeft className="mr-2 size-4" />
+//               Back
+//             </Button>
+//           </CardContent>
+//         </Card>
+//       </div>
+//     );
+//   }
+
+//   const customerName =
+//     rfq.customer?.company_name ||
+//     rfq.customer?.name?.trim() ||
+//     "Unnamed Customer";
+
+//   const supplierName =
+//     rfq.supplier?.company_name ||
+//     rfq.supplier?.contact_name ||
+//     "Unnamed Supplier";
+
+//   return (
+//     <div className="min-h-screen bg-muted/30 p-4 md:p-6">
+//       <div className="mx-auto max-w-7xl space-y-6">
+//         <div className="flex flex-col gap-4 rounded-3xl border bg-background p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+//           <div className="flex items-start gap-4">
+//             <Button
+//               variant="outline"
+//               size="icon"
+//               onClick={() => navigate(-1)}
+//               className="rounded-2xl"
+//             >
+//               <ArrowLeft className="size-4" />
+//             </Button>
+
+//             <div>
+//               <div className="mb-2 flex flex-wrap items-center gap-2">
+//                 <StatusBadge status={rfq.status} />
+//                 <Badge variant="secondary" className="rounded-full text-white!">
+//                   {safeText(rfq.document_type)?.toUpperCase()}
+//                 </Badge>
+//                 {rfq.is_purchase_order && (
+//                   <Badge className="rounded-full">Purchase Order</Badge>
+//                 )}
+//               </div>
+
+//               <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+//                 {safeText(rfq.display_number || rfq.rfq_number)}
+//               </h1>
+
+//               <p className="mt-1 text-sm text-muted-foreground">
+//                 Created at {formatDate(rfq.created_at)} by{" "}
+//                 {safeText(rfq.procurement_user?.name)}
+//               </p>
+//             </div>
+//           </div>
+
+//           <div className="flex flex-wrap gap-2">
+//             {rfq.can_be_fully_edited && (
+//               <Button
+//                 variant="outline"
+//                 className="rounded-2xl"
+//                 onClick={() => navigate(`/rfqs/${rfq.id}/edit`)}
+//               >
+//                 <Pencil className="mr-2 size-4" />
+//                 Edit RFQ
+//               </Button>
+//             )}
+
+//           </div>
+//         </div>
+
+//         <div className="grid gap-5 lg:grid-cols-3">
+//           <Card className="rounded-3xl">
+//             <CardHeader>
+//               <CardTitle className="flex items-center gap-2">
+//                 <Building2 className="size-5" />
+//                 Customer
+//               </CardTitle>
+//               <CardDescription>Customer request information</CardDescription>
+//             </CardHeader>
+
+//             <CardContent className="space-y-3">
+//               <InfoRow icon={Building2} label="Company" value={customerName} />
+//               <InfoRow
+//                 icon={UserRound}
+//                 label="Type"
+//                 value={rfq.customer?.customer_type}
+//               />
+//               <InfoRow icon={Mail} label="Email" value={rfq.customer?.email} />
+//               <InfoRow icon={Phone} label="Mobile" value={rfq.customer?.mobile} />
+//             </CardContent>
+//           </Card>
+
+//           <Card className="rounded-3xl">
+//             <CardHeader>
+//               <CardTitle className="flex items-center gap-2">
+//                 <Package className="size-5" />
+//                 Supplier
+//               </CardTitle>
+//               <CardDescription>Supplier quotation information</CardDescription>
+//             </CardHeader>
+
+//             <CardContent className="space-y-3">
+//               <InfoRow icon={Building2} label="Company" value={supplierName} />
+//               <InfoRow
+//                 icon={UserRound}
+//                 label="Contact"
+//                 value={rfq.supplier?.contact_name}
+//               />
+//               <InfoRow icon={Mail} label="Email" value={rfq.supplier?.email} />
+//               <InfoRow
+//                 icon={ReceiptText}
+//                 label="VAT Number"
+//                 value={rfq.supplier?.vat_number}
+//               />
+//             </CardContent>
+//           </Card>
+
+//           <Card className="rounded-3xl">
+//             <CardHeader>
+//               <CardTitle className="flex items-center gap-2">
+//                 <FileText className="size-5" />
+//                 RFQ Summary
+//               </CardTitle>
+//               <CardDescription>Main RFQ dates and references</CardDescription>
+//             </CardHeader>
+
+//             <CardContent className="space-y-3">
+//               <InfoRow icon={Hash} label="RFQ Number" value={rfq.rfq_number} />
+//               <InfoRow
+//                 icon={CalendarDays}
+//                 label="RFQ Date"
+//                 value={formatDate(rfq.rfq_date)}
+//               />
+//               <InfoRow
+//                 icon={CalendarDays}
+//                 label="Required Date"
+//                 value={formatDate(rfq.required_date)}
+//               />
+//               <InfoRow
+//                 icon={Clock3}
+//                 label="Submitted At"
+//                 value={formatDate(rfq.submitted_at)}
+//               />
+//             </CardContent>
+//           </Card>
+//         </div>
+
+//         <div className="grid gap-5 lg:grid-cols-3">
+//           <Card className="rounded-3xl lg:col-span-2">
+//             <CardHeader>
+//               <CardTitle className="flex items-center gap-2">
+//                 <Truck className="size-5" />
+//                 Delivery & Purchase Request
+//               </CardTitle>
+//               <CardDescription>
+//                 Delivery address, PR reference and logistics data
+//               </CardDescription>
+//             </CardHeader>
+
+//             <CardContent className="grid gap-3 md:grid-cols-2">
+//               <InfoRow
+//                 icon={MapPin}
+//                 label="Delivery Address"
+//                 value={rfq.delivery_address}
+//               />
+//               <InfoRow
+//                 icon={Truck}
+//                 label="Delivery Type"
+//                 value={rfq.delivery_type}
+//               />
+//               <InfoRow
+//                 icon={Hash}
+//                 label="PR Number"
+//                 value={rfq.purchase_request?.pr_number}
+//               />
+//               <InfoRow
+//                 icon={CheckCircle2}
+//                 label="PR Status"
+//                 value={rfq.purchase_request?.status}
+//               />
+//             </CardContent>
+//           </Card>
+
+//           <Card className="rounded-3xl">
+//             <CardHeader>
+//               <CardTitle className="flex items-center gap-2">
+//                 <CreditCard className="size-5" />
+//                 Payment
+//               </CardTitle>
+//               <CardDescription>Payment terms and due dates</CardDescription>
+//             </CardHeader>
+
+//             <CardContent className="space-y-3">
+//               <InfoRow
+//                 icon={CreditCard}
+//                 label="Payment Terms"
+//                 value={rfq.payment_terms_text}
+//               />
+//               <InfoRow
+//                 icon={CalendarDays}
+//                 label="Payment Due Date"
+//                 value={formatDate(rfq.payment_due_date)}
+//               />
+//               <InfoRow
+//                 icon={Clock3}
+//                 label="Payment Days"
+//                 value={rfq.payment_days}
+//               />
+//             </CardContent>
+//           </Card>
+//         </div>
+
+//         <Card className="overflow-hidden rounded-3xl">
+//           <CardHeader>
+//             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+//               <div>
+//                 <CardTitle className="flex items-center gap-2">
+//                   <Package className="size-5" />
+//                   RFQ Items
+//                 </CardTitle>
+//                 <CardDescription>
+//                   {rfq.items?.length || 0} item
+//                   {(rfq.items?.length || 0) === 1 ? "" : "s"} included in this
+//                   request
+//                 </CardDescription>
+//               </div>
+
+//               {rfq.can_edit_prices && (
+//                 <Badge variant="outline" className="w-fit rounded-full">
+//                   Prices can be edited
+//                 </Badge>
+//               )}
+//             </div>
+//           </CardHeader>
+
+//           <CardContent>
+//             <div className="overflow-hidden rounded-2xl border">
+//               <Table>
+//                 <TableHeader>
+//                   <TableRow className="bg-muted/60">
+//                     <TableHead>Item</TableHead>
+//                     <TableHead>Unit</TableHead>
+//                     <TableHead className="text-right">Qty</TableHead>
+//                     <TableHead className="text-right">Target Price</TableHead>
+//                     <TableHead className="text-right">Unit Price</TableHead>
+//                     <TableHead className="text-right">VAT</TableHead>
+//                     <TableHead className="text-right">Line Total</TableHead>
+//                   </TableRow>
+//                 </TableHeader>
+
+//                 <TableBody>
+//                   {rfq.items?.length ? (
+//                     rfq.items.map((item) => (
+//                       <TableRow key={item.id}>
+//                         <TableCell>
+//                           <div>
+//                             <p className="font-semibold">
+//                               {safeText(item.item_name)}
+//                             </p>
+//                             <p className="mt-1 text-xs text-muted-foreground">
+//                               Notes: {safeText(item.notes)}
+//                             </p>
+//                           </div>
+//                         </TableCell>
+
+//                         <TableCell>{safeText(item.unit?.name)}</TableCell>
+
+//                         <TableCell className="text-right">
+//                           {formatNumber(item.quantity)}
+//                         </TableCell>
+
+//                         <TableCell className="text-right">
+//                           {formatMoney(item.target_price, currency)}
+//                         </TableCell>
+
+//                         <TableCell className="text-right">
+//                           {formatMoney(item.unit_price, currency)}
+//                         </TableCell>
+
+//                         <TableCell className="text-right">
+//                           {formatNumber(item.vat_rate)}%
+//                         </TableCell>
+
+//                         <TableCell className="text-right font-semibold">
+//                           {formatMoney(item.line_total, currency)}
+//                         </TableCell>
+//                       </TableRow>
+//                     ))
+//                   ) : (
+//                     <TableRow>
+//                       <TableCell
+//                         colSpan={7}
+//                         className="h-28 text-center text-muted-foreground"
+//                       >
+//                         No items found
+//                       </TableCell>
+//                     </TableRow>
+//                   )}
+//                 </TableBody>
+//               </Table>
+//             </div>
+//           </CardContent>
+//         </Card>
+
+//         <div className="grid gap-5 lg:grid-cols-3">
+//           <Card className="rounded-3xl lg:col-span-2">
+//             <CardHeader>
+//               <CardTitle>Notes & Terms</CardTitle>
+//               <CardDescription>
+//                 Internal notes and terms attached to this RFQ
+//               </CardDescription>
+//             </CardHeader>
+
+//             <CardContent className="space-y-4">
+//               <div className="rounded-2xl border bg-background p-4">
+//                 <p className="text-xs font-medium text-muted-foreground">
+//                   Notes
+//                 </p>
+//                 <p className="mt-2 text-sm font-medium">
+//                   {safeText(rfq.notes)}
+//                 </p>
+//               </div>
+
+//               <div className="rounded-2xl border bg-background p-4">
+//                 <p className="text-xs font-medium text-muted-foreground">
+//                   Terms & Conditions
+//                 </p>
+//                 <p className="mt-2 text-sm font-medium">
+//                   {safeText(rfq.terms_and_conditions)}
+//                 </p>
+//               </div>
+
+//               <div className="rounded-2xl border bg-background p-4">
+//                 <p className="text-xs font-medium text-muted-foreground">
+//                   Supplier Reference
+//                 </p>
+//                 <p className="mt-2 text-sm font-medium">
+//                   {safeText(rfq.supplier_reference)}
+//                 </p>
+//               </div>
+//             </CardContent>
+//           </Card>
+
+//           <Card className="rounded-3xl">
+//             <CardHeader>
+//               <CardTitle className="flex items-center gap-2">
+//                 <BadgeDollarSign className="size-5" />
+//                 Totals
+//               </CardTitle>
+//               <CardDescription>Financial summary</CardDescription>
+//             </CardHeader>
+
+//             <CardContent className="space-y-4">
+//               <div className="space-y-3">
+//                 <div className="flex items-center justify-between text-sm">
+//                   <span className="text-muted-foreground">Subtotal</span>
+//                   <span className="font-semibold">
+//                     {formatMoney(rfq.subtotal, currency)}
+//                   </span>
+//                 </div>
+
+//                 <div className="flex items-center justify-between text-sm">
+//                   <span className="text-muted-foreground">Discount</span>
+//                   <span className="font-semibold">
+//                     {formatMoney(rfq.discount_amount, currency)}
+//                   </span>
+//                 </div>
+
+//                 <div className="flex items-center justify-between text-sm">
+//                   <span className="text-muted-foreground">
+//                     VAT {formatNumber(rfq.vat_rate)}%
+//                   </span>
+//                   <span className="font-semibold">
+//                     {formatMoney(rfq.vat_amount || rfq.tax_amount, currency)}
+//                   </span>
+//                 </div>
+//               </div>
+
+//               <Separator />
+
+//               <div className="flex items-center justify-between rounded-2xl bg-muted p-4">
+//                 <span className="font-bold">Total</span>
+//                 <span className="text-xl font-black">
+//                   {formatMoney(rfq.total_amount, currency)}
+//                 </span>
+//               </div>
+
+//               <div className="grid grid-cols-2 gap-3">
+//                 <div className="rounded-2xl border p-3 text-center">
+//                   <p className="text-xs text-muted-foreground">Currency</p>
+//                   <p className="mt-1 font-bold">{safeText(currency?.code)}</p>
+//                 </div>
+
+//                 <div className="rounded-2xl border p-3 text-center">
+//                   <p className="text-xs text-muted-foreground">VAT Rate</p>
+//                   <p className="mt-1 font-bold">
+//                     {formatNumber(rfq.vat_rate)}%
+//                   </p>
+//                 </div>
+//               </div>
+//             </CardContent>
+//           </Card>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+import React, { useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -335,12 +926,15 @@ import {
   Pencil,
   Phone,
   ReceiptText,
-  Send,
   Truck,
   UserRound,
+  Printer,
+  Database,
+  Info
 } from "lucide-react";
 
 import { useRFQDetails } from "../../hooks/rfqs/useRFQs";
+import useListSettings from "../../hooks/Settings/useListSettings";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -353,14 +947,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 const getRfq = (response) => {
   return response?.data?.data || response?.data || response || null;
@@ -368,9 +954,7 @@ const getRfq = (response) => {
 
 const formatDate = (value) => {
   if (!value) return "—";
-
   const date = new Date(value);
-
   if (Number.isNaN(date.getTime())) return "—";
 
   return new Intl.DateTimeFormat("en-GB", {
@@ -381,25 +965,20 @@ const formatDate = (value) => {
 };
 
 const formatMoney = (value, currency) => {
-  if (value === null || value === undefined || value === "") return "—";
-
+  if (value === null || value === undefined || value === "") return "0.00";
   const number = Number(value);
-
   if (Number.isNaN(number)) return value;
 
-  return `${number.toLocaleString("en-US", {
+  return number.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  })} ${currency?.symbol || currency?.code || ""}`;
+  });
 };
 
 const formatNumber = (value) => {
-  if (value === null || value === undefined || value === "") return "—";
-
+  if (value === null || value === undefined || value === "") return "0";
   const number = Number(value);
-
   if (Number.isNaN(number)) return value;
-
   return number.toLocaleString("en-US", {
     maximumFractionDigits: 2,
   });
@@ -407,7 +986,7 @@ const formatNumber = (value) => {
 
 const safeText = (value) => {
   if (value === null || value === undefined || value === "") return "—";
-  return value;
+  return String(value);
 };
 
 const statusStyles = {
@@ -434,7 +1013,7 @@ function StatusBadge({ status }) {
   return (
     <Badge
       variant="outline"
-      className={`rounded-full px-3 py-1 text-xs font-semibold ${
+      className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${
         statusStyles[status] || "bg-muted text-muted-foreground"
       }`}
     >
@@ -449,7 +1028,6 @@ function InfoRow({ icon: Icon, label, value }) {
       <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-muted">
         <Icon className="size-4 text-muted-foreground" />
       </div>
-
       <div className="min-w-0">
         <p className="text-xs font-medium text-muted-foreground">{label}</p>
         <p className="mt-1 break-words text-sm font-semibold text-foreground">
@@ -477,11 +1055,24 @@ function LoadingState() {
 export default function RFQDetails() {
   const { rfqId } = useParams();
   const navigate = useNavigate();
+  const printRef = useRef(null);
+
+  const { data: settingsData } = useListSettings();
+  const getSetting = (key) => settingsData?.data?.find(s => s.key === key)?.value;
+
+  const companyPhone = getSetting('phone') || getSetting('company_phone') || '+966 55 598 0730';
+  const companyEmail = getSetting('email') || getSetting('company_email') || 'procurement@forsa.com';
+  const companyVat = getSetting('vat') || getSetting('vat_number') || '300123456700003';
+  const companyAddress = getSetting('address') || getSetting('company_address') || 'King Fahd Road, Olaya District, Riyadh 12211';
 
   const { data: rfqResponse, isLoading, isError } = useRFQDetails(rfqId);
 
   const rfq = getRfq(rfqResponse);
   const currency = rfq?.currency;
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   if (isLoading) {
     return <LoadingState />;
@@ -508,399 +1099,285 @@ export default function RFQDetails() {
     );
   }
 
-  const customerName =
-    rfq.customer?.company_name ||
-    rfq.customer?.name?.trim() ||
-    "Unnamed Customer";
-
-  const supplierName =
-    rfq.supplier?.company_name ||
-    rfq.supplier?.contact_name ||
-    "Unnamed Supplier";
+  const customerName = rfq.customer?.company_name || rfq.customer?.name?.trim() || "Unnamed Customer";
+  const supplierName = rfq.supplier?.company_name || rfq.supplier?.contact_name || "Unnamed Supplier";
 
   return (
     <div className="min-h-screen bg-muted/30 p-4 md:p-6">
-      <div className="mx-auto max-w-7xl space-y-6">
-        <div className="flex flex-col gap-4 rounded-3xl border bg-background p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+      {/* GLOBAL HIGH-FIDELITY PRINT OVERRIDES */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @media print {
+          body { visibility: hidden; background: white !important; }
+          .no-print { display: none !important; }
+          
+          #printable-rfq-area-wrapper { 
+            visibility: visible !important;
+            display: block !important;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+          }
+          #printable-rfq-area-wrapper * { visibility: visible !important; }
+          
+          @page { size: A4; margin: 15mm 10mm 15mm 10mm; }
+          .page-break {
+            page-break-before: always;
+          }
+        }
+      `}} />
+
+      <div className="mx-auto max-w-7xl space-y-6 no-print">
+        {/* Main Header Action Controls */}
+        {/* <div className="flex flex-col gap-4 rounded-3xl border bg-background p-5 shadow-sm md:flex-row md:items-center md:justify-between">
           <div className="flex items-start gap-4">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => navigate(-1)}
-              className="rounded-2xl"
-            >
+            <Button variant="outline" size="icon" onClick={() => navigate(-1)} className="rounded-2xl">
               <ArrowLeft className="size-4" />
             </Button>
-
             <div>
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <StatusBadge status={rfq.status} />
-                <Badge variant="secondary" className="rounded-full text-white!">
-                  {safeText(rfq.document_type)?.toUpperCase()}
+                <Badge variant="secondary" className="rounded-full uppercase">
+                  {safeText(rfq.document_type)}
                 </Badge>
-                {rfq.is_purchase_order && (
-                  <Badge className="rounded-full">Purchase Order</Badge>
-                )}
+                {rfq.is_purchase_order && <Badge className="rounded-full">Purchase Order</Badge>}
               </div>
-
               <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
                 {safeText(rfq.display_number || rfq.rfq_number)}
               </h1>
-
               <p className="mt-1 text-sm text-muted-foreground">
-                Created at {formatDate(rfq.created_at)} by{" "}
-                {safeText(rfq.procurement_user?.name)}
+                Created at {formatDate(rfq.created_at)} by {safeText(rfq.procurement_user?.name)}
               </p>
             </div>
           </div>
-
           <div className="flex flex-wrap gap-2">
+            <Button 
+              variant="outline" 
+              onClick={handlePrint}
+              className="rounded-2xl border-slate-200 text-slate-600 gap-2 font-bold hover:bg-slate-50"
+            >
+              <Printer className="w-4 h-4" /> Download/Print Full PDF
+            </Button>
             {rfq.can_be_fully_edited && (
-              <Button
-                variant="outline"
-                className="rounded-2xl"
-                onClick={() => navigate(`/rfqs/${rfq.id}/edit`)}
-              >
-                <Pencil className="mr-2 size-4" />
-                Edit RFQ
+              <Button variant="outline" className="rounded-2xl" onClick={() => navigate(`/rfqs/${rfq.id}/edit`)}>
+                <Pencil className="mr-2 size-4" /> Edit RFQ
               </Button>
             )}
-
           </div>
-        </div>
+        </div> */}
 
-        <div className="grid gap-5 lg:grid-cols-3">
+        {/* Informational Cards */}
+        {/* <div className="grid gap-5 lg:grid-cols-3">
           <Card className="rounded-3xl">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="size-5" />
-                Customer
-              </CardTitle>
-              <CardDescription>Customer request information</CardDescription>
-            </CardHeader>
-
+            <CardHeader><CardTitle className="flex items-center gap-2"><Building2 className="size-5" /> Customer</CardTitle></CardHeader>
             <CardContent className="space-y-3">
-              <InfoRow icon={Building2} label="Company" value={customerName} />
-              <InfoRow
-                icon={UserRound}
-                label="Type"
-                value={rfq.customer?.customer_type}
-              />
-              <InfoRow icon={Mail} label="Email" value={rfq.customer?.email} />
-              <InfoRow icon={Phone} label="Mobile" value={rfq.customer?.mobile} />
+              <InfoRow icon={Building2} label="Company Name" value={customerName} />
+              <InfoRow icon={UserRound} label="Customer Type" value={rfq.customer?.customer_type} />
+              <InfoRow icon={Mail} label="Customer Email" value={rfq.customer?.email} />
+              <InfoRow icon={Phone} label="Customer Mobile" value={rfq.customer?.mobile} />
             </CardContent>
           </Card>
 
           <Card className="rounded-3xl">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Package className="size-5" />
-                Supplier
-              </CardTitle>
-              <CardDescription>Supplier quotation information</CardDescription>
-            </CardHeader>
-
+            <CardHeader><CardTitle className="flex items-center gap-2"><Package className="size-5" /> Supplier</CardTitle></CardHeader>
             <CardContent className="space-y-3">
-              <InfoRow icon={Building2} label="Company" value={supplierName} />
-              <InfoRow
-                icon={UserRound}
-                label="Contact"
-                value={rfq.supplier?.contact_name}
-              />
-              <InfoRow icon={Mail} label="Email" value={rfq.supplier?.email} />
-              <InfoRow
-                icon={ReceiptText}
-                label="VAT Number"
-                value={rfq.supplier?.vat_number}
-              />
+              <InfoRow icon={Building2} label="Supplier Company" value={supplierName} />
+              <InfoRow icon={UserRound} label="Contact Person" value={rfq.supplier?.contact_name} />
+              <InfoRow icon={Mail} label="Supplier Email" value={rfq.supplier?.email} />
+              <InfoRow icon={ReceiptText} label="Supplier VAT Number" value={rfq.supplier?.vat_number} />
             </CardContent>
           </Card>
 
           <Card className="rounded-3xl">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="size-5" />
-                RFQ Summary
-              </CardTitle>
-              <CardDescription>Main RFQ dates and references</CardDescription>
-            </CardHeader>
-
+            <CardHeader><CardTitle className="flex items-center gap-2"><FileText className="size-5" /> Summary Reference Keys</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               <InfoRow icon={Hash} label="RFQ Number" value={rfq.rfq_number} />
-              <InfoRow
-                icon={CalendarDays}
-                label="RFQ Date"
-                value={formatDate(rfq.rfq_date)}
-              />
-              <InfoRow
-                icon={CalendarDays}
-                label="Required Date"
-                value={formatDate(rfq.required_date)}
-              />
-              <InfoRow
-                icon={Clock3}
-                label="Submitted At"
-                value={formatDate(rfq.submitted_at)}
-              />
+              <InfoRow icon={CalendarDays} label="RFQ Creation Date" value={formatDate(rfq.rfq_date)} />
+              <InfoRow icon={CalendarDays} label="Required Fulfillment Date" value={formatDate(rfq.required_date)} />
+              <InfoRow icon={Clock3} label="Submitted Timestamp" value={formatDate(rfq.submitted_at)} />
             </CardContent>
           </Card>
-        </div>
+        </div> */}
 
-        <div className="grid gap-5 lg:grid-cols-3">
-          <Card className="rounded-3xl lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Truck className="size-5" />
-                Delivery & Purchase Request
-              </CardTitle>
-              <CardDescription>
-                Delivery address, PR reference and logistics data
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent className="grid gap-3 md:grid-cols-2">
-              <InfoRow
-                icon={MapPin}
-                label="Delivery Address"
-                value={rfq.delivery_address}
-              />
-              <InfoRow
-                icon={Truck}
-                label="Delivery Type"
-                value={rfq.delivery_type}
-              />
-              <InfoRow
-                icon={Hash}
-                label="PR Number"
-                value={rfq.purchase_request?.pr_number}
-              />
-              <InfoRow
-                icon={CheckCircle2}
-                label="PR Status"
-                value={rfq.purchase_request?.status}
-              />
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-3xl">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="size-5" />
-                Payment
-              </CardTitle>
-              <CardDescription>Payment terms and due dates</CardDescription>
-            </CardHeader>
-
-            <CardContent className="space-y-3">
-              <InfoRow
-                icon={CreditCard}
-                label="Payment Terms"
-                value={rfq.payment_terms_text}
-              />
-              <InfoRow
-                icon={CalendarDays}
-                label="Payment Due Date"
-                value={formatDate(rfq.payment_due_date)}
-              />
-              <InfoRow
-                icon={Clock3}
-                label="Payment Days"
-                value={rfq.payment_days}
-              />
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card className="overflow-hidden rounded-3xl">
-          <CardHeader>
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Package className="size-5" />
-                  RFQ Items
-                </CardTitle>
-                <CardDescription>
-                  {rfq.items?.length || 0} item
-                  {(rfq.items?.length || 0) === 1 ? "" : "s"} included in this
-                  request
-                </CardDescription>
-              </div>
-
-              {rfq.can_edit_prices && (
-                <Badge variant="outline" className="w-fit rounded-full">
-                  Prices can be edited
-                </Badge>
-              )}
-            </div>
-          </CardHeader>
-
+        {/* Dynamic Items Framework */}
+        {/* <Card className="rounded-3xl overflow-hidden">
+          <CardHeader><CardTitle>RFQ Items Metadata Matrix</CardTitle></CardHeader>
           <CardContent>
-            <div className="overflow-hidden rounded-2xl border">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/60">
-                    <TableHead>Item</TableHead>
-                    <TableHead>Unit</TableHead>
-                    <TableHead className="text-right">Qty</TableHead>
-                    <TableHead className="text-right">Target Price</TableHead>
-                    <TableHead className="text-right">Unit Price</TableHead>
-                    <TableHead className="text-right">VAT</TableHead>
-                    <TableHead className="text-right">Line Total</TableHead>
-                  </TableRow>
-                </TableHeader>
-
-                <TableBody>
-                  {rfq.items?.length ? (
-                    rfq.items.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>
-                          <div>
-                            <p className="font-semibold">
-                              {safeText(item.item_name)}
-                            </p>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                              Notes: {safeText(item.notes)}
-                            </p>
-                          </div>
-                        </TableCell>
-
-                        <TableCell>{safeText(item.unit?.name)}</TableCell>
-
-                        <TableCell className="text-right">
-                          {formatNumber(item.quantity)}
-                        </TableCell>
-
-                        <TableCell className="text-right">
-                          {formatMoney(item.target_price, currency)}
-                        </TableCell>
-
-                        <TableCell className="text-right">
-                          {formatMoney(item.unit_price, currency)}
-                        </TableCell>
-
-                        <TableCell className="text-right">
-                          {formatNumber(item.vat_rate)}%
-                        </TableCell>
-
-                        <TableCell className="text-right font-semibold">
-                          {formatMoney(item.line_total, currency)}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={7}
-                        className="h-28 text-center text-muted-foreground"
-                      >
-                        No items found
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+            <div className="overflow-x-auto rounded-2xl border">
+              <table className="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr className="bg-muted/50 font-semibold border-b">
+                    <th className="p-4">Item Details</th>
+                    <th className="p-4">Unit</th>
+                    <th className="p-4 text-right">Quantity Keys</th>
+                    <th className="p-4 text-right">Target Price</th>
+                    <th className="p-4 text-right">Unit Price</th>
+                    <th className="p-4 text-right">VAT Rate</th>
+                    <th className="p-4 text-right">Line Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {rfq.items?.map((item) => (
+                    <tr key={item.id} className="hover:bg-muted/10">
+                      <td className="p-4">
+                        <p className="font-semibold text-foreground">{safeText(item.item_name)}</p>
+                        <p className="text-xs text-slate-400 mt-1">ID: {item.item_id} | Notes: {safeText(item.notes)}</p>
+                      </td>
+                      <td className="p-4 text-muted-foreground">{safeText(item.unit?.name)} (ID: {safeText(item.unit?.id)})</td>
+                      <td className="p-4 text-right">
+                        <div className="text-sm font-medium">{formatNumber(item.quantity)}</div>
+                        <div className="text-[10px] text-slate-400">Rem: {item.remaining_quantity} | Acc: {item.quantity_accepted}</div>
+                      </td>
+                      <td className="p-4 text-right text-muted-foreground">{formatMoney(item.target_price)}</td>
+                      <td className="p-4 text-right font-medium">{formatMoney(item.unit_price)}</td>
+                      <td className="p-4 text-right text-muted-foreground">{formatNumber(item.vat_rate)}%</td>
+                      <td className="p-4 text-right font-bold">{formatMoney(item.line_total)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
+      </div>
 
-        <div className="grid gap-5 lg:grid-cols-3">
-          <Card className="rounded-3xl lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Notes & Terms</CardTitle>
-              <CardDescription>
-                Internal notes and terms attached to this RFQ
-              </CardDescription>
-            </CardHeader>
+      {/* ========================================================================= */}
+      {/* HIGH-FIDELITY PRINT CANVAS (PRINTS ABSOLUTELY ALL RETURNED API METRICS) */}
+      {/* ========================================================================= */}
+      <div id="printable-rfq-area-wrapper" className="bg-white py-6">
+        <div className="max-w-[850px] mx-auto bg-white p-12 border border-slate-200 rounded-sm" id="printable-rfq-area" ref={printRef}>
+          
+          {/* Brand Header Line */}
+          <div className="flex justify-between items-start border-b-2 border-slate-900 pb-6 mb-8">
+            <div><img src='/images/LOGO.svg' className='h-20 w-36 object-cover mb-2' alt="Logo" /></div>
+            <div className="text-right text-[11px] text-slate-500 space-y-0.5">
+              <h2 className="font-extrabold text-sm text-slate-900 tracking-wide">FORSA TRADING & CONTRACTING</h2>
+              <p>{companyAddress} | VAT: {companyVat}</p>
+              <p>Procurement Hub Stream &nbsp;|&nbsp; email: {companyEmail}</p>
+            </div>
+          </div>
 
-            <CardContent className="space-y-4">
-              <div className="rounded-2xl border bg-background p-4">
-                <p className="text-xs font-medium text-muted-foreground">
-                  Notes
-                </p>
-                <p className="mt-2 text-sm font-medium">
-                  {safeText(rfq.notes)}
-                </p>
+          <h3 className="text-xl font-bold text-slate-900 mb-6 tracking-tight uppercase border-b pb-2 flex justify-between">
+            <span>REQUEST FOR QUOTATION AUDIT REPORT</span>
+            <span className="text-slate-400 font-normal text-xs font-mono">STATUS: {safeText(rfq.status).toUpperCase()}</span>
+          </h3>
+
+          {/* Core Entity Reference Information Boxes */}
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-[11px] space-y-1">
+              <h4 className="font-bold text-slate-900 text-xs uppercase mb-1 flex items-center gap-1"><Building2 className="w-3 h-3 text-slate-400" /> Customer Data</h4>
+              <p><span className="text-slate-400">Company:</span> <strong className="text-slate-800">{customerName}</strong></p>
+              <p><span className="text-slate-400">Type:</span> {safeText(rfq.customer?.customer_type)}</p>
+              <p><span className="text-slate-400">Email:</span> {safeText(rfq.customer?.email)}</p>
+              <p><span className="text-slate-400">Mobile:</span> {safeText(rfq.customer?.mobile)}</p>
+            </div>
+
+            <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-[11px] space-y-1">
+              <h4 className="font-bold text-slate-900 text-xs uppercase mb-1 flex items-center gap-1"><Package className="w-3 h-3 text-slate-400" /> Supplier Data</h4>
+              <p><span className="text-slate-400">Company:</span> <strong className="text-slate-800">{supplierName}</strong></p>
+              <p><span className="text-slate-400">VAT No:</span> {safeText(rfq.supplier?.vat_number)}</p>
+              <p><span className="text-slate-400">Email:</span> {safeText(rfq.supplier?.email)}</p>
+              <p><span className="text-slate-400">Ref Code:</span> {safeText(rfq.supplier_reference)}</p>
+            </div>
+
+            <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-[11px] space-y-1">
+              <h4 className="font-bold text-slate-900 text-xs uppercase mb-1 flex items-center gap-1"><Info className="w-3 h-3 text-slate-400" /> Registry Data</h4>
+              <p><span className="text-slate-400">RFQ ID / Code:</span> {safeText(rfq.id)}</p>
+              <p><span className="text-slate-400">RFQ Number:</span> <strong>{rfq.display_number || rfq.rfq_number}</strong></p>
+              <p><span className="text-slate-400">PR Connected:</span> {safeText(rfq.purchase_request?.pr_number)}</p>
+              <p><span className="text-slate-400">PR Status:</span> {safeText(rfq.purchase_request?.status)}</p>
+            </div>
+          </div>
+
+          {/* Workflow Schedule Matrix Box */}
+          <div className="bg-slate-50 rounded-xl p-4 text-[11px] border border-slate-100 grid grid-cols-4 gap-4 mb-6">
+            <div><span className="text-slate-400 block">RFQ Creation Date</span><strong className="text-slate-800">{formatDate(rfq.rfq_date)}</strong></div>
+            <div><span className="text-slate-400 block">Required Date</span><strong className="text-slate-800">{formatDate(rfq.required_date)}</strong></div>
+            <div><span className="text-slate-400 block">Created At Timestamp</span><strong className="text-slate-800">{formatDate(rfq.created_at)}</strong></div>
+            <div><span className="text-slate-400 block">System Operator</span><strong className="text-slate-800">{safeText(rfq.procurement_user?.name)}</strong></div>
+          </div>
+
+          {/* Financial Settings Metric Bar */}
+          <div className="bg-slate-50 rounded-xl p-4 text-[11px] border border-slate-100 grid grid-cols-4 gap-4 mb-6">
+            <div><span className="text-slate-400 block">Payment Logistics Profile</span><strong className="text-slate-800">{safeText(rfq.payment_terms_text)}</strong></div>
+            <div><span className="text-slate-400 block">Payment Days Duration</span><strong className="text-slate-800">{safeText(rfq.payment_days)} Days</strong></div>
+            <div><span className="text-slate-400 block">Delivery Address Config</span><strong className="text-slate-800">{safeText(rfq.delivery_address)}</strong></div>
+            <div><span className="text-slate-400 block">Delivery Typology</span><strong className="text-slate-800 uppercase">{safeText(rfq.delivery_type)}</strong></div>
+          </div>
+
+          {/* Line Items Table Rendering All Column Targets */}
+          <h4 className="text-xs font-bold text-slate-800 tracking-wider uppercase mb-2">Itemized Component Metrics Grid</h4>
+          <table className="w-full text-left border-collapse mb-6">
+            <thead>
+              <tr className="border-b border-slate-400 text-[10px] font-bold text-slate-800 uppercase bg-slate-50">
+                <th className="py-2 px-1 w-8 text-center">No.</th>
+                <th className="py-2 px-2">Description & Notes</th>
+                <th className="py-2 px-2 text-center">Unit Definition</th>
+                <th className="py-2 px-2 text-right">Quantity Metrics</th>
+                <th className="py-2 px-2 text-right">Target Price</th>
+                <th className="py-2 px-2 text-right">Unit Price</th>
+                <th className="py-2 px-2 text-right">VAT Rate</th>
+                <th className="py-2 px-2 text-right">Line Total</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 text-[11px] text-slate-700">
+              {rfq.items?.map((item, index) => (
+                <tr key={item.id || index} className="align-top">
+                  <td className="py-3 px-1 text-center text-slate-400">{index + 1}</td>
+                  <td className="py-3 px-2">
+                    <span className="font-bold text-slate-900 block">{item.item_name}</span>
+                    {item.notes && <span className="text-[10px] text-slate-400 block">Note: {item.notes}</span>}
+                    <span className="text-[9px] text-slate-400 block font-mono">Item ID: {item.item_id} | Created: {safeText(item.created_at)}</span>
+                  </td>
+                  <td className="py-3 px-2 text-center text-slate-500">{item.unit?.name || "طن"} <span className="text-[9px] font-mono block">({safeText(item.unit?.id)})</span></td>
+                  <td className="py-3 px-2 text-right font-medium">
+                    <div className="font-bold text-slate-900">{formatNumber(item.quantity)}</div>
+                    <div className="text-[9px] text-slate-400 font-mono">Rem: {item.remaining_quantity} | Acc: {item.quantity_accepted}</div>
+                  </td>
+                  <td className="py-3 px-2 text-right text-slate-500 font-mono">{formatMoney(item.target_price)}</td>
+                  <td className="py-3 px-2 text-right font-mono">{formatMoney(item.unit_price)}</td>
+                  <td className="py-3 px-2 text-right text-slate-400 font-mono">{formatNumber(item.vat_rate)}%</td>
+                  <td className="py-3 px-2 text-right font-bold text-slate-900 font-mono">{formatMoney(item.line_total)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* Cumulative Financial Columns Blocks */}
+          <div className="flex justify-end mb-8">
+            <div className="w-80 space-y-1.5 text-[11px] border-t border-slate-100 pt-3">
+              <div className="flex justify-between text-slate-500 px-2">
+                <span>Subtotal Summation</span>
+                <span className="font-semibold text-slate-900 font-mono">{formatMoney(rfq.subtotal)} {currency?.code || "SAR"}</span>
               </div>
-
-              <div className="rounded-2xl border bg-background p-4">
-                <p className="text-xs font-medium text-muted-foreground">
-                  Terms & Conditions
-                </p>
-                <p className="mt-2 text-sm font-medium">
-                  {safeText(rfq.terms_and_conditions)}
-                </p>
+              <div className="flex justify-between text-slate-500 px-2">
+                <span>Discount Deduction</span>
+                <span className="font-semibold text-slate-900 font-mono">{formatMoney(rfq.discount_amount)} {currency?.code || "SAR"}</span>
               </div>
-
-              <div className="rounded-2xl border bg-background p-4">
-                <p className="text-xs font-medium text-muted-foreground">
-                  Supplier Reference
-                </p>
-                <p className="mt-2 text-sm font-medium">
-                  {safeText(rfq.supplier_reference)}
-                </p>
+              <div className="flex justify-between text-slate-500 px-2">
+                <span>Tax Allocation / VAT ({formatNumber(rfq.vat_rate)}%)</span>
+                <span className="font-semibold text-slate-900 font-mono">{formatMoney(rfq.vat_amount || rfq.tax_amount)} {currency?.code || "SAR"}</span>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-3xl">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BadgeDollarSign className="size-5" />
-                Totals
-              </CardTitle>
-              <CardDescription>Financial summary</CardDescription>
-            </CardHeader>
-
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-semibold">
-                    {formatMoney(rfq.subtotal, currency)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Discount</span>
-                  <span className="font-semibold">
-                    {formatMoney(rfq.discount_amount, currency)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">
-                    VAT {formatNumber(rfq.vat_rate)}%
-                  </span>
-                  <span className="font-semibold">
-                    {formatMoney(rfq.vat_amount || rfq.tax_amount, currency)}
-                  </span>
-                </div>
+              <div className="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-100 text-slate-900 mt-2">
+                <span className="font-bold text-slate-900 text-xs">Total Evaluated Summary</span>
+                <span className="font-black text-sm font-mono text-slate-950">{formatMoney(rfq.total_amount)} {currency?.code || "SAR"}</span>
               </div>
+            </div>
+          </div>
+ 
 
-              <Separator />
+          {/* Structural Signatures */}
+          <div className="grid grid-cols-2 gap-12 text-center text-[11px] font-bold text-slate-700 pt-12 border-t border-slate-200 mt-12">
+            <div className="space-y-10">
+              <div className="h-px bg-slate-200 mx-4"></div>
+              <p>System Operator Signature Audit</p>
+            </div>
+            <div className="space-y-10">
+              <div className="h-px bg-slate-200 mx-4"></div>
+              <p>Security Infrastructure Stamp</p>
+            </div>
+          </div>
 
-              <div className="flex items-center justify-between rounded-2xl bg-muted p-4">
-                <span className="font-bold">Total</span>
-                <span className="text-xl font-black">
-                  {formatMoney(rfq.total_amount, currency)}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-2xl border p-3 text-center">
-                  <p className="text-xs text-muted-foreground">Currency</p>
-                  <p className="mt-1 font-bold">{safeText(currency?.code)}</p>
-                </div>
-
-                <div className="rounded-2xl border p-3 text-center">
-                  <p className="text-xs text-muted-foreground">VAT Rate</p>
-                  <p className="mt-1 font-bold">
-                    {formatNumber(rfq.vat_rate)}%
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

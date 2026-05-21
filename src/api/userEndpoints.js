@@ -66,4 +66,11 @@ export const userEndpoints = {
 
    // customer_invoices
    get_customer_invoices :"customer-invoices",
+
+   // activity logs
+   get_activity:"activity-logs",
+   get_activity_mentions:"activity-logs/my-mentions",
+   add_comment:"activity-logs/comments",
+   
+
 }

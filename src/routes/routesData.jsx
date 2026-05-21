@@ -444,12 +444,12 @@ export const routesData = [
     hidden: false,
     icon: Settings2,
   },
-  {
-    id: "notifications",
-    name: "Notifications",
-    path: "/notifications",
-    component: NotificationsPage,
-    hidden: false,
-    icon: Bell,
-  },
+  // {
+  //   id: "notifications",
+  //   name: "Notifications",
+  //   path: "/notifications",
+  //   component: NotificationsPage,
+  //   hidden: false,
+  //   icon: Bell,
+  // },
 ];

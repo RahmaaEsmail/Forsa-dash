@@ -5,7 +5,7 @@ import { ChevronRight } from "lucide-react";
 
 export default function Links() {
   return (
-    <div className="mt-20 flex flex-col gap-3">
+    <div className="mt-4 flex flex-col gap-3">
       {routesData?.map(
         (route) =>
           !route.hidden && (
