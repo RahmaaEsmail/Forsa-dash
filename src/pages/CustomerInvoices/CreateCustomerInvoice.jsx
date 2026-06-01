@@ -178,6 +178,7 @@ export default function CreateCustomerInvoice() {
         <div className="flex items-center gap-2 max-w-[150px]">
           <Input 
             type="number" 
+            disabled
             {...register(`items.${index}.quantity`, { valueAsNumber: true, required: true })} 
             className="bg-slate-50 border-none h-11 rounded-xl text-center font-bold w-24 text-slate-800"
           />
@@ -340,7 +341,25 @@ export default function CreateCustomerInvoice() {
                 ) : (
                   <div className="p-8 text-center text-slate-400 text-sm flex flex-col items-center gap-2">
                     <Info className="w-8 h-8 text-slate-300" />
-                    No items left in this invoice. Try reloading or adding items.
+                    No items left in this invoice.
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => {
+                        const formattedItems = quotation?.items?.map(item => ({
+                          quotation_item_id: item.id,
+                          item_name: item.item_name || item.item?.name || 'Item',
+                          quantity: Number(item.quantity) || 0,
+                          selling_price: Number(item.selling_price) || 0,
+                          discount_percentage: 0,
+                          unit_name: item.unit?.name || item.unit_name || ''
+                        })) || [];
+                        setValue("items", formattedItems);
+                      }}
+                      className="mt-2 text-primary border-primary hover:bg-primary/5"
+                    >
+                      Reload Items from Quotation
+                    </Button>
                   </div>
                 )}
               </div>

@@ -176,14 +176,7 @@ export default function PurchaseRequestTable({ page, setPage, purchase_data }) {
               <Trash2 />
             </Button>}
 
-            <Button
-              onClick={() => {
-                setOpenChangeStatus(true);
-                setRowData(row);
-              }}
-              title="Change Status" variant="ghost" size="icon">
-              <Eye />
-            </Button>
+            {/* Removed Change Status from table per user request */}
 
             {row?.status === 'approved' && (
               <Button

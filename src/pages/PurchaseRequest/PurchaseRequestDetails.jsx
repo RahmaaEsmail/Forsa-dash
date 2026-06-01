@@ -37,14 +37,18 @@ import PurchaseDetailsAdministrative from '../../components/pages/PurchaseReques
 import PurchaseDetailsStats from '../../components/pages/PurchaseRequests/PurchaseDetails/PurchaseDetailsStats';
 import PurchaseDetailsTimeline from '../../components/pages/PurchaseRequests/PurchaseDetails/PurchaseDetailsTimeline';
 import CreateRFQModal from '../../components/pages/PurchaseRequests/CreateRFQModal';
-import { Button } from '../../components/ui/button';
 import { FilePlus } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ChangePurchaseStatusModal from '../../components/pages/PurchaseRequests/ChangePurchaseStatusModal';
+import { Button } from '../../components/ui/button';
 
 export default function PurchaseRequestDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { mutate, data, isPending } = usePurchaseDetails();
   const [isRFQModalOpen, setIsRFQModalOpen] = useState(false);
+  const [openChangeStatus, setOpenChangeStatus] = useState(false);
   const pr = data?.data;
 
   useEffect(() => {
@@ -103,14 +107,26 @@ export default function PurchaseRequestDetails() {
             getStatusVariant={getPurchaseStatusVariant}
             pr={pr}
           />
-          <div className="flex gap-2">
-            {pr?.status === 'approved' && (
+          <div className="flex gap-2 items-center">
+            {pr?.status && pr?.status?.toLowerCase() !== 'cancelled' && pr?.status?.toLowerCase() !== 'rejected' && (
+              <Button
+                type="button" 
+                variant="outline" 
+                className="border-primary text-primary hover:bg-primary/10 font-bold h-10 px-4" 
+                onClick={() => setOpenChangeStatus(true)}
+              >
+                Change Status
+              </Button>
+            )}
+            
+            {pr?.status?.toLowerCase() === 'approved' && (
               <Button 
-                onClick={() => navigate(`/purchase-requests/${pr.id}/rfqs`)}
-                className="flex items-center gap-2"
+                type="button" 
+                onClick={() => navigate(`/purchase-requests/${id}/rfqs`)}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-10 px-4 flex items-center gap-2"
               >
                 <FilePlus className="w-4 h-4" />
-                RFQ
+                RFQs & Quotations
               </Button>
             )}
           </div>
@@ -145,6 +161,14 @@ export default function PurchaseRequestDetails() {
           </div>
         </div>
       </Card>
+      
+      <ChangePurchaseStatusModal 
+        open={openChangeStatus}
+        setOpen={setOpenChangeStatus} 
+        currentStatus={pr?.status}
+        id={id}
+        onSuccess={() => mutate({ id })}
+      /> 
     </div>
   );
 }

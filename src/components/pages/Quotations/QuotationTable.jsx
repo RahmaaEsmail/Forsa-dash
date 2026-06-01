@@ -101,6 +101,15 @@ export default function QuotationTable({ data, isLoading, page, setPage }) {
           >
             <Trash2 className="w-4 h-4" />
           </Button>
+          {row.status === 'paid_payment' || row.status === 'approved' ? (
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate(`/create-delivery-note/${row.id}`)}
+              className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 px-2"
+            >
+              Delivery Note
+            </Button>
+          ) : null}
           <Button 
             variant="ghost" 
             size="" 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import CustomTable from '../../shared/CustomTable'
 import { Button } from '../../ui/button'
-import { Edit, Eye, Trash2, XCircle } from 'lucide-react'
+import { Edit, Eye, Trash2, XCircle, PackagePlus } from 'lucide-react'
 import CancelRFQModal from './CancelRFQModal'
 import { handleChangeRFQStatus, handleGetRFQs } from '../../../services/rfqs'
 import { useNavigate } from 'react-router-dom'
@@ -107,7 +107,10 @@ export default function RFQTable({ prId, view = "rfq", filters = {} }) {
     },
     {
       title: "Actions",
-      render: (_, row) => (
+      render: (_, row) =>
+       {
+        console.log("row",row);
+        return   (
         <div className="flex gap-2">
           <Button 
             variant="ghost" 
@@ -126,7 +129,7 @@ export default function RFQTable({ prId, view = "rfq", filters = {} }) {
             <Edit className="w-4 h-4" />
           </Button>
           
-          {row.status !== 'purchase_ordered' && row.status !== 'canceled' && (
+          {row.status != 'purchase_ordered' && row.status != 'cancelled' && (
             <Button 
               variant="ghost" 
               size="icon"
@@ -137,17 +140,31 @@ export default function RFQTable({ prId, view = "rfq", filters = {} }) {
             </Button>
           )}
 
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => handleDelete(row.id)}
-            disabled={deleteMutation.isPending}
-            title="Delete RFQ"
-          >
-            <Trash2 className="w-4 h-4 text-red-500" />
-          </Button>
+          {row.status === 'purchase_ordered' && (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => navigate(`/create-grn/${row.id}`)}
+              title="Create GRN"
+            >
+              <PackagePlus className="w-4 h-4 text-emerald-600" />
+            </Button>
+          )}
+
+          {row.status !== 'canceled' && row.status !== 'cancelled' && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => handleDelete(row.id)}
+              disabled={deleteMutation.isPending}
+              title="Delete RFQ"
+            >
+              <Trash2 className="w-4 h-4 text-red-500" />
+            </Button>
+          )}
         </div>
       )
+       }
     }
   ];
 

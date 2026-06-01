@@ -9,19 +9,23 @@ import { Card, CardContent } from '../../ui/card'
 
 export default function GRNForm({ isEdit = false }) {
   const { control, setValue, watch } = useFormContext();
+  const [rfqDetails, setRfqDetails] = React.useState(null);
   const rfq_id = watch("rfq_id");
 
   useEffect(() => {
     if (rfq_id && !isEdit) {
       handleGetRFQDetails({ id: rfq_id }).then(res => {
-        if (res?.data?.items) {
-          setValue("items", res.data.items.map(item => ({
-            rfq_item_id: item.id,
-            item_name: item.item_name,
-            quantity_ordered: item.quantity,
-            quantity_received: item.quantity, // Default to full quantity
-            unit_name: item.unit?.name
-          })));
+        if (res?.data) {
+          setRfqDetails(res.data);
+          if (res.data.items) {
+            setValue("items", res.data.items.map(item => ({
+              rfq_item_id: item.id,
+              item_name: item.item_name,
+              quantity_ordered: item.quantity,
+              quantity_received: item.quantity, // Default to full quantity
+              unit_name: item.unit?.name
+            })));
+          }
         }
       });
     }
@@ -31,18 +35,12 @@ export default function GRNForm({ isEdit = false }) {
     <div className="space-y-6">
       <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
         <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <SearchableAsyncSelect 
-            control={control}
-            name="rfq_id"
-            label="Select Purchase Order / RFQ"
-            placeholder="Search by RFQ number..."
-            fetchFn={(params) => handleGetRFQs({ params: { ...params, view: 'po' } })}
-            queryKeyPrefix="grn_rfqs"
-            getOptionLabel={(option) => `#${option.rfq_number} - ${option.supplier?.company_name || 'No Supplier'}`}
-            getOptionValue={(option) => option?.id?.toString()}
-            disabled={isEdit}
-            isRequired={true}
-          />
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Purchase Order / RFQ Reference</label>
+            <div className="h-11 flex items-center px-4 bg-slate-50 border border-slate-100 rounded-xl text-slate-700 font-bold">
+              {rfqDetails?.rfq_number ? `#${rfqDetails.rfq_number}` : `ID: ${rfq_id}`}
+            </div>
+          </div>
           <DatePickerInput 
             control={control}
             name="received_date"

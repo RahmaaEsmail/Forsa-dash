@@ -169,7 +169,7 @@ export const routesData = [
   {
     id: "create-delivery-note",
     name: "Create Delivery Note",
-    path: "/create-delivery-note",
+    path: "/create-delivery-note/:id",
     component: CreateDeliveryNote,
     hidden: true,
   },
@@ -418,7 +418,7 @@ export const routesData = [
   {
     id: "create-grn",
     name: "Create GRN",
-    path: "/create-grn",
+    path: "/create-grn/:id",
     component: CreateGRN,
     hidden: true,
   },

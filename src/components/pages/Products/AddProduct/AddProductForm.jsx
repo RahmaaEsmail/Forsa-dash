@@ -356,27 +356,49 @@ export default function AddProductForm() {
             name="name_en"
           />
 
-          <CustomInput
+          {/* <CustomInput
             errors={errors?.product_code}
             placeholder={"e.g. STRB-16-001"}
             label={"Product Code"}
-            isRequired
             register={register}
             name="product_code"
-          />
+          /> */}
 
-          <CustomInput
+          {/* <CustomInput
             errors={errors?.product_sku}
             placeholder={"e.g. SKU-12345"}
             label={"Product SKU"}
-            isRequired
             register={register}
             name="product_sku"
-          />
+          /> */}
+
+           <CustomSelect
+          control={control}
+          name="category"
+          multiple={false}
+          errors={errors?.category}
+          label={"Main Category"}
+          isRequired
+          placeholder={
+            fetch_categories ? "Loading categories..." : "Choose main category"
+          }
+          options={mainCategoryOptions}
+          disabled={fetch_categories}
+          isLoading={fetch_categories}
+        />
+
+         <CustomInput
+          errors={errors?.brand}
+          label={"Brand"}
+          isRequired
+          placeholder={"e.g. Emirates Steel"}
+          register={register}
+          name="brand"
+        />
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-7">
+      {/* <div className="grid grid-cols-2 gap-7">
         <CustomSelect
           control={control}
           name="category"
@@ -391,16 +413,10 @@ export default function AddProductForm() {
           disabled={fetch_categories}
           isLoading={fetch_categories}
         />
-      </div>
+      </div> */}
 
       <div className="grid grid-cols-2 gap-7">
-        {/* <CustomInput
-          errors={errors?.brand}
-          label={"Brand"}
-          placeholder={"e.g. Emirates Steel"}
-          register={register}
-          name="brand"
-        /> */}
+       
 
         <CustomSelect
           control={control}

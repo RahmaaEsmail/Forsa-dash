@@ -28,9 +28,9 @@ const GROUP_CONFIG = {
   tax: { label: 'Taxation', icon: Percent },
   company: { label: 'Company Profile', icon: Building2 },
   system: { label: 'System Settings', icon: SettingsIcon },
-  orders: { label: 'Order Management', icon: ShoppingBag },
-  credit: { label: 'Credit & Payments', icon: CreditCard },
-  // notification: { label: 'Notifications', icon: BellRing },
+  // orders: { label: 'Order Management', icon: ShoppingBag },
+  // credit: { label: 'Credit & Payments', icon: CreditCard },
+  notification: { label: 'Notifications', icon: BellRing },
   general: { label: 'General Settings', icon: Globe },
 };
 
@@ -38,7 +38,6 @@ export default function Settings() {
   const { data: settingsData, isLoading } = useListSettings();
   const updateSettings = useUpdateSettings();
   const [formValues, setFormValues] = useState({});
-  const [expandedSettings, setExpandedSettings] = useState({});
 
   useEffect(() => {
     if (settingsData?.data) {
@@ -58,8 +57,24 @@ export default function Settings() {
 
   const groupedSettings = useMemo(() => {
     if (!settingsData?.data) return {};
+    
+    const HIDDEN_GROUPS = ['general', 'credit', 'orders'];
+    
     return settingsData.data.reduce((acc, setting) => {
       const group = setting.group || 'general';
+      
+      if (HIDDEN_GROUPS.includes(group)) return acc;
+      
+      const keyStr = setting.key?.toLowerCase() || '';
+      const labelStr = (setting.label?.en || '').toLowerCase();
+      
+      if (
+        keyStr.includes('date_format') || labelStr.includes('date format') ||
+        keyStr.includes('default_tax') || labelStr.includes('default tax')
+      ) {
+        return acc;
+      }
+
       if (!acc[group]) acc[group] = [];
       acc[group].push(setting);
       return acc;
@@ -71,20 +86,6 @@ export default function Settings() {
       ...prev,
       [key]: { ...prev[key], value },
     }));
-  };
-
-  const handleNestedChange = (key, field, lang, value) => {
-    setFormValues((prev) => ({
-      ...prev,
-      [key]: {
-        ...prev[key],
-        [field]: { ...prev[key][field], [lang]: value },
-      },
-    }));
-  };
-
-  const toggleExpand = (key) => {
-    setExpandedSettings((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleSave = () => {
@@ -139,7 +140,7 @@ export default function Settings() {
       <Tabs defaultValue={groups[0]} className="w-full">
         <TabsList className="mb-8 flex w-full flex-wrap justify-start gap-3 bg-transparent p-0">
           {groups.map((group) => {
-            const config = GROUP_CONFIG[group] || GROUP_CONFIG.general;
+            const config = GROUP_CONFIG[group] || { label: group, icon: SettingsIcon };
             const Icon = config.icon;
             return (
               <TabsTrigger
@@ -204,67 +205,8 @@ export default function Settings() {
                             />
                           )}
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => toggleExpand(setting.key)}
-                          className={`h-11 w-11 transition-transform duration-300 ${expandedSettings[setting.key] ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}
-                        >
-                          <Languages className="h-5 w-5" />
-                        </Button>
                       </div>
                     </div>
-
-                    {expandedSettings[setting.key] && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-muted/5 p-8 border-t border-border/20 animate-in slide-in-from-top-2 duration-300">
-                        <div className="space-y-6">
-                          <div className="space-y-3">
-                            <Label className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
-                              <span className="h-1 w-1 rounded-full bg-primary" /> Label (English)
-                            </Label>
-                            <Input 
-                              value={formValues[setting.key]?.label?.en || ''} 
-                              onChange={(e) => handleNestedChange(setting.key, 'label', 'en', e.target.value)}
-                              className="bg-background border-border/40 focus:border-primary/40"
-                            />
-                          </div>
-                          <div className="space-y-3">
-                            <Label className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
-                               <span className="h-1 w-1 rounded-full bg-primary" /> Label (Arabic)
-                            </Label>
-                            <Input 
-                              dir="rtl"
-                              value={formValues[setting.key]?.label?.ar || ''} 
-                              onChange={(e) => handleNestedChange(setting.key, 'label', 'ar', e.target.value)}
-                              className="bg-background border-border/40 font-cairo text-right focus:border-primary/40"
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-6">
-                          <div className="space-y-3">
-                            <Label className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
-                               <span className="h-1 w-1 rounded-full bg-primary" /> Description (English)
-                            </Label>
-                            <Textarea 
-                              value={formValues[setting.key]?.description?.en || ''} 
-                              onChange={(e) => handleNestedChange(setting.key, 'description', 'en', e.target.value)}
-                              className="bg-background border-border/40 min-h-[90px] focus:border-primary/40"
-                            />
-                          </div>
-                          <div className="space-y-3">
-                            <Label className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
-                               <span className="h-1 w-1 rounded-full bg-primary" /> Description (Arabic)
-                            </Label>
-                            <Textarea 
-                              dir="rtl"
-                              value={formValues[setting.key]?.description?.ar || ''} 
-                              onChange={(e) => handleNestedChange(setting.key, 'description', 'ar', e.target.value)}
-                              className="bg-background border-border/40 font-cairo min-h-[90px] text-right focus:border-primary/40"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 ))}
               </CardContent>

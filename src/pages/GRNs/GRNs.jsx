@@ -37,13 +37,7 @@ export default function GRNs() {
             Export
           </Button>
 
-          <Button 
-            onClick={() => navigate(`/create-grn`)}
-            className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
-          >
-            <Plus className="w-4 h-4" />
-            Create GRN
-          </Button>
+
         </div>
       </PageHeader>
 

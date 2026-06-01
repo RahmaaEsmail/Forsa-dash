@@ -9,8 +9,10 @@ import { Badge } from '../../../ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../ui/tabs';
 import SearchableAsyncSelect from '../../../shared/SearchableAsyncSelect';
 import { handleGetAllProducts } from '../../../../services/products';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../ui/select";
+import { Controller } from "react-hook-form";
 
-export default function RFQItemsTable({ items, isEdit = false }) {
+export default function RFQItemsTable({ items, isEdit = false, prData }) {
   const { control, register, watch, setValue } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -48,13 +50,36 @@ export default function RFQItemsTable({ items, isEdit = false }) {
       className: "text-left px-4",
       render: (_, record, index) => (
         <div className="min-w-[200px] text-left">
-          <SearchableAsyncSelect
+          <Controller
             control={control}
             name={`items.${index}.purchase_request_item_id`}
-            placeholder="Search product..."
-            fetchFn={handleGetAllProducts}
-            queryKeyPrefix="products"
-            onSelectOption={(prod) => handleProductSelect(prod, index)}
+            render={({ field }) => (
+              <Select
+                value={field.value ? String(field.value) : ""}
+                onValueChange={(val) => {
+                  field.onChange(val);
+                  const selectedPrItem = prData?.data?.items?.find(i => String(i.id) === String(val));
+                  if (selectedPrItem) {
+                    setValue(`items.${index}.item_name`, selectedPrItem.item_name || selectedPrItem.item?.name?.en || "");
+                    setValue(`items.${index}.specifications`, selectedPrItem.specifications || "");
+                    setValue(`items.${index}.unit_name`, selectedPrItem.unit?.name?.en || selectedPrItem.unit?.name?.ar || "");
+                    setValue(`items.${index}.unit_price`, 0);
+                    setValue(`items.${index}.target_price`, selectedPrItem.target_price || 0);
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full bg-transparent border text-sm h-10 shadow-none focus:ring-0">
+                  <SelectValue placeholder="Select PR product..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {prData?.data?.items?.map(item => (
+                    <SelectItem key={item.id} value={String(item.id)}>
+                      {item.item_name || item.item?.name?.en || `Item #${item.id}`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           />
         </div>
       )

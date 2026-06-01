@@ -13,7 +13,8 @@ export default function ProductInventoryForm() {
   } = useFormContext();
 
   const { data: all_suppliers, isLoading } = useQuery(getAllSupplierOptions());
-
+  
+  console.log("all_suppliers", all_suppliers);
   const all_suppliers_options = useMemo(() => {
     const list = all_suppliers?.data ?? [];
 
@@ -27,7 +28,7 @@ export default function ProductInventoryForm() {
 
       const label = fullName || (item?.name ?? "Unnamed Supplier");
 
-      return { label, value: item?.id };
+      return { label : item?.company_name, value: item?.id };
     });
   }, [all_suppliers]);
 

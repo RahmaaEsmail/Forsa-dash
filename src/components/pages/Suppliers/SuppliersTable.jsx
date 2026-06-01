@@ -44,7 +44,7 @@ export default function SuppliersTable({ searc,  sortOrder, page,per_page,  data
   const columns = [
   { title: "#", dataIndex: "id", key: "id" },
 
-  { title: "Arabic Name", dataIndex: "name", key: "name" },
+  // { title: "Arabic Name", dataIndex: "name", key: "name" },
 
   { title: "Company", dataIndex: "company_name", key: "company_name" },
 

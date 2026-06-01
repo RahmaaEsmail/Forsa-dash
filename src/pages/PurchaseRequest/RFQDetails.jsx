@@ -1129,7 +1129,7 @@ export default function RFQDetails() {
 
       <div className="mx-auto max-w-7xl space-y-6 no-print">
         {/* Main Header Action Controls */}
-        {/* <div className="flex flex-col gap-4 rounded-3xl border bg-background p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 rounded-3xl border bg-background p-5 shadow-sm md:flex-row md:items-center md:justify-between">
           <div className="flex items-start gap-4">
             <Button variant="outline" size="icon" onClick={() => navigate(-1)} className="rounded-2xl">
               <ArrowLeft className="size-4" />
@@ -1158,13 +1158,21 @@ export default function RFQDetails() {
             >
               <Printer className="w-4 h-4" /> Download/Print Full PDF
             </Button>
+            {rfq.status === 'purchase_ordered' && (
+              <Button 
+                className="rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2"
+                onClick={() => navigate(`/create-grn/${rfq.id}`)}
+              >
+                <Package className="w-4 h-4" /> Create GRN
+              </Button>
+            )}
             {rfq.can_be_fully_edited && (
               <Button variant="outline" className="rounded-2xl" onClick={() => navigate(`/rfqs/${rfq.id}/edit`)}>
                 <Pencil className="mr-2 size-4" /> Edit RFQ
               </Button>
             )}
           </div>
-        </div> */}
+        </div>
 
         {/* Informational Cards */}
         {/* <div className="grid gap-5 lg:grid-cols-3">

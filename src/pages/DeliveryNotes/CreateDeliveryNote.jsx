@@ -4,17 +4,18 @@ import { Button } from '../../components/ui/button'
 import DeliveryNoteForm from '../../components/pages/DeliveryNotes/DeliveryNoteForm'
 import { FormProvider, useForm } from 'react-hook-form'
 import useCreateDeliveryNote from '../../hooks/delivery-notes/useCreateDeliveryNote'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { format } from 'date-fns'
 import { Save, ArrowLeft } from 'lucide-react'
 
 export default function CreateDeliveryNote() {
+  const { id } = useParams();
   const navigate = useNavigate();
   const createDeliveryNote = useCreateDeliveryNote();
   
   const methods = useForm({
     defaultValues: {
-      quotation_id: "",
+      quotation_id: id || "",
       customer_id: "",
       delivery_date: new Date(),
       delivery_address: "",

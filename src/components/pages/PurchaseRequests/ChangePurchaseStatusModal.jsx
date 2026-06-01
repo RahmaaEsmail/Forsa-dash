@@ -7,28 +7,23 @@ import { useForm } from 'react-hook-form';
 import useChangePurchaseStatus from '../../../hooks/purchaseRequest/useChangePurchaseStatus';
 import { toast } from 'sonner';
 
-const status_options = [
-  {
-    label: "Approved",
-    value: "approve",
-  },
-  {
-    label: "Submitted",
-    value: "submit",
-  },
-  {
-    label: "Reject",
-    value: "reject",
-  },
-  {
-    label: "Cancel",
-    value: "cancel",
-  },
-  {
-    label: "Draft",
-    value: "revert-to-draft"
+const getAvailableStatuses = (currentStatus) => {
+  const status = currentStatus?.toLowerCase();
+  switch(status) {
+    case 'draft':
+      return [{ label: "Submit (Pending)", value: "submit" }];
+    case 'pending':
+    case 'submitted':
+      return [
+        { label: "Approve", value: "approve" },
+        { label: "Reject", value: "reject" }
+      ];
+    case 'approved':
+      return [{ label: "Cancel", value: "cancel" }];
+    default:
+      return [];
   }
-];
+};
 
 export default function ChangePurchaseStatusModal({ open, setOpen, currentStatus, id, onSuccess }) {
   const { control, register, handleSubmit, watch, reset, formState: { errors } } = useForm({
@@ -39,6 +34,7 @@ export default function ChangePurchaseStatusModal({ open, setOpen, currentStatus
   });
 
   const selectedStatus = watch("status");
+  const available_status_options = getAvailableStatuses(currentStatus);
   
   const { mutate, isPending, isSuccess, isError, error } = useChangePurchaseStatus();
 
@@ -84,7 +80,7 @@ export default function ChangePurchaseStatusModal({ open, setOpen, currentStatus
 
   // Get status label for display
   const getStatusLabel = (statusValue) => {
-    const option = status_options.find(opt => opt.value === statusValue);
+    const option = getAvailableStatuses(currentStatus).find(opt => opt.value === statusValue);
     return option ? option.label : "None selected";
   };
 
@@ -107,7 +103,7 @@ export default function ChangePurchaseStatusModal({ open, setOpen, currentStatus
           {/* Status Selector */}
           <div className="mb-4">
             <CustomSelect
-              options={status_options}
+              options={available_status_options}
               control={control}
               isRequired={true}
               name="status"

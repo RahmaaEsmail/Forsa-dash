@@ -35,7 +35,7 @@ export const handleAddPurchaseRequest = async ({ body, signal }) => {
 }
 
 export const handleUpdatePurchaseRequest = async ({ id, body, signal }) => {
-  const response = await apiInstance.put(`${userEndpoints.get_purchase_request}/${id}`, body, {
+  const response = await apiInstance.post(`${userEndpoints.get_purchase_request}/${id}`, body, {
     signal
   });
   return response.data;

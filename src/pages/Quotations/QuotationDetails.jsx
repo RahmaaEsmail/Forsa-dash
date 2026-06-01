@@ -714,7 +714,8 @@ import {
   CreditCard,
   FileText,
   XCircle,
-  Trash2
+  Trash2,
+  Truck
 } from 'lucide-react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { useQuotationDetails } from '../../hooks/quotations/useQuotationDetails'
@@ -916,6 +917,16 @@ export default function QuotationDetails() {
               >
                 <CreditCard className="w-4 h-4" />
                 {updateStatus.isPending ? "Processing..." : "Record Payment"}
+              </Button>
+            )}
+
+            {(quotation?.status === 'paid_payment' || quotation?.status === 'approved') && (
+              <Button 
+                onClick={() => navigate(`/create-delivery-note/${id}`)}
+                className="h-11 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2 shadow-lg shadow-blue-600/20"
+              >
+                <Truck className="w-4 h-4" />
+                Create Delivery Note
               </Button>
             )}
 

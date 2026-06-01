@@ -103,7 +103,7 @@ export default function ProductTable({ data = product_data }) {
                 </TableCell>
 
                 <TableCell className={`${tdBase} text-left`}>
-                  {prod?.category?.parent?.name || "---"}
+                  {prod?.category?.name || "---"}
                 </TableCell>
 
                 <TableCell className={`${tdBase} text-center`}>

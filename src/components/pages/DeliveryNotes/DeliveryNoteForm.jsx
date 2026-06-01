@@ -115,20 +115,12 @@ export default function DeliveryNoteForm({ isReadOnly = false, isEdit = false })
 
         <div className="p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-            <CustomSelect
-              control={control}
-              name="quotation_id"
-              label="Select Quotation"
-              placeholder="Select Quotation..."
-              isRequired={true}
-              disabled={isReadOnly}
-              options={quotation_data?.data?.map(q => ({
-                value: q.id.toString(),
-                label: `#${q.quotation_number} - ${q.customer?.company_name || 'No Customer'}`,
-                textValue: q.quotation_number
-              })) || []}
-              errors={errors?.quotation_id}
-            />
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Quotation Reference</label>
+              <div className="h-11 flex items-center px-4 bg-slate-50 border border-slate-100 rounded-xl text-slate-700 font-bold">
+                {quotationResponse?.data?.quotation_number ? `#${quotationResponse.data.quotation_number}` : `ID: ${selectedQuotationId}`}
+              </div>
+            </div>
 
             <DatePickerInput
               control={control}

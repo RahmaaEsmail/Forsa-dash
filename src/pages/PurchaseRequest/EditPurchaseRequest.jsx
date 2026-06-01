@@ -10,7 +10,11 @@ import { format } from 'date-fns'
 import { useNavigate, useParams } from 'react-router-dom'
 import usePurchaseDetails from '../../hooks/purchaseRequest/usePurchaseDetails'
 import useUpdatePurchaseRequest from '../../hooks/purchaseRequest/useUpdatePurchaseRequest'
+import useChangePurchaseStatus from '../../hooks/purchaseRequest/useChangePurchaseStatus'
 import Loading from '../../components/shared/Loading'
+import ChangePurchaseStatusModal from '../../components/pages/PurchaseRequests/ChangePurchaseStatusModal'
+import { useState } from 'react'
+import { FilePlus } from 'lucide-react'
 
 export default function EditPurchaseRequest() {
   const { id } = useParams();
@@ -19,6 +23,8 @@ export default function EditPurchaseRequest() {
   
   const { mutate: fetchDetails, data: prData, isPending: isLoadingDetails } = usePurchaseDetails();
   const { mutate: updatePR, isPending: isUpdating } = useUpdatePurchaseRequest();
+  
+  const [openChangeStatus, setOpenChangeStatus] = useState(false);
 
   const method = useForm({
     defaultValues: {
@@ -103,7 +109,7 @@ export default function EditPurchaseRequest() {
       },
       onError: (err) => {
         console.log("error",err);
-        toast.error(err.response?.data?.message || err.message || "Failed to update PR.");
+        toast.error(err.response?.data?.error?.message || err.message || "Failed to update PR.");
       }
     });
   }
@@ -115,6 +121,28 @@ export default function EditPurchaseRequest() {
     <div className="flex pb-6 flex-col gap-10">
       <PageHeader title={"Edit Purchase Request"} subTitle={`Updating PR #${prData?.data?.pr_number || id}`}>
         <div className='flex gap-2 items-center'>
+          {prData?.data?.status && prData?.data?.status?.toLowerCase() !== 'cancelled' && prData?.data?.status?.toLowerCase() !== 'rejected' && (
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="border-primary text-primary hover:bg-primary/10 font-bold" 
+              onClick={() => setOpenChangeStatus(true)}
+            >
+              Change Status
+            </Button>
+          )}
+
+          {prData?.data?.status?.toLowerCase() === 'approved' && (
+            <Button 
+              type="button" 
+              onClick={() => navigate(`/purchase-requests/${id}/rfqs`)}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold flex items-center gap-2"
+            >
+              <FilePlus className="w-4 h-4" />
+              RFQs & Quotations
+            </Button>
+          )}
+
           <Button 
             type="button"
             onClick={() => navigate("/purchaseRequest")}
@@ -137,6 +165,14 @@ export default function EditPurchaseRequest() {
       </form>  
 
       <PurchaseRequestsTabs />
+      
+      <ChangePurchaseStatusModal 
+        open={openChangeStatus}
+        setOpen={setOpenChangeStatus} 
+        currentStatus={prData?.data?.status}
+        id={id}
+        onSuccess={() => fetchDetails({ id })}
+      /> 
     </div>
     </FormProvider>
   )

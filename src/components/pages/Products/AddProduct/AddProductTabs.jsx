@@ -34,8 +34,70 @@ const tabs = [
 ];
 
 // ✅ Helper: map API product -> RHF values
+// function mapProductToForm(product) {
+//   if (!product) return null;
+
+//   console.log("product", product);
+
+//   return {
+//     // General
+//     name_ar: product?.name?.ar ?? "",
+//     name_en: product?.name?.en ?? "",
+//     product_code: product?.model ?? "",
+//     product_sku: product?.model ?? "",
+//     category: product?.category?.id ? String(product.category?.id) : (product?.category?.id ? String(product.category.id) : ""),
+//     subcategory: "",
+//     brand: product?.brand ?? "",
+//     unit_of_measure: Array.isArray(product?.units)
+//       ? product.units.map((u) => String(u.id))
+//       : [],
+//     description: product?.description?? "",
+//     image: product?.image ?? null, // ✅ غالبًا URL في edit
+
+//     // Pricing
+//     currency:  "SAR",
+//     cost_price: product?.cost_price ?? "",
+//     selling_price: product?.selling_price ?? "",
+//     discount_role: product?.default_discount_rule ?? "",
+
+//     // Inventory
+//     supplier: product?.default_supplier_id ? String(product.default_supplier_id) : "",
+//     max_stock: product?.max_stock ?? "",
+//     min_stock: product?.minimum_stock ?? "",
+//     avg_time: product?.average_lead_time ?? "",
+//     storage_location_code: product?.storage_location_code ?? "",
+
+//     // Attachments (existing)
+//     attachment: Array.isArray(product?.attachments) ? product.attachments : [],
+
+//     // ✅ new files only (always empty at reset)
+//     attachment_files: [],
+//   };
+// }
+
+// ✅ Helper: map API product -> RHF values
 function mapProductToForm(product) {
   if (!product) return null;
+
+  console.log("Mapping product to form:", product);
+
+  // Extract category ID safely
+  let categoryId = "";
+  if (product?.category && typeof product.category === 'object' && product.category.id) {
+    categoryId = String(product.category.id);
+  } else if (product?.category && (typeof product.category === 'string' || typeof product.category === 'number')) {
+    categoryId = String(product.category);
+  } else if (product?.category_id) {
+    categoryId = String(product.category_id);
+  }
+
+  // Extract unit IDs safely
+  let unitIds = [];
+  if (Array.isArray(product?.units)) {
+    unitIds = product.units.map((u) => String(u.id));
+  } else if (product?.unit_id) {
+    unitIds = [String(product.unit_id)];
+  }
 
   return {
     // General
@@ -43,17 +105,15 @@ function mapProductToForm(product) {
     name_en: product?.name?.en ?? "",
     product_code: product?.model ?? "",
     product_sku: product?.model ?? "",
-    category: product?.category?.id ? String(product.category.id) : "",
+    category: categoryId, // ✅ Now properly set as string
     subcategory: "",
     brand: product?.brand ?? "",
-    unit_of_measure: Array.isArray(product?.units)
-      ? product.units.map((u) => String(u.id))
-      : [],
-    description: product?.description?? "",
-    image: product?.image ?? null, // ✅ غالبًا URL في edit
+    unit_of_measure: unitIds,
+    description: product?.description ?? "",
+    image: product?.image ?? null,
 
     // Pricing
-    currency:  "SAR",
+    currency: product?.currency ?? "SAR",
     cost_price: product?.cost_price ?? "",
     selling_price: product?.selling_price ?? "",
     discount_role: product?.default_discount_rule ?? "",
@@ -65,10 +125,8 @@ function mapProductToForm(product) {
     avg_time: product?.average_lead_time ?? "",
     storage_location_code: product?.storage_location_code ?? "",
 
-    // Attachments (existing)
+    // Attachments
     attachment: Array.isArray(product?.attachments) ? product.attachments : [],
-
-    // ✅ new files only (always empty at reset)
     attachment_files: [],
   };
 }

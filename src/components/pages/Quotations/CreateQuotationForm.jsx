@@ -167,25 +167,29 @@ export default function CreateQuotationForm({
               icon={<Clock className="w-4 h-4 text-slate-400" />}
             />
 
-            <CustomInput
-              register={register}
-              name="payment_days"
-              type="number"
-              label="Payment Days"
-              placeholder="e.g. 30"
-              disabled={isReadOnly}
-              icon={<Wallet className="w-4 h-4 text-slate-400" />}
-            />
+            {!isEdit && (
+              <>
+                <CustomInput
+                  register={register}
+                  name="payment_days"
+                  type="number"
+                  label="Payment Days"
+                  placeholder="e.g. 30"
+                  disabled={isReadOnly}
+                  icon={<Wallet className="w-4 h-4 text-slate-400" />}
+                />
 
-            <CustomInput
-              register={register}
-              name="delivery_days"
-              type="number"
-              label="Delivery Days"
-              placeholder="e.g. 7"
-              disabled={isReadOnly}
-              icon={<Truck className="w-4 h-4 text-slate-400" />}
-            />
+                <CustomInput
+                  register={register}
+                  name="delivery_days"
+                  type="number"
+                  label="Delivery Days"
+                  placeholder="e.g. 7"
+                  disabled={isReadOnly}
+                  icon={<Truck className="w-4 h-4 text-slate-400" />}
+                />
+              </>
+            )}
           </div>
         </div>
       </Card>

@@ -24,6 +24,7 @@ export default function CreateRFQ() {
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [rfqStatus, setRfqStatus] = useState("draft");
+  const [rfqDetailsPrId, setRfqDetailsPrId] = useState(null);
 
   const methods = useForm({
     defaultValues: {
@@ -55,6 +56,9 @@ export default function CreateRFQ() {
           const data = res.data;
           console.log("editing data", data);
           setRfqStatus(data.status || "draft");
+          if (data.purchase_request_id || data.purchase_request?.id) {
+            setRfqDetailsPrId(data.purchase_request_id || data.purchase_request?.id);
+          }
           methods.reset({
             supplier_id: data.supplier?.id?.toString(),
             currency_code: data.currency?.code,
@@ -66,8 +70,8 @@ export default function CreateRFQ() {
             notes: data.notes || "",
             rfq_number: data.rfq_number,
             items: data.items?.map(item => ({
-              id: item?.item_id,
-              purchase_request_item_id: item.purchase_request_item_id || item.id,
+              id: item.id,
+              purchase_request_item_id: item.purchase_request_item_id,
               item_name: item.item_name,
               quantity: item.quantity,
               unit_name: item.unit?.name,
@@ -87,6 +91,12 @@ export default function CreateRFQ() {
       loadRFQDetails();
     }
   }, [isEdit, rfqId, loadRFQDetails]);
+
+  useEffect(() => {
+    if (rfqDetailsPrId) {
+      fetchPR({ id: rfqDetailsPrId });
+    }
+  }, [rfqDetailsPrId, fetchPR]);
 
   useEffect(() => {
     if (!isEdit && prData?.data) {
@@ -178,12 +188,12 @@ export default function CreateRFQ() {
       if (res?.success) {
         toast.success(res.message || `RFQ ${isEdit ? 'updated' : 'created'} successfully!`);
         const newRfqId = res.data?.id || rfqId;
-         if(prId) {
-
-            navigate(`/purchase-requests/${prId}/rfqs`); 
-          }else {
+        const redirectPrId = prId || rfqDetailsPrId;
+        if(redirectPrId) {
+            navigate(`/purchase-requests/${redirectPrId}/rfqs`); 
+        } else {
             navigate(`/rfqs`)
-          }
+        }
         // navigate(`/rfqs/${newRfqId}/details`);
       }
     }).catch(err => {
@@ -296,7 +306,7 @@ export default function CreateRFQ() {
               )} */}
               <RFQGeneralInfo isEdit={isEdit} prData={prData} />
             </div>
-            <RFQItemsTable isEdit={isEdit}  />
+            <RFQItemsTable isEdit={isEdit} prData={prData} />
           </div>
         </div>
 

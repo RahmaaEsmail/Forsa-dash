@@ -71,6 +71,8 @@ export const userEndpoints = {
    get_activity:"activity-logs",
    get_activity_mentions:"activity-logs/my-mentions",
    add_comment:"activity-logs/comments",
-   
+    
+   // stats
+   home:"stats"
 
 }

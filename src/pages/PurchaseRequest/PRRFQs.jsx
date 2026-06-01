@@ -38,6 +38,13 @@ export default function PRRFQs() {
       >
         <div className='flex gap-2 items-center'>
           <Button 
+            variant="outline"
+            onClick={() => navigate(`/purchase_request_details/${prId}`)}
+            className={"font-bold flex items-center gap-2 text-primary border-primary hover:bg-primary/5"}
+          >
+            Back to PR Details
+          </Button>
+          <Button 
             onClick={() => navigate(`/purchase-requests/${prId}/create-rfq`)}
             className={"font-bold flex items-center gap-2"}>
             <Plus className="w-4 h-4" />

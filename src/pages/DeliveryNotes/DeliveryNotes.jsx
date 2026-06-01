@@ -37,13 +37,7 @@ export default function DeliveryNotes() {
             Export
           </Button>
 
-          <Button 
-            onClick={() => navigate(`/create-delivery-note`)}
-            className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
-          >
-            <Plus className="w-4 h-4" />
-            Create Note
-          </Button>
+
         </div>
       </PageHeader>
 

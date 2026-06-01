@@ -62,8 +62,8 @@ export const makeBasicProductDataSchema = (mode) =>
   z.object({
     name_ar: requiredText("name_ar").min(2, "Product Arabic Name must be at least 2 character"),
     name_en: requiredText("name_en").min(2, "Product English Name must be at least 2 character"),
-    product_code: requiredText("product_code"),
-    product_sku: requiredText("product_sku"),
+    product_code: z.string().optional(),
+    product_sku: z.string().optional(),
     category: requiredText("category"),
     brand: requiredText("brand"),
     unit_of_measure: z.array(z.any()).optional(),

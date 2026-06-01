@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useForm, FormProvider } from 'react-hook-form'
 import PageHeader from '../../components/shared/PageHeader'
 import { Button } from '../../components/ui/button'
@@ -8,12 +8,13 @@ import GRNForm from '../../components/pages/GRNs/GRNForm'
 import { format } from 'date-fns'
 
 export default function CreateGRN() {
+  const { id } = useParams();
   const navigate = useNavigate();
   const createGRN = useCreateGRN();
 
   const methods = useForm({
     defaultValues: {
-      rfq_id: "",
+      rfq_id: id || "",
       received_date: new Date(),
       supplier_reference: null,
       items: []
