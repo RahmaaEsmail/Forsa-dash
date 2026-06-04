@@ -218,7 +218,7 @@ export default function AddProductTabs() {
 
     formData.append("name[en]", values?.name_en ?? "");
     formData.append("name[ar]", values?.name_ar ?? "");
-    formData.append("description[en]", values?.description ?? "");
+    formData.append("description", values?.description ?? "");
 
     formData.append("brand", values?.brand ?? "");
     formData.append("model", values?.product_sku ?? "");

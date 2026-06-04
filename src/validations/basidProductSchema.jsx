@@ -107,8 +107,8 @@ export const makeProductAttachmentValidation = (mode) =>
     // ✅ existing attachments (urls/objects) — always optional
     attachment: z.array(existingAttachmentSchema).optional().default([]),
 
-    // ✅ new uploads only
-    attachment_files: mode === "create" ? newFilesSchemaCreate : newFilesSchemaEdit,
+    // ✅ new uploads only (always optional)
+    attachment_files: newFilesSchemaEdit,
   });
 
 export const makeAddProductSchema = (mode) =>
