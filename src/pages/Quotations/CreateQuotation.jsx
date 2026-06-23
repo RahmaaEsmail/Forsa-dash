@@ -22,6 +22,7 @@ export default function CreateQuotation() {
       payment_days: 30,
       delivery_days: 7,
       notes: "",
+      delivery_address: "",
       items: []
     },
   })
@@ -37,6 +38,7 @@ export default function CreateQuotation() {
       payment_days: Number(values.payment_days),
       delivery_days: Number(values.delivery_days),
       notes: values.notes,
+      delivery_address: values.delivery_address || "",
       items: values.items.map(item => ({
         rfq_item_id: Number(item.rfq_item_id),
         quantity: Number(item.quantity),

@@ -30,6 +30,7 @@ export default function EditQuotation() {
       payment_days: 30,
       delivery_days: 7,
       notes: "",
+      delivery_address: "",
       items: []
     },
   })
@@ -48,6 +49,7 @@ export default function EditQuotation() {
         payment_days: quotation.payment_days || 0,
         delivery_days: quotation.delivery_days || 0,
         notes: quotation.notes || "",
+        delivery_address: quotation.delivery_address || "",
         items: quotation.items?.map(item => ({
           id: item.id,
           rfq_item_id: item.rfq_item_id,
@@ -69,6 +71,7 @@ export default function EditQuotation() {
       payment_days: Number(values.payment_days) || 0,
       delivery_days: Number(values.delivery_days) || 0,
       notes: values.notes || "",
+      delivery_address: values.delivery_address || "",
     };
 
     updateQuotation.mutate({ id, body: payload }, {

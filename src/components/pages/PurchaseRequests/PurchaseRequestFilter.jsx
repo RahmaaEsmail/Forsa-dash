@@ -21,12 +21,10 @@ export default function PurchaseRequestFilter({ setFilter, filter }) {
     })
   }
   
-  console.log("search",filter);
-
   return (
     <div className='bg-white flex w-full  items-center rounded-main'>
        <div className='p-6 w-[350px]  text-secondary font-bold text-sm flex justify-center items-center border-r border-gray-200'>
-        <Input placeholder="Search" value={filter?.name}  onChange={(e) => handleValueChange("name", e.target.value)} />
+        <Input placeholder="Search" value={filter?.search}  onChange={(e) => handleValueChange("search", e.target.value)} />
       </div>
 
       <div className='p-6 border-r px-7 border-gray-200'>
@@ -71,8 +69,12 @@ export default function PurchaseRequestFilter({ setFilter, filter }) {
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Status</SelectLabel>
-              <SelectItem value="rfq">RFQ</SelectItem>
-              <SelectItem value="approved">Waiting PM Approval</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="submitted">Submitted</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>

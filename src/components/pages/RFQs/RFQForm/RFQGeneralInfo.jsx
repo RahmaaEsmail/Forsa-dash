@@ -10,8 +10,7 @@ import CustomSelect from '../../../shared/CustomSelect'
 import CustomInput from '../../../shared/CustomInput'
 import { Card, CardContent } from '../../../ui/card'
 import { useQuery } from '@tanstack/react-query'
-import { Mail, Printer, Star } from 'lucide-react'
-import { Button } from '../../../ui/button'
+import { MapPin, Star } from 'lucide-react'
 import useListSettings from '../../../../hooks/Settings/useListSettings'
 import useListPaymentTerms from '../../../../hooks/paymentTerms/useListPaymentTerms'
 
@@ -69,6 +68,18 @@ export default function RFQGeneralInfo({ prData , isEdit}) {
     }
   }, [supplierDetails, setValue]);
 
+  // Build address options from the selected supplier's registered addresses
+  const deliveryAddressOptions = useMemo(() => {
+    const addrs = supplierDetails?.data?.addresses || [];
+    return addrs.map(a => {
+      const parts = [a.address_line_1, a.address_line_2, a.city, a.state, a.country].filter(Boolean);
+      return {
+        label: `${a.label || a.type || 'Address'} — ${parts.join(', ')}`,
+        value: parts.join(', ')
+      };
+    });
+  }, [supplierDetails]);
+
   const uniqueCurrencyOptions = useMemo(() => {
     const currencyData = flagData?.data || [];
     const map = new Map();
@@ -116,15 +127,25 @@ export default function RFQGeneralInfo({ prData , isEdit}) {
 
       <CardContent className="p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-y-6 gap-x-12">
-          {!isEdit && <SearchableAsyncSelect
-            control={control}
-            name="supplier_id"
-            label="Vendor"
-            placeholder="Enter vendor name"
-            isRequired={true}
-            fetchFn={handleGetAllSupplier}
-            queryKeyPrefix="suppliers"
-          />}
+          {!isEdit ? (
+            <SearchableAsyncSelect
+              control={control}
+              name="supplier_id"
+              label="Vendor"
+              placeholder="Enter vendor name"
+              isRequired={true}
+              fetchFn={handleGetAllSupplier}
+              queryKeyPrefix="suppliers"
+            />
+          ) : (
+            <CustomInput
+              register={register}
+              name="supplier_name"
+              label="Vendor"
+              placeholder="—"
+              disabled
+            />
+          )}
 
           {/* <CustomSelect 
             control={control} 
@@ -166,28 +187,36 @@ export default function RFQGeneralInfo({ prData , isEdit}) {
             options={[]}
           /> */}
 
-         {!isEdit &&  (
-          paymentTermsOptions  ? (
-            <CustomSelect
-              control={control}
-              name="payment_term_id"
-              label="Payment terms"
-              placeholder="Choose the payment terms"
-              isRequired={true}
-              options={paymentTermsOptions}
-            />
+          {!isEdit ? (
+            paymentTermsOptions ? (
+              <CustomSelect
+                control={control}
+                name="payment_term_id"
+                label="Payment terms"
+                placeholder="Choose the payment terms"
+                isRequired={true}
+                options={paymentTermsOptions}
+              />
+            ) : (
+              <SearchableAsyncSelect
+                control={control}
+                name="payment_term_id"
+                label="Payment terms"
+                placeholder="Choose the payment terms"
+                isRequired={true}
+                fetchFn={handleGetAllPaymentTerms}
+                queryKeyPrefix="payment-terms"
+              />
+            )
           ) : (
-            <SearchableAsyncSelect
-              control={control}
-              name="payment_term_id"
+            <CustomInput
+              register={register}
+              name="payment_terms_text"
               label="Payment terms"
-              placeholder="Choose the payment terms"
-              isRequired={true}
-              fetchFn={handleGetAllPaymentTerms}
-              queryKeyPrefix="payment-terms"
+              placeholder="—"
+              disabled
             />
-          )
-         )}
+          )}
 
           {/* <CustomSelect
             control={control}
@@ -231,12 +260,31 @@ export default function RFQGeneralInfo({ prData , isEdit}) {
           <DatePickerInput
             control={control}
             name={isEdit ? "due_date" : "receipt_date"}
-            label={isEdit ?"Due Date" :"Receipt Date"}
+            label={isEdit ? "Due Date" : "Receipt Date"}
             placeholder="24/12/2025"
           />
+
+          {/* Delivery / Warehouse Address — populated from supplier's registered addresses */}
+          {deliveryAddressOptions.length > 0 ? (
+            <CustomSelect
+              control={control}
+              name="delivery_address"
+              label="Delivery / Warehouse Address"
+              placeholder="Select receiving address..."
+              options={deliveryAddressOptions}
+            />
+          ) : (
+            <CustomInput
+              register={register}
+              name="delivery_address"
+              label="Delivery / Warehouse Address"
+              placeholder="Enter delivery address"
+              icon={<MapPin className="w-4 h-4 text-slate-400" />}
+            />
+          )}
         </div>
 
-        
+
       </CardContent>
     </Card>
   )

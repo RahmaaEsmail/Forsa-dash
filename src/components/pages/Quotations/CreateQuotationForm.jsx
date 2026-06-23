@@ -8,7 +8,7 @@ import { handleGetRFQs, handleGetRFQDetails } from "../../../services/rfqs"
 import { useCurrencyFlags } from "../../../hooks/useCurrencyFlags"
 import QuotationItemsTable from "./QuotationItemsTable"
 import { Separator } from "../../ui/separator"
-import { FileText, Calendar, Wallet, Truck, Clock } from 'lucide-react'
+import { FileText, Calendar, Wallet, Truck, Clock, MapPin } from 'lucide-react'
 import { handleGetAllSupplier } from "../../../services/suppliers"
 import CustomSelect from "../../shared/CustomSelect"
 
@@ -190,6 +190,15 @@ export default function CreateQuotationForm({
                 />
               </>
             )}
+
+            <CustomInput
+              register={register}
+              name="delivery_address"
+              label="Client Delivery Address"
+              placeholder="Enter client delivery address"
+              disabled={isReadOnly}
+              icon={<MapPin className="w-4 h-4 text-slate-400" />}
+            />
           </div>
         </div>
       </Card>

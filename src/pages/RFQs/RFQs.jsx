@@ -25,14 +25,14 @@ export default function RFQs() {
     <div className="flex pb-6 flex-col gap-8">
       <PageHeader title={"Request for Quotation"}>
         <div className='flex gap-2 items-center'>
-          <Button className={"bg-white border border-primary text-primary font-bold hover:bg-slate-50 transition-all"}>
+          {/* <Button className={"bg-white border border-primary text-primary font-bold hover:bg-slate-50 transition-all"}>
             <Download className="w-4 h-4 mr-2" />
             <span>Download</span>
-          </Button>
+          </Button> */}
         </div>
       </PageHeader>
 
-      <RFQStatusTabs />
+      {/* <RFQStatusTabs /> */}
 
       <RFQFilter onFilter={handleFilter} onReset={handleReset} />
 

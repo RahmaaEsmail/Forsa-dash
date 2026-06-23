@@ -932,6 +932,7 @@ import {
   Database,
   Info
 } from "lucide-react";
+import html2pdf from "html2pdf.js";
 
 import { useRFQDetails } from "../../hooks/rfqs/useRFQs";
 import useListSettings from "../../hooks/Settings/useListSettings";
@@ -1070,8 +1071,22 @@ export default function RFQDetails() {
   const rfq = getRfq(rfqResponse);
   const currency = rfq?.currency;
 
-  const handlePrint = () => {
-    window.print();
+  const handleDownloadPDF = () => {
+    const element = document.getElementById("printable-rfq-area");
+    if (!element) return;
+    const isPO = rfq?.is_purchase_order;
+    const docNumber = rfq?.display_number || rfq?.rfq_number || rfq?.po_number || "document";
+    const fileName = isPO ? `PO-${docNumber}.pdf` : `RFQ-${docNumber}.pdf`;
+    html2pdf()
+      .set({
+        margin: [10, 10, 10, 10],
+        filename: fileName,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      })
+      .from(element)
+      .save();
   };
 
   if (isLoading) {
@@ -1137,9 +1152,9 @@ export default function RFQDetails() {
             <div>
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <StatusBadge status={rfq.status} />
-                <Badge variant="secondary" className="rounded-full uppercase">
+                {/* <Badge variant="secondary" className="rounded-full text-white! uppercase">
                   {safeText(rfq.document_type)}
-                </Badge>
+                </Badge> */}
                 {rfq.is_purchase_order && <Badge className="rounded-full">Purchase Order</Badge>}
               </div>
               <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
@@ -1151,12 +1166,12 @@ export default function RFQDetails() {
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button 
-              variant="outline" 
-              onClick={handlePrint}
+            <Button
+              variant="outline"
+              onClick={handleDownloadPDF}
               className="rounded-2xl border-slate-200 text-slate-600 gap-2 font-bold hover:bg-slate-50"
             >
-              <Printer className="w-4 h-4" /> Download/Print Full PDF
+              <Printer className="w-4 h-4" /> Download PDF
             </Button>
             {rfq.status === 'purchase_ordered' && (
               <Button 
@@ -1266,20 +1281,12 @@ export default function RFQDetails() {
           </div>
 
           <h3 className="text-xl font-bold text-slate-900 mb-6 tracking-tight uppercase border-b pb-2 flex justify-between">
-            <span>REQUEST FOR QUOTATION AUDIT REPORT</span>
+            <span>{rfq.is_purchase_order ? "PURCHASE ORDER" : "REQUEST FOR QUOTATION"}</span>
             <span className="text-slate-400 font-normal text-xs font-mono">STATUS: {safeText(rfq.status).toUpperCase()}</span>
           </h3>
 
           {/* Core Entity Reference Information Boxes */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-[11px] space-y-1">
-              <h4 className="font-bold text-slate-900 text-xs uppercase mb-1 flex items-center gap-1"><Building2 className="w-3 h-3 text-slate-400" /> Customer Data</h4>
-              <p><span className="text-slate-400">Company:</span> <strong className="text-slate-800">{customerName}</strong></p>
-              <p><span className="text-slate-400">Type:</span> {safeText(rfq.customer?.customer_type)}</p>
-              <p><span className="text-slate-400">Email:</span> {safeText(rfq.customer?.email)}</p>
-              <p><span className="text-slate-400">Mobile:</span> {safeText(rfq.customer?.mobile)}</p>
-            </div>
-
+          <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-[11px] space-y-1">
               <h4 className="font-bold text-slate-900 text-xs uppercase mb-1 flex items-center gap-1"><Package className="w-3 h-3 text-slate-400" /> Supplier Data</h4>
               <p><span className="text-slate-400">Company:</span> <strong className="text-slate-800">{supplierName}</strong></p>
@@ -1290,10 +1297,13 @@ export default function RFQDetails() {
 
             <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-[11px] space-y-1">
               <h4 className="font-bold text-slate-900 text-xs uppercase mb-1 flex items-center gap-1"><Info className="w-3 h-3 text-slate-400" /> Registry Data</h4>
-              <p><span className="text-slate-400">RFQ ID / Code:</span> {safeText(rfq.id)}</p>
-              <p><span className="text-slate-400">RFQ Number:</span> <strong>{rfq.display_number || rfq.rfq_number}</strong></p>
-              <p><span className="text-slate-400">PR Connected:</span> {safeText(rfq.purchase_request?.pr_number)}</p>
-              <p><span className="text-slate-400">PR Status:</span> {safeText(rfq.purchase_request?.status)}</p>
+              {rfq.is_purchase_order ? (
+                <p><span className="text-slate-400">PO Number:</span> <strong>{rfq.po_number || rfq.display_number}</strong></p>
+              ) : (
+                <p><span className="text-slate-400">RFQ Number:</span> <strong>{rfq.display_number || rfq.rfq_number}</strong></p>
+              )}
+              {/* <p><span className="text-slate-400">PR Connected:</span> {safeText(rfq.purchase_request?.pr_number)}</p> */}
+              {/* <p><span className="text-slate-400">PR Status:</span> {safeText(rfq.purchase_request?.status)}</p> */}
             </div>
           </div>
 
@@ -1301,31 +1311,42 @@ export default function RFQDetails() {
           <div className="bg-slate-50 rounded-xl p-4 text-[11px] border border-slate-100 grid grid-cols-4 gap-4 mb-6">
             <div><span className="text-slate-400 block">RFQ Creation Date</span><strong className="text-slate-800">{formatDate(rfq.rfq_date)}</strong></div>
             <div><span className="text-slate-400 block">Required Date</span><strong className="text-slate-800">{formatDate(rfq.required_date)}</strong></div>
-            <div><span className="text-slate-400 block">Created At Timestamp</span><strong className="text-slate-800">{formatDate(rfq.created_at)}</strong></div>
-            <div><span className="text-slate-400 block">System Operator</span><strong className="text-slate-800">{safeText(rfq.procurement_user?.name)}</strong></div>
+            <div><span className="text-slate-400 block">Delivery Address Config</span><strong className="text-slate-800">{safeText(rfq.delivery_address)}</strong></div>
+            {/* <div><span className="text-slate-400 block">Created At Timestamp</span><strong className="text-slate-800">{formatDate(rfq.created_at)}</strong></div> */}
+            {/* <div><span className="text-slate-400 block">System Operator</span><strong className="text-slate-800">{safeText(rfq.procurement_user?.name)}</strong></div> */}
           </div>
 
           {/* Financial Settings Metric Bar */}
-          <div className="bg-slate-50 rounded-xl p-4 text-[11px] border border-slate-100 grid grid-cols-4 gap-4 mb-6">
-            <div><span className="text-slate-400 block">Payment Logistics Profile</span><strong className="text-slate-800">{safeText(rfq.payment_terms_text)}</strong></div>
-            <div><span className="text-slate-400 block">Payment Days Duration</span><strong className="text-slate-800">{safeText(rfq.payment_days)} Days</strong></div>
-            <div><span className="text-slate-400 block">Delivery Address Config</span><strong className="text-slate-800">{safeText(rfq.delivery_address)}</strong></div>
-            <div><span className="text-slate-400 block">Delivery Typology</span><strong className="text-slate-800 uppercase">{safeText(rfq.delivery_type)}</strong></div>
-          </div>
+          {/* <div className="bg-slate-50 rounded-xl p-4 text-[11px] border border-slate-100 grid grid-cols-4 gap-4 mb-6"> */}
+            {/* <div><span className="text-slate-400 block">Payment Logistics Profile</span><strong className="text-slate-800">{safeText(rfq.payment_terms_text)}</strong></div> */}
+            {/* <div><span className="text-slate-400 block">Payment Days Duration</span><strong className="text-slate-800">{safeText(rfq.payment_days)} Days</strong></div> */}
+            {/* <div><span className="text-slate-400 block">Delivery Typology</span><strong className="text-slate-800 uppercase">{safeText(rfq.delivery_type)}</strong></div> */}
+          {/* </div> */}
 
-          {/* Line Items Table Rendering All Column Targets */}
-          <h4 className="text-xs font-bold text-slate-800 tracking-wider uppercase mb-2">Itemized Component Metrics Grid</h4>
+          {/* PO-specific info row */}
+          {rfq.is_purchase_order && (
+            <div className="bg-slate-50 rounded-xl p-4 text-[11px] border border-slate-100 grid grid-cols-3 gap-4 mb-6">
+              <div><span className="text-slate-400 block">PO Number</span><strong className="text-slate-800">{safeText(rfq.po_number || rfq.display_number)}</strong></div>
+              <div><span className="text-slate-400 block">PO Date</span><strong className="text-slate-800">{formatDate(rfq.po_date || rfq.confirmed_at || rfq.created_at)}</strong></div>
+              <div><span className="text-slate-400 block">Payment Terms</span><strong className="text-slate-800">{safeText(rfq.payment_terms_text)}</strong></div>
+            </div>
+          )}
+
+          {/* Line Items */}
+          <h4 className="text-xs font-bold text-slate-800 tracking-wider uppercase mb-2">
+            {rfq.is_purchase_order ? "Purchase Order Items" : "Requested Items"}
+          </h4>
           <table className="w-full text-left border-collapse mb-6">
             <thead>
               <tr className="border-b border-slate-400 text-[10px] font-bold text-slate-800 uppercase bg-slate-50">
                 <th className="py-2 px-1 w-8 text-center">No.</th>
-                <th className="py-2 px-2">Description & Notes</th>
-                <th className="py-2 px-2 text-center">Unit Definition</th>
-                <th className="py-2 px-2 text-right">Quantity Metrics</th>
+                <th className="py-2 px-2">Description</th>
+                <th className="py-2 px-2 text-center">Unit</th>
+                <th className="py-2 px-2 text-right">Qty</th>
                 <th className="py-2 px-2 text-right">Target Price</th>
                 <th className="py-2 px-2 text-right">Unit Price</th>
-                <th className="py-2 px-2 text-right">VAT Rate</th>
-                <th className="py-2 px-2 text-right">Line Total</th>
+                <th className="py-2 px-2 text-right">VAT %</th>
+                <th className="py-2 px-2 text-right">Total</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-[11px] text-slate-700">
@@ -1335,12 +1356,12 @@ export default function RFQDetails() {
                   <td className="py-3 px-2">
                     <span className="font-bold text-slate-900 block">{item.item_name}</span>
                     {item.notes && <span className="text-[10px] text-slate-400 block">Note: {item.notes}</span>}
-                    <span className="text-[9px] text-slate-400 block font-mono">Item ID: {item.item_id} | Created: {safeText(item.created_at)}</span>
+                    {/* <span className="text-[9px] text-slate-400 block font-mono">Item ID: {item.item_id} | Created: {safeText(item.created_at)}</span> */}
                   </td>
                   <td className="py-3 px-2 text-center text-slate-500">{item.unit?.name || "طن"} <span className="text-[9px] font-mono block">({safeText(item.unit?.id)})</span></td>
                   <td className="py-3 px-2 text-right font-medium">
                     <div className="font-bold text-slate-900">{formatNumber(item.quantity)}</div>
-                    <div className="text-[9px] text-slate-400 font-mono">Rem: {item.remaining_quantity} | Acc: {item.quantity_accepted}</div>
+                    {/* <div className="text-[9px] text-slate-400 font-mono">Rem: {item.remaining_quantity} | Acc: {item.quantity_accepted}</div> */}
                   </td>
                   <td className="py-3 px-2 text-right text-slate-500 font-mono">{formatMoney(item.target_price)}</td>
                   <td className="py-3 px-2 text-right font-mono">{formatMoney(item.unit_price)}</td>
@@ -1374,15 +1395,34 @@ export default function RFQDetails() {
           </div>
  
 
-          {/* Structural Signatures */}
+          {/* Notes & Terms */}
+          <div className="grid grid-cols-2 gap-4 mb-8 text-[11px]">
+            {rfq.notes && (
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+                <h4 className="font-bold text-slate-800 uppercase text-[10px] mb-1">Notes</h4>
+                <p className="text-slate-600 leading-relaxed">{rfq.notes}</p>
+              </div>
+            )}
+            {/* Always show Terms & Conditions for PO; otherwise only if content exists */}
+            {(rfq.terms_and_conditions || rfq.is_purchase_order) && (
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+                <h4 className="font-bold text-slate-800 uppercase text-[10px] mb-1">Terms & Conditions</h4>
+                <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
+                  {rfq.terms_and_conditions || "Standard terms and conditions apply. Delivery as per agreed schedule. Payment as per payment terms above."}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Signatures */}
           <div className="grid grid-cols-2 gap-12 text-center text-[11px] font-bold text-slate-700 pt-12 border-t border-slate-200 mt-12">
             <div className="space-y-10">
               <div className="h-px bg-slate-200 mx-4"></div>
-              <p>System Operator Signature Audit</p>
+              <p>{rfq.is_purchase_order ? "Authorized Buyer Signature & Stamp" : "Procurement Officer Signature"}</p>
             </div>
             <div className="space-y-10">
               <div className="h-px bg-slate-200 mx-4"></div>
-              <p>Security Infrastructure Stamp</p>
+              <p>{rfq.is_purchase_order ? "Supplier Authorized Signature & Stamp" : "Approver Signature"}</p>
             </div>
           </div>
 

@@ -5,42 +5,57 @@ import { Button } from '../../components/ui/button'
 import { FormProvider, useForm } from 'react-hook-form'
 import RFQGeneralInfo from '../../components/pages/RFQs/RFQForm/RFQGeneralInfo'
 import RFQItemsTable from '../../components/pages/RFQs/RFQForm/RFQItemsTable'
+import RFQSummary from '../../components/pages/RFQs/RFQForm/RFQSummary'
 import RFQStatusTabs from '../../components/pages/RFQs/RFQStatusTabs'
 import { handleGetRFQDetails, handleCreateRFQ, handleUpdateRFQ, handleChangeRFQStatus } from '../../services/rfqs'
 import usePurchaseDetails from '../../hooks/purchaseRequest/usePurchaseDetails'
 import Loading from '../../components/shared/Loading'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
-// import ActivityChatLog from '../../components/pages/PurchaseRequests/ActivityChatLog'
 import CancelRFQModal from '../../components/pages/RFQs/CancelRFQModal'
+import ActivityLog from '../../layout/ActivityLog/ActivityLog'
+import { Printer, MessageSquare, AlertCircle, X } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '../../components/ui/dialog'
 
 export default function CreateRFQ() {
   const { prId, rfqId } = useParams();
   const navigate = useNavigate();
   const isEdit = !!rfqId;
-  
+
   const { mutate: fetchPR, data: prData, isPending: isPRLoading } = usePurchaseDetails();
   const [isLoadingRFQ, setIsLoadingRFQ] = useState(isEdit);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [rfqStatus, setRfqStatus] = useState("draft");
   const [rfqDetailsPrId, setRfqDetailsPrId] = useState(null);
+  const [showChat, setShowChat] = useState(false);
+  const [errorDialog, setErrorDialog] = useState({ open: false, title: '', message: '' });
 
   const methods = useForm({
     defaultValues: {
       supplier_id: "",
+      supplier_name: "",
       currency_code: "SAR",
       payment_term_id: "",
+      payment_terms_text: "",
       receipt_date: new Date(),
       creation_date: new Date(),
       approval_date: new Date(),
       due_date: new Date(),
       notes: "",
+      terms_and_conditions: "",
+      delivery_address: "",
       items: []
     }
   });
 
   const items = methods.watch("items") || [];
+  const { isDirty } = methods.formState;
   const hasPrices = items.some(item => Number(item.unit_price) > 0);
 
   useEffect(() => {
@@ -54,31 +69,35 @@ export default function CreateRFQ() {
       .then(res => {
         if (res?.data) {
           const data = res.data;
-          console.log("editing data", data);
           setRfqStatus(data.status || "draft");
           if (data.purchase_request_id || data.purchase_request?.id) {
             setRfqDetailsPrId(data.purchase_request_id || data.purchase_request?.id);
           }
           methods.reset({
             supplier_id: data.supplier?.id?.toString(),
+            supplier_name: data.supplier?.company_name || data.supplier?.contact_name || "",
             currency_code: data.currency?.code,
             payment_term_id: data.payment_term?.id?.toString(),
+            payment_terms_text: data.payment_terms_text || "",
             receipt_date: data.receipt_date ? new Date(data.receipt_date) : new Date(),
             creation_date: data.created_at ? new Date(data.created_at) : new Date(),
             approval_date: data.approved_at ? new Date(data.approved_at) : new Date(),
             due_date: data.due_date ? new Date(data.due_date) : new Date(),
             notes: data.notes || "",
+            terms_and_conditions: data.terms_and_conditions || "",
+            delivery_address: data.delivery_address || "",
             rfq_number: data.rfq_number,
             items: data.items?.map(item => ({
               id: item.id,
               purchase_request_item_id: item.purchase_request_item_id,
-              item_name: item.item_name,
+              item_name: item.item_name || item.item?.name?.en,
               quantity: item.quantity,
-              unit_name: item.unit?.name,
+              unit_name: item.unit?.name?.en || item.unit?.name,
               target_price: item.target_price || 0,
-              unit_price: item.unit_price || 0,
+              unit_price: Number(item.unit_price) || 0,
               tax_rate: item.tax_rate || 15,
-              selected: true
+              selected: true,
+              is_custom: false
             })) || []
           });
         }
@@ -110,94 +129,137 @@ export default function CreateRFQ() {
           target_price: item.target_price || 0,
           unit_price: 0,
           tax_rate: 15,
-          selected: true
+          selected: true,
+          is_custom: false
         })));
       }
     }
   }, [isEdit, prData, methods]);
 
+  const showErrorPopup = (title, message) => {
+    setErrorDialog({ open: true, title, message });
+  };
+
   const handleStatusChange = (status, reason = "") => {
     if (!rfqId) return;
-    
+
+    // Price validation for stages after rfq_sent
+    const priceRequiredStatuses = ["approve", "price-gathering-approve", "po-approve", "purchase-order"];
+    if (priceRequiredStatuses.includes(status) && !hasPrices) {
+      showErrorPopup(
+        "Prices Required",
+        "At least one item must have a unit price set before proceeding to the next stage. Please enter prices for the received quotations."
+      );
+      return;
+    }
+
+    if (isDirty) {
+      if (!window.confirm("You have unsaved changes. Changing status will reload the data and discard your current edits. Continue?")) {
+        return;
+      }
+    }
+
     setIsUpdatingStatus(true);
-    handleChangeRFQStatus({ 
-      id: rfqId, 
+    handleChangeRFQStatus({
+      id: rfqId,
       status: status,
       body: status === "cancel" ? { cancellation_reason: reason || "Discarded by user" } : {}
     })
       .then(res => {
         if (res?.success) {
-          toast.success(`RFQ ${status === "cancel" ? "canceled" : "submitted"} successfully!`);
+          toast.success(`RFQ ${status === "cancel" ? "canceled" : "status updated"} successfully!`);
           setIsCancelModalOpen(false);
           loadRFQDetails();
-          // Stay on details or go to details to see next action
-          // if(prId) {
-
-          //   navigate(`/purchase-requests/${prId}/rfqs`); 
-          // }else {
-          //   navigate(`/rfqs`)
-          // }
         }
       })
       .catch(err => {
-        toast.error(err.response?.data?.message || "Failed to update status");
+        const message = err.response?.data?.message || err.response?.data?.error?.message || "Failed to update RFQ status.";
+        showErrorPopup("Status Change Failed", message);
       })
       .finally(() => setIsUpdatingStatus(false));
   };
 
   const onSubmit = (values) => {
     let payload;
-    
+
     if (isEdit) {
-      // Structure based on user request for update
       payload = {
-        due_date: values.due_date 
+        due_date: values.due_date
           ? (values.due_date instanceof Date ? format(values.due_date, "yyyy-MM-dd") : format(new Date(values.due_date), "yyyy-MM-dd"))
           : format(new Date(), "yyyy-MM-dd"),
         notes: values.notes || "",
-        items: (values.items || []).map(item => ({
-          id: item.id,
-          supplier_id: Number(values.supplier_id),
-          unit_price: Number(item.unit_price) || 0,
-          target_price: Number(item.target_price) || 0,
-          tax_rate: Number(item.tax_rate) || 15
-        }))
+        terms_and_conditions: values.terms_and_conditions || "",
+        delivery_address: values.delivery_address || "",
+        items: (values.items || []).map(item => {
+          if (item.is_custom && !item.id) {
+            return {
+              item_name: item.item_name,
+              unit_name: item.unit_name,
+              supplier_id: Number(values.supplier_id),
+              unit_price: Number(item.unit_price) || 0,
+              target_price: Number(item.target_price) || 0,
+              tax_rate: Number(item.tax_rate) || 15
+            };
+          }
+          return {
+            id: item.id,
+            supplier_id: Number(values.supplier_id),
+            unit_price: Number(item.unit_price) || 0,
+            target_price: Number(item.target_price) || 0,
+            tax_rate: Number(item.tax_rate) || 15
+          };
+        })
       };
     } else {
-      // Default structure for creation
       payload = {
         supplier_id: Number(values.supplier_id),
         currency_code: values.currency_code,
         payment_term_id: Number(values.payment_term_id),
         receipt_date: values.receipt_date ? format(values.receipt_date, "yyyy-MM-dd") : null,
         notes: values.notes,
+        delivery_address: values.delivery_address || "",
         items: values.items
           .filter(item => item.selected)
-          .map(item => ({
-            purchase_request_item_id: item.purchase_request_item_id,
-            quantity: Number(item.quantity)
-          }))
+          .map(item => {
+            if (item.is_custom) {
+              return {
+                item_name: item.item_name,
+                unit_name: item.unit_name,
+                quantity: Number(item.quantity)
+              };
+            }
+            return {
+              purchase_request_item_id: item.purchase_request_item_id,
+              quantity: Number(item.quantity)
+            };
+          })
       };
     }
 
-    const action = isEdit 
+    const action = isEdit
       ? handleUpdateRFQ({ id: rfqId, body: payload })
       : handleCreateRFQ({ prId: prId, body: payload });
 
     action.then(res => {
       if (res?.success) {
         toast.success(res.message || `RFQ ${isEdit ? 'updated' : 'created'} successfully!`);
-        const newRfqId = res.data?.id || rfqId;
-        const redirectPrId = prId || rfqDetailsPrId;
-        if(redirectPrId) {
-            navigate(`/purchase-requests/${redirectPrId}/rfqs`); 
+        if (isEdit) {
+          // Stay on the edit page and reload fresh data
+          loadRFQDetails();
         } else {
-            navigate(`/rfqs`)
+          // After creating, land on the edit page of the new RFQ
+          const newRfqId = res.data?.id || res.data?.rfq?.id || res.rfq?.id;
+          if (newRfqId) {
+            navigate(`/rfqs/${newRfqId}/edit`);
+          } else {
+            const redirectPrId = prId || rfqDetailsPrId;
+            if (redirectPrId) navigate(`/purchase-requests/${redirectPrId}/rfqs`);
+            else navigate(`/rfqs`);
+          }
         }
-        // navigate(`/rfqs/${newRfqId}/details`);
       }
     }).catch(err => {
-      toast.error(err.response?.data?.message  || err.response?.data?.error?.message|| "Something went wrong");
+      toast.error(err.response?.data?.message || err.response?.data?.error?.message || "Something went wrong");
     });
   };
 
@@ -207,22 +269,45 @@ export default function CreateRFQ() {
     <FormProvider {...methods}>
       <div className="flex h-full min-h-screen">
         <div className="flex-1 flex flex-col gap-6 pb-6 px-6 overflow-y-auto">
-          <PageHeader 
-            title="Request for Quotation" 
-            subTitle={isEdit ? `Edit RFQ #${methods.watch("rfq_number")}` : "PR-1025/RFQ-1524242"}
+          <PageHeader
+            title="Request for Quotation"
+            subTitle={isEdit ? `Edit RFQ #${methods.watch("rfq_number")}` : `PR #${prData?.data?.pr_number || prId}`}
           >
             <div className='flex gap-2 items-center'>
-              <Button 
-                variant="outline" 
-                className="border-primary text-primary h-10 px-6 font-bold" 
+              <Button
+                variant="outline"
+                className="border-primary text-primary h-10 px-6 font-bold"
                 onClick={() => navigate(-1)}
               >
                 Discard
               </Button>
-              {/* <Button variant="outline" className="border-primary text-primary h-10 px-6 font-bold">Actions</Button> */}
-              
-              {isEdit && rfqStatus == 'draft' && hasPrices && (
-                <Button 
+
+              {isEdit && (
+                <Button
+                  variant="outline"
+                  className="border-slate-300 text-slate-600 h-10 px-4 font-bold gap-2"
+                  onClick={() => navigate(`/rfqs/${rfqId}/details`)}
+                  title="Print / View PDF"
+                >
+                  <Printer className="w-4 h-4" />
+                  Print
+                </Button>
+              )}
+
+              {isEdit && (
+                <Button
+                  variant="outline"
+                  className={`h-10 px-4 font-bold gap-2 ${showChat ? 'bg-primary/10 border-primary text-primary' : 'border-slate-300 text-slate-600'}`}
+                  onClick={() => setShowChat(v => !v)}
+                  title="Activity Chat Log"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                </Button>
+              )}
+
+              {/* Draft → RFQ Sent: no price required */}
+              {isEdit && rfqStatus === 'draft' && (
+                <Button
                   className="bg-primary hover:bg-primary/90 h-10 px-6 font-bold"
                   onClick={() => handleStatusChange("submit")}
                   disabled={isUpdatingStatus}
@@ -231,8 +316,9 @@ export default function CreateRFQ() {
                 </Button>
               )}
 
-              {isEdit && rfqStatus == 'rfq_sent' && (
-                <Button 
+              {/* RFQ Sent → Buyer Approval: price required */}
+              {isEdit && rfqStatus === 'rfq_sent' && (
+                <Button
                   className="bg-primary hover:bg-primary/90 h-10 px-6 font-bold"
                   onClick={() => handleStatusChange("approve")}
                   disabled={isUpdatingStatus}
@@ -241,8 +327,8 @@ export default function CreateRFQ() {
                 </Button>
               )}
 
-              {isEdit && rfqStatus== 'buyer_approval' && (
-                <Button 
+              {isEdit && rfqStatus === 'buyer_approval' && (
+                <Button
                   className="bg-primary hover:bg-primary/90 h-10 px-6 font-bold"
                   onClick={() => handleStatusChange("price-gathering-approve")}
                   disabled={isUpdatingStatus}
@@ -251,8 +337,8 @@ export default function CreateRFQ() {
                 </Button>
               )}
 
-              {isEdit && rfqStatus == 'price_gathering_approval' && (
-                <Button 
+              {isEdit && rfqStatus === 'price_gathering_approval' && (
+                <Button
                   className="bg-primary hover:bg-primary/90 h-10 px-6 font-bold"
                   onClick={() => handleStatusChange("po-approve")}
                   disabled={isUpdatingStatus}
@@ -261,8 +347,8 @@ export default function CreateRFQ() {
                 </Button>
               )}
 
-              {isEdit && rfqStatus == 'po_approval' && (
-                <Button 
+              {isEdit && rfqStatus === 'po_approval' && (
+                <Button
                   className="bg-primary hover:bg-primary/90 h-10 px-6 font-bold"
                   onClick={() => handleStatusChange("purchase-order")}
                   disabled={isUpdatingStatus}
@@ -271,8 +357,8 @@ export default function CreateRFQ() {
                 </Button>
               )}
 
-              <Button 
-                className="bg-primary hover:bg-primary/90 h-10 px-6 font-bold" 
+              <Button
+                className="bg-primary hover:bg-primary/90 h-10 px-6 font-bold"
                 onClick={methods.handleSubmit(onSubmit)}
               >
                 {isEdit ? "Save Changes" : "Save Request"}
@@ -283,45 +369,48 @@ export default function CreateRFQ() {
           {isEdit && <RFQStatusTabs currentStatus={rfqStatus} />}
 
           <div className="space-y-6">
-            <div className="relative">
-              {/* {isEdit && rfqStatus !== 'purchase_ordered' && rfqStatus !== 'canceled' && (
-                <div className="absolute top-6 right-8 z-10 flex gap-2">
-                   <Button 
-                     variant="outline" 
-                     className="border-red-500 text-red-500 hover:bg-red-50 h-9 px-6 font-bold"
-                     onClick={() => setIsCancelModalOpen(true)}
-                   >
-                     Cancel
-                   </Button>
-                   {rfqStatus !== 'draft' && (
-                     <Button 
-                       variant="outline" 
-                       className="border-primary text-primary h-9 px-6 font-bold"
-                       onClick={() => handleStatusChange("draft")}
-                     >
-                       Set to Draft
-                     </Button>
-                   )}
-                </div>
-              )} */}
-              <RFQGeneralInfo isEdit={isEdit} prData={prData} />
-            </div>
+            <RFQGeneralInfo isEdit={isEdit} prData={prData} />
             <RFQItemsTable isEdit={isEdit} prData={prData} />
+            <RFQSummary />
           </div>
         </div>
 
-        {/* <ActivityChatLog /> */}
+        {isEdit && showChat && rfqId && (
+          <ActivityLog
+            modelType="rfq"
+            modelId={rfqId}
+            onClose={() => setShowChat(false)}
+          />
+        )}
 
-        <CancelRFQModal 
+        <CancelRFQModal
           open={isCancelModalOpen}
           onOpenChange={setIsCancelModalOpen}
           isLoading={isUpdatingStatus}
           onConfirm={(reason) => handleStatusChange("cancel", reason)}
         />
+
+        {/* Error Dialog */}
+        <Dialog open={errorDialog.open} onOpenChange={(open) => setErrorDialog(d => ({ ...d, open }))}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-red-600">
+                <AlertCircle className="w-5 h-5" />
+                {errorDialog.title}
+              </DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-slate-600 leading-relaxed">{errorDialog.message}</p>
+            <div className="flex justify-end pt-2">
+              <Button
+                variant="outline"
+                onClick={() => setErrorDialog(d => ({ ...d, open: false }))}
+              >
+                Close
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </FormProvider>
   )
 }
-
-
-

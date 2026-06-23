@@ -52,13 +52,7 @@ export default function QuotationFilter({ filters, onFilterChange, onReset }) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button 
-          variant="outline" 
-          className="h-11 px-6 rounded-xl border-slate-200 text-slate-600 gap-2 font-bold"
-        >
-          <Filter className="w-4 h-4" />
-          More Filters
-        </Button>
+    
 
         {hasFilters && (
           <Button 

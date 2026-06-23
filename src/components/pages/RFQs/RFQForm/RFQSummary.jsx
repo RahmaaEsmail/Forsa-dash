@@ -10,7 +10,7 @@ export default function RFQSummary() {
   // Calculate totals (mock calculations for UI demo)
   const subtotal = items.reduce((acc, item) => {
     if (!item.selected) return acc;
-    return acc + (Number(item.quantity) * Number(item.target_price || 0));
+    return acc + (Number(item.quantity) * Number(item.unit_price || 0));
   }, 0);
 
   const discount = 0;
@@ -36,11 +36,6 @@ export default function RFQSummary() {
           className="w-full min-h-[150px] p-4 border rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary bg-white shadow-sm"
           placeholder="Write here..."
         />
-        <div className="flex justify-end">
-          <button type="button" className="bg-red-500 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors">
-            Done
-          </button>
-        </div>
       </div>
 
       <div className="flex justify-end items-start">

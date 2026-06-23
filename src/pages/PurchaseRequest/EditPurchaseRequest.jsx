@@ -104,7 +104,7 @@ export default function EditPurchaseRequest() {
       onSuccess: (res) => {
         if(res?.success) {
           toast.success(res?.meta?.message ||"Purchase Request updated successfully!");
-          navigate("/purchaseRequest");
+          navigate(`/purchase_request_details/${id}`);
         }
       },
       onError: (err) => {
@@ -132,9 +132,9 @@ export default function EditPurchaseRequest() {
             </Button>
           )}
 
-          {prData?.data?.status?.toLowerCase() === 'approved' && (
-            <Button 
-              type="button" 
+          {['approved', 'completed'].includes(prData?.data?.status?.toLowerCase()) && (
+            <Button
+              type="button"
               onClick={() => navigate(`/purchase-requests/${id}/rfqs`)}
               className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold flex items-center gap-2"
             >

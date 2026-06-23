@@ -119,9 +119,9 @@ export default function PurchaseRequestDetails() {
               </Button>
             )}
             
-            {pr?.status?.toLowerCase() === 'approved' && (
-              <Button 
-                type="button" 
+            {['approved', 'completed'].includes(pr?.status?.toLowerCase()) && (
+              <Button
+                type="button"
                 onClick={() => navigate(`/purchase-requests/${id}/rfqs`)}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-10 px-4 flex items-center gap-2"
               >

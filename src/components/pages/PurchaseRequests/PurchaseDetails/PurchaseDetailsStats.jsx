@@ -5,7 +5,7 @@ export default function PurchaseDetailsStats({ totalEstimatedAmount, pr }) {
   return (
     <div className="p-5 rounded-xl border bg-linear-to-br from-primary/5 to-primary/10 flex items-center justify-between">
       <div>
-        <span className="text-sm font-medium text-slate-600">Total Estimation</span>
+        <span className="text-sm font-medium text-slate-600">Target Price</span>
         <div className="flex items-baseline gap-1">
           <span className="text-2xl font-black text-primary">
             {totalEstimatedAmount?.toLocaleString()}

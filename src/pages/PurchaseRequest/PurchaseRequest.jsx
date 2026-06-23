@@ -14,11 +14,17 @@ import { useMemo } from 'react'
 export default function PurchaseRequest() {
   const navigate = useNavigate();
   const [page, setPage] = React.useState(1);
-  const { data: purchase_data } = useQuery(purchaseRequestOptions({ page  , per_page : 10}));
+  const [filter, setFilter] = React.useState({ search: "", date: "", status: "" });
   
-  // const stats = useMemo(() => {
-  //   const 
-  // } , [purchase_data])
+  const cleanFilter = useMemo(() => {
+    return Object.fromEntries(
+      Object.entries(filter).filter(([_, value]) => value !== "" && value !== null && value !== undefined)
+    );
+  }, [filter])
+
+  const { data: purchase_data } = useQuery(purchaseRequestOptions({ page, per_page: 10, ...cleanFilter }));
+  
+
   return (
     <div className="flex pb-6 flex-col gap-10">
       <PageHeader title={"Purchase Request"}>
@@ -34,7 +40,7 @@ export default function PurchaseRequest() {
         </div>
         </PageHeader>
 
-        <QuotationsFilter />
+        <QuotationsFilter filter={filter} setFilter={setFilter} />
         {/* <QuotationStats stats={purchase_data?.statistics} /> */}
         <QuotationTable page={page} setPage={setPage} purchase_data={purchase_data} />
     </div>

@@ -58,27 +58,23 @@ export default function PurchaseProducts() {
             fetchFn={handleGetAllProducts}
             queryKeyPrefix="products"
             onSelectOption={(prod) => handleProductSelect(prod, index)}
-            // onCreateNew={(search) => handleCreateProduct(search, index)}
-            // createLabel="Create New Product"
+            onCreateNew={(search) => handleCreateProduct(search, index)}
+            createLabel="Create New Product"
           />
         </div>
       )
     },
     {
       title: "Description / Specs",
-      render: (_, __, index) => {
-        const isProductSelected = !!watchItems[index]?.item_id;
-        return (
-          <div className="min-w-[150px]">
-            <Input 
-              {...register(`items.${index}.specifications`)} 
-              placeholder="Specs" 
-              className="bg-input-bg border-none min-h-[50px] rounded-md"
-              disabled={isProductSelected}
-            />
-          </div>
-        );
-      }
+      render: (_, __, index) => (
+        <div className="min-w-[150px]">
+          <Input
+            {...register(`items.${index}.specifications`)}
+            placeholder="Specs"
+            className="bg-input-bg border-none min-h-[50px] rounded-md"
+          />
+        </div>
+      )
     },
     {
       title: "Qty",
@@ -96,39 +92,31 @@ export default function PurchaseProducts() {
     {
       title: "UoM",
       width: "150px",
-      render: (_, __, index) => {
-        const isProductSelected = !!watchItems[index]?.item_id;
-        return (
-          <div className="min-w-[150px] text-left">
-            <SearchableAsyncSelect
-              control={control}
-              name={`items.${index}.unit_id`}
-              placeholder="Unit"
-              fetchFn={handleGetAllUnits}
-              queryKeyPrefix="units"
-              disabled={isProductSelected}
-            />
-          </div>
-        );
-      }
+      render: (_, __, index) => (
+        <div className="min-w-[150px] text-left">
+          <SearchableAsyncSelect
+            control={control}
+            name={`items.${index}.unit_id`}
+            placeholder="Unit"
+            fetchFn={handleGetAllUnits}
+            queryKeyPrefix="units"
+          />
+        </div>
+      )
     },
     {
       title: "Target Price",
       width: "120px",
-      render: (_, __, index) => {
-        const isProductSelected = !!watchItems[index]?.item_id;
-        return (
-          <div className="min-w-[100px]">
-            <Input 
-              type="number" 
-              {...register(`items.${index}.target_price`, { valueAsNumber: true })} 
-              className="bg-input-bg border-none min-h-[50px] rounded-md text-center"
-              placeholder="Price"
-              disabled={isProductSelected}
-            />
-          </div>
-        );
-      }
+      render: (_, __, index) => (
+        <div className="min-w-[100px]">
+          <Input
+            type="number"
+            {...register(`items.${index}.target_price`, { valueAsNumber: true })}
+            className="bg-input-bg border-none min-h-[50px] rounded-md text-center"
+            placeholder="Price"
+          />
+        </div>
+      )
     },
     {
       title: "Notes",
@@ -190,10 +178,18 @@ export default function PurchaseProducts() {
         </Button>
       </div>
 
-      <CreateProductModal 
-        open={isProductModalOpen} 
+      <CreateProductModal
+        open={isProductModalOpen}
         onOpenChange={setIsProductModalOpen}
         initialName={newProductName}
+        onCreated={(id, firstUnitId) => {
+          if (activeItemIndex !== null) {
+            setValue(`items.${activeItemIndex}.item_id`, String(id));
+            if (firstUnitId) {
+              setValue(`items.${activeItemIndex}.unit_id`, String(firstUnitId));
+            }
+          }
+        }}
       />
     </div>
   )

@@ -26,6 +26,9 @@ const getModelFromPath = (pathname) => {
     if (parts[0] === 'rfqs' && parts[2] === 'details') {
       return { model_type: 'rfq', model_id: parts[1] };
     }
+    if (parts[0] === 'rfqs' && parts[2] === 'edit') {
+      return { model_type: 'rfq', model_id: parts[1] };
+    }
     if (parts[0] === 'quotations' && parts[2] === 'details') {
       return { model_type: 'quotation', model_id: parts[1] };
     }

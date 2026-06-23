@@ -65,16 +65,10 @@ export const makeBasicProductDataSchema = (mode) =>
     product_code: z.string().optional(),
     product_sku: z.string().optional(),
     category: requiredText("category"),
-    brand: requiredText("brand"),
-    unit_of_measure: z.array(z.any()).optional(),
+    brand: z.string().optional(),
+    unit_of_measure: z.array(z.any()).min(1, "Unit of measure is required"),
     description: z.string().optional(),
-
-    // ✅ Create requires File
-    // ✅ Edit accepts existing url/object OR File OR empty
-    image:
-      mode === "create"
-        ? z.instanceof(File, { message: "Image is Required" })
-        : imageSchemaEdit.optional(),
+    image: imageSchemaEdit.optional(),
   });
 
 export const productPriceValidation = z

@@ -178,11 +178,9 @@ export default function PurchaseRequestTable({ page, setPage, purchase_data }) {
 
             {/* Removed Change Status from table per user request */}
 
-            {row?.status === 'approved' && (
+            {['approved', 'completed'].includes(row?.status) && (
               <Button
-                onClick={() => {
-                  navigate(`/purchase-requests/${row.id}/rfqs`);
-                }}
+                onClick={() => navigate(`/purchase-requests/${row.id}/rfqs`)}
                 title="RFQ" variant="ghost" size="icon" className="text-primary">
                 <FilePlus className="w-5 h-5" />
               </Button>

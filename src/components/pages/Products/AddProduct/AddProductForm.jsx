@@ -200,7 +200,6 @@ import { Upload } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import CustomSelect from "../../../shared/CustomSelect";
 import CustomInput from "../../../shared/CustomInput";
-import CustomTextarea from "../../../shared/CustomTextarea";
 import { useQuery } from "@tanstack/react-query";
 import categoriesAllOptions from "../../../../hooks/categories/categoriesAllOptions";
 import getAllUnitsOptions from "../../../../hooks/units/getAllUnitsOptions";
@@ -390,7 +389,6 @@ export default function AddProductForm() {
          <CustomInput
           errors={errors?.brand}
           label={"Brand"}
-          isRequired
           placeholder={"e.g. Emirates Steel"}
           register={register}
           name="brand"
@@ -432,21 +430,6 @@ export default function AddProductForm() {
         />
       </div>
 
-      <CustomTextarea
-        errors={errors?.description}
-        placeholder="وصف مختصر..."
-        name={"description"}
-        label={"Short description"}
-        register={register}
-      />
-
-      {/* <CustomTextarea
-        errors={errors?.description_en}
-        placeholder="Short description..."
-        name={"description_en"}
-        label={"Short description in English"}
-        register={register}
-      /> */}
     </form>
   );
 }

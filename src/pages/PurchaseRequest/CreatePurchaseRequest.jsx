@@ -40,7 +40,8 @@ export default function CreatePurchaseRequest() {
     onSuccess: (res) => {
       if(res?.success) {
         toast.success(res?.message || "Purchase Request created successfully!");
-        navigate(`/purchaseRequest`)
+        const newId = res?.data?.id;
+        navigate(newId ? `/purchase_request_details/${newId}` : `/purchaseRequest`);
       }
       queryClient.invalidateQueries(["purchase-requests"]);
       method.reset();

@@ -19,7 +19,10 @@ const getAvailableStatuses = (currentStatus) => {
         { label: "Reject", value: "reject" }
       ];
     case 'approved':
-      return [{ label: "Cancel", value: "cancel" }];
+      return [
+        { label: "Complete", value: "completed" },
+        { label: "Cancel", value: "cancel" }
+      ];
     default:
       return [];
   }
@@ -67,13 +70,15 @@ export default function ChangePurchaseStatusModal({ open, setOpen, currentStatus
       body = { rejection_reason: values.reason };
     } else if (values.status === 'cancel' && values.reason) {
       body = { cancellation_reason: values.reason };
+    } else if (values.status === 'complete') {
+      body = {};
     }
     
     // If no reason needed, body remains empty object {}
-    
+     console.log("status", values.status)
     mutate({ 
       id, 
-      status: values.status,
+      status:  values.status,
       body 
     });
   };
