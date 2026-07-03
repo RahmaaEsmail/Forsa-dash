@@ -6,10 +6,21 @@ import QuotationsFilter from '../../components/pages/PurchaseRequests/PurchaseRe
 import QuotationStats from '../../components/pages/PurchaseRequests/PurchaseRequestStats'
 import QuotationTable from '../../components/pages/PurchaseRequests/PurchaseRequestTable'
 import { useNavigate } from 'react-router-dom'
-
 import purchaseRequestOptions from '../../hooks/purchaseRequest/purchaseRequestOptions'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
+import { exportToExcel } from '../../utils/exportToExcel'
+
+const PR_COL_MAP = {
+  pr_number:            'PR Number',
+  pr_date:              'PR Date',
+  status:               'Status',
+  required_date:        'Required Date',
+  delivery_address:     'Delivery Address',
+  notes:                'Notes',
+  rejection_reason:     'Rejection Reason',
+  cancellation_reason:  'Cancellation Reason',
+};
 
 export default function PurchaseRequest() {
   const navigate = useNavigate();
@@ -24,19 +35,23 @@ export default function PurchaseRequest() {
 
   const { data: purchase_data } = useQuery(purchaseRequestOptions({ page, per_page: 10, ...cleanFilter }));
   
-
   return (
     <div className="flex pb-6 flex-col gap-10">
       <PageHeader title={"Purchase Request"}>
         <div className='flex gap-2 items-center'>
-          {/* <Button className={"bg-white hover:bg-primary hover:text-white border border-primary text-primary font-bold"}>
-            <Download />
-            <span>Download</span>
-          </Button> */}
+          <Button
+            variant="outline"
+            className="border-primary text-primary font-bold hover:bg-primary/5 gap-2"
+            onClick={() => exportToExcel(purchase_data?.data || [], 'purchase_requests', PR_COL_MAP)}
+          >
+            <Download className="w-4 h-4" />
+            Export Excel
+          </Button>
 
           <Button 
-          onClick={() => navigate(`/create_purchase_request`)}
-          className={"font-bold"}>Create</Button>
+            onClick={() => navigate(`/create_purchase_request`)}
+            className={"font-bold"}>Create
+          </Button>
         </div>
         </PageHeader>
 

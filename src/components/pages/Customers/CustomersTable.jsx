@@ -8,6 +8,7 @@ import { ActiveInActiveStatusModal } from '../../shared/ActiveInActiveStatusModa
 import { useNavigate } from 'react-router-dom';
 import useDeleteCustomer from '../../../hooks/customers/useDeleteCustomer';
 import useChangeCustomerStatus from '../../../hooks/customers/useChangeCustomerStatus';
+import ContactLink from '../../shared/ContactLink';
 
 export default function CustomersTable({ data, loading }) {
   const navigate = useNavigate();
@@ -60,8 +61,18 @@ export default function CustomersTable({ data, loading }) {
       key: "name",
       render: (_, row) => row.customer_type === 'company' ? row.company_name : `${row.first_name || ''} ${row.last_name || ''}`
     },
-    { title: "Email", dataIndex: "email", key: "email" },
-    { title: "Mobile", dataIndex: "mobile", key: "mobile" },
+    { 
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      render: (v) => <ContactLink type="email" value={v} />,
+    },
+    {
+      title: "Mobile",
+      dataIndex: "mobile",
+      key: "mobile",
+      render: (v) => <ContactLink type="mobile" value={v} />,
+    },
     {
       title: "Active",
       dataIndex: "is_active",

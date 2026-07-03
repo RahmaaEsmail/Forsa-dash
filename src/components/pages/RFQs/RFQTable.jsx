@@ -9,8 +9,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Loading from '../../shared/Loading'
 import { Badge } from '../../ui/badge'
 import { toast } from 'sonner'
+import EntityLink from '../../shared/EntityLink'
 
-export default function RFQTable({ prId, view = "rfq", filters = {} }) {
+export default function RFQTable({ prId, view = "rfq", filters = {}, onDataLoaded }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
@@ -30,6 +31,11 @@ export default function RFQTable({ prId, view = "rfq", filters = {} }) {
       } 
     }),
   });
+
+  // Notify parent whenever data changes so it can export
+  React.useEffect(() => {
+    if (rfqsData?.data) onDataLoaded?.(rfqsData.data);
+  }, [rfqsData]);
 
   const cancelMutation = useMutation({
     mutationFn: ({ id, reason }) => handleChangeRFQStatus({ id, status: 'cancel', body: { cancellation_reason: reason } }),
@@ -77,7 +83,11 @@ export default function RFQTable({ prId, view = "rfq", filters = {} }) {
     },
     {
       title: "Supplier",
-      render: (_, row) => row.supplier?.company_name || row.supplier?.contact_name || "N/A",
+      render: (_, row) => (
+        <EntityLink type="supplier" id={row.supplier?.id}>
+          {row.supplier?.company_name || row.supplier?.contact_name || "N/A"}
+        </EntityLink>
+      ),
     },
     {
       title: "PR Number",
@@ -85,7 +95,11 @@ export default function RFQTable({ prId, view = "rfq", filters = {} }) {
     },
     {
       title: "Customer",
-      render: (_, row) => row.customer?.company_name || row.customer?.name || "N/A",
+      render: (_, row) => (
+        <EntityLink type="customer" id={row.customer?.id}>
+          {row.customer?.company_name || row.customer?.name || "N/A"}
+        </EntityLink>
+      ),
     },
     {
       title: "Status",

@@ -1,8 +1,8 @@
 // import React, { useEffect, useState } from 'react'
 // import { useNavigate, useParams } from 'react-router-dom'
-// import { 
-//   XCircle, 
-//   Printer, 
+// import {
+//   XCircle,
+//   Printer,
 //   ChevronRight,
 //   Save,
 //   Send,
@@ -29,7 +29,7 @@
 // export default function RFQDetails() {
 //   const { rfqId } = useParams();
 //   const navigate = useNavigate();
-  
+
 //   const { data: rfqResponse, isLoading } = useRFQDetails(rfqId);
 //   const updateRFQ = useUpdateRFQ();
 //   const changeStatus = useChangeRFQStatus();
@@ -143,8 +143,8 @@
 //             </h1>
 //             <div className="flex gap-2">
 //               <Button variant="outline" className="rounded-xl border-red-200 text-red-500 hover:bg-red-50" onClick={handleDelete}>Delete RFQ</Button>
-//               <Button 
-//                 onClick={methods.handleSubmit(onUpdate)} 
+//               <Button
+//                 onClick={methods.handleSubmit(onUpdate)}
 //                 disabled={updateRFQ.isPending}
 //                 className="bg-primary hover:bg-primary/90 text-white rounded-xl gap-2 shadow-lg shadow-primary/20 px-6"
 //               >
@@ -162,10 +162,10 @@
 //             {/* <Button variant="outline" className="rounded-lg border-primary text-primary hover:bg-primary/5 px-6 font-bold">
 //               <Printer className="w-4 h-4 mr-2" /> Print RFQ
 //             </Button> */}
-            
+
 //             {rfq?.status !== 'purchase_ordered' && rfq?.status !== 'canceled' && (
-//               <Button 
-//                 variant="outline" 
+//               <Button
+//                 variant="outline"
 //                 className="rounded-lg border-red-500 text-red-500 hover:bg-red-50 px-6 font-bold"
 //                 onClick={() => setIsCancelModalOpen(true)}
 //               >
@@ -174,12 +174,12 @@
 //             )}
 
 //             {rfq?.status === 'draft' && (
-//               <Button 
-//                 onClick={handleSubmitStatus} 
+//               <Button
+//                 onClick={handleSubmitStatus}
 //                 disabled={changeStatus.isPending}
 //                 className={`rounded-lg px-10 shadow-lg transition-all font-bold ${
-//                   allPricesSet 
-//                     ? "bg-primary hover:bg-primary/90 text-white shadow-primary/20" 
+//                   allPricesSet
+//                     ? "bg-primary hover:bg-primary/90 text-white shadow-primary/20"
 //                     : "bg-slate-200 text-slate-500 cursor-not-allowed opacity-70"
 //                 }`}
 //               >
@@ -188,8 +188,8 @@
 //             )}
 
 //             {rfq?.status === 'rfq_sent' && (
-//               <Button 
-//                 onClick={() => handleStatusAction('approve')} 
+//               <Button
+//                 onClick={() => handleStatusAction('approve')}
 //                 disabled={changeStatus.isPending}
 //                 className="rounded-lg px-10 shadow-lg transition-all font-bold bg-primary hover:bg-primary/90 text-white shadow-primary/20"
 //               >
@@ -198,8 +198,8 @@
 //             )}
 
 //             {rfq?.status === 'buyer_approval' && (
-//               <Button 
-//                 onClick={() => handleStatusAction('price-gathering-approve')} 
+//               <Button
+//                 onClick={() => handleStatusAction('price-gathering-approve')}
 //                 disabled={changeStatus.isPending}
 //                 className="rounded-lg px-10 shadow-lg transition-all font-bold bg-primary hover:bg-primary/90 text-white shadow-primary/20"
 //               >
@@ -208,8 +208,8 @@
 //             )}
 
 //             {rfq?.status === 'price_gathering_approval' && (
-//               <Button 
-//                 onClick={() => handleStatusAction('po-approve')} 
+//               <Button
+//                 onClick={() => handleStatusAction('po-approve')}
 //                 disabled={changeStatus.isPending}
 //                 className="rounded-lg px-10 shadow-lg transition-all font-bold bg-primary hover:bg-primary/90 text-white shadow-primary/20"
 //               >
@@ -218,8 +218,8 @@
 //             )}
 
 //             {rfq?.status === 'po_approval' && (
-//               <Button 
-//                 onClick={() => handleStatusAction('purchase-order')} 
+//               <Button
+//                 onClick={() => handleStatusAction('purchase-order')}
 //                 disabled={changeStatus.isPending}
 //                 className="rounded-lg px-10 shadow-lg transition-all font-bold bg-primary hover:bg-primary/90 text-white shadow-primary/20"
 //               >
@@ -230,7 +230,7 @@
 
 //           <div className="space-y-6">
 //             <RFQGeneralInfo />
-            
+
 //             <Tabs defaultValue="general" className="w-full">
 //               {/* <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8 mb-6">
 //                 <TabsTrigger value="general" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-2 font-bold uppercase text-xs">General Info</TabsTrigger>
@@ -242,7 +242,7 @@
 //                 <RFQItemsTable isEdit={true} items={rfq?.items} />
 //                 <RFQSummary />
 //               </TabsContent>
-              
+
 //               <TabsContent value="pricing">
 //                 <div className="p-12 text-center text-slate-400 border border-dashed rounded-xl font-medium">
 //                   Pricing details will be available after vendor submission.
@@ -305,9 +305,9 @@
 //           </div>
 //         </div>
 //       </div>
-      
-//       <CancelRFQModal 
-//         open={isCancelModalOpen} 
+
+//       <CancelRFQModal
+//         open={isCancelModalOpen}
 //         onOpenChange={setIsCancelModalOpen}
 //         onConfirm={handleCancelRFQ}
 //         isLoading={changeStatus.isPending}
@@ -315,7 +315,6 @@
 //     </FormProvider>
 //   )
 // }
-
 
 // import React from "react";
 // import { useNavigate, useParams } from "react-router-dom";
@@ -907,7 +906,6 @@
 //   );
 // }
 
-
 import React, { useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -930,12 +928,15 @@ import {
   UserRound,
   Printer,
   Database,
-  Info
+  Info,
+  MessageSquare,
 } from "lucide-react";
-import html2pdf from "html2pdf.js";
 
 import { useRFQDetails } from "../../hooks/rfqs/useRFQs";
 import useListSettings from "../../hooks/Settings/useListSettings";
+import { useActivityLogsList } from "../../hooks/activity-logs/useActivityLogs";
+import useListUsers from "../../hooks/Users/useListUsers";
+import EntityLink from "../../components/shared/EntityLink";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -988,6 +989,38 @@ const formatNumber = (value) => {
 const safeText = (value) => {
   if (value === null || value === undefined || value === "") return "—";
   return String(value);
+};
+
+const formatDateTime = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return `${formatDate(value)} ${date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  })}`;
+};
+
+const resolveMentions = (text, users) => {
+  if (!text) return "";
+  return text.replace(/@\[(\d+)\]/g, (_match, id) => {
+    const user = users.find((u) => u.id === Number(id));
+    return `@${user ? user.name : `User #${id}`}`;
+  });
+};
+
+const flattenComments = (list) => {
+  const flat = [];
+  const walk = (items) => {
+    (items || []).forEach((item) => {
+      flat.push(item);
+      if (item.replies?.length) walk(item.replies);
+    });
+  };
+  walk(list);
+  return flat
+    .filter((c) => c && typeof c === "object" && c.id !== undefined)
+    .sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
 };
 
 const statusStyles = {
@@ -1059,34 +1092,44 @@ export default function RFQDetails() {
   const printRef = useRef(null);
 
   const { data: settingsData } = useListSettings();
-  const getSetting = (key) => settingsData?.data?.find(s => s.key === key)?.value;
+  const getSetting = (key) =>
+    settingsData?.data?.find((s) => s.key === key)?.value;
 
-  const companyPhone = getSetting('phone') || getSetting('company_phone') || '+966 55 598 0730';
-  const companyEmail = getSetting('email') || getSetting('company_email') || 'procurement@forsa.com';
-  const companyVat = getSetting('vat') || getSetting('vat_number') || '300123456700003';
-  const companyAddress = getSetting('address') || getSetting('company_address') || 'King Fahd Road, Olaya District, Riyadh 12211';
+  const companyPhone =
+    getSetting("phone") || getSetting("company_phone") || "+966 55 598 0730";
+  const companyEmail =
+    getSetting("email") ||
+    getSetting("company_email") ||
+    "procurement@forsa.com";
+  const companyVat =
+    getSetting("vat") || getSetting("vat_number") || "300123456700003";
+  const companyAddress =
+    getSetting("address") ||
+    getSetting("company_address") ||
+    "King Fahd Road, Olaya District, Riyadh 12211";
 
   const { data: rfqResponse, isLoading, isError } = useRFQDetails(rfqId);
 
   const rfq = getRfq(rfqResponse);
   const currency = rfq?.currency;
 
-  const handleDownloadPDF = () => {
-    const element = document.getElementById("printable-rfq-area");
-    if (!element) return;
-    const isPO = rfq?.is_purchase_order;
-    const docNumber = rfq?.display_number || rfq?.rfq_number || rfq?.po_number || "document";
-    const fileName = isPO ? `PO-${docNumber}.pdf` : `RFQ-${docNumber}.pdf`;
-    html2pdf()
-      .set({
-        margin: [10, 10, 10, 10],
-        filename: fileName,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      })
-      .from(element)
-      .save();
+  const activityModelType = rfq
+    ? rfq.is_purchase_order
+      ? "purchase_order"
+      : "rfq"
+    : null;
+  const { data: logsData } = useActivityLogsList(activityModelType, rfqId);
+  const { data: usersResponse } = useListUsers({ per_page: 100 });
+
+  const chatUsers = Array.isArray(usersResponse)
+    ? usersResponse
+    : usersResponse?.data || [];
+  const chatComments = flattenComments(
+    Array.isArray(logsData) ? logsData : logsData?.data || [],
+  );
+
+  const handlePrint = () => {
+    window.print();
   };
 
   if (isLoading) {
@@ -1114,13 +1157,21 @@ export default function RFQDetails() {
     );
   }
 
-  const customerName = rfq.customer?.company_name || rfq.customer?.name?.trim() || "Unnamed Customer";
-  const supplierName = rfq.supplier?.company_name || rfq.supplier?.contact_name || "Unnamed Supplier";
+  const customerName =
+    rfq.customer?.company_name ||
+    rfq.customer?.name?.trim() ||
+    "Unnamed Customer";
+  const supplierName =
+    rfq.supplier?.company_name ||
+    rfq.supplier?.contact_name ||
+    "Unnamed Supplier";
 
   return (
     <div className="min-h-screen bg-muted/30 p-4 md:p-6">
       {/* GLOBAL HIGH-FIDELITY PRINT OVERRIDES */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @media print {
           body { visibility: hidden; background: white !important; }
           .no-print { display: none !important; }
@@ -1140,13 +1191,20 @@ export default function RFQDetails() {
             page-break-before: always;
           }
         }
-      `}} />
+      `,
+        }}
+      />
 
       <div className="mx-auto max-w-7xl space-y-6 no-print">
         {/* Main Header Action Controls */}
         <div className="flex flex-col gap-4 rounded-3xl border bg-background p-5 shadow-sm md:flex-row md:items-center md:justify-between">
           <div className="flex items-start gap-4">
-            <Button variant="outline" size="icon" onClick={() => navigate(-1)} className="rounded-2xl">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => navigate(-1)}
+              className="rounded-2xl"
+            >
               <ArrowLeft className="size-4" />
             </Button>
             <div>
@@ -1155,26 +1213,29 @@ export default function RFQDetails() {
                 {/* <Badge variant="secondary" className="rounded-full text-white! uppercase">
                   {safeText(rfq.document_type)}
                 </Badge> */}
-                {rfq.is_purchase_order && <Badge className="rounded-full">Purchase Order</Badge>}
+                {rfq.is_purchase_order && (
+                  <Badge className="rounded-full">Purchase Order</Badge>
+                )}
               </div>
               <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
                 {safeText(rfq.display_number || rfq.rfq_number)}
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Created at {formatDate(rfq.created_at)} by {safeText(rfq.procurement_user?.name)}
+                Created at {formatDate(rfq.created_at)} by{" "}
+                {safeText(rfq.procurement_user?.name)}
               </p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button
               variant="outline"
-              onClick={handleDownloadPDF}
+              onClick={handlePrint}
               className="rounded-2xl border-slate-200 text-slate-600 gap-2 font-bold hover:bg-slate-50"
             >
-              <Printer className="w-4 h-4" /> Download PDF
+              <Printer className="w-4 h-4" /> Download/Print PDF
             </Button>
-            {rfq.status === 'purchase_ordered' && (
-              <Button 
+            {rfq.status === "purchase_ordered" && (
+              <Button
                 className="rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2"
                 onClick={() => navigate(`/create-grn/${rfq.id}`)}
               >
@@ -1182,7 +1243,11 @@ export default function RFQDetails() {
               </Button>
             )}
             {rfq.can_be_fully_edited && (
-              <Button variant="outline" className="rounded-2xl" onClick={() => navigate(`/rfqs/${rfq.id}/edit`)}>
+              <Button
+                variant="outline"
+                className="rounded-2xl"
+                onClick={() => navigate(`/rfqs/${rfq.id}/edit`)}
+              >
                 <Pencil className="mr-2 size-4" /> Edit RFQ
               </Button>
             )}
@@ -1268,39 +1333,84 @@ export default function RFQDetails() {
       {/* HIGH-FIDELITY PRINT CANVAS (PRINTS ABSOLUTELY ALL RETURNED API METRICS) */}
       {/* ========================================================================= */}
       <div id="printable-rfq-area-wrapper" className="bg-white py-6">
-        <div className="max-w-[850px] mx-auto bg-white p-12 border border-slate-200 rounded-sm" id="printable-rfq-area" ref={printRef}>
-          
+        <div
+          className="max-w-[850px] mx-auto bg-white p-12 border border-slate-200 rounded-sm"
+          id="printable-rfq-area"
+          ref={printRef}
+        >
           {/* Brand Header Line */}
           <div className="flex justify-between items-start border-b-2 border-slate-900 pb-6 mb-8">
-            <div><img src='/images/LOGO.svg' className='h-20 w-36 object-cover mb-2' alt="Logo" /></div>
+            <div>
+              <img
+                src="/images/LOGO.svg"
+                className="h-20 w-36 object-cover mb-2"
+                alt="Logo"
+              />
+            </div>
             <div className="text-right text-[11px] text-slate-500 space-y-0.5">
-              <h2 className="font-extrabold text-sm text-slate-900 tracking-wide">FORSA TRADING & CONTRACTING</h2>
-              <p>{companyAddress} | VAT: {companyVat}</p>
+              <h2 className="font-extrabold text-sm text-slate-900 tracking-wide">
+                FORSA TRADING & CONTRACTING
+              </h2>
+              <p>
+                {companyAddress} | VAT: {companyVat}
+              </p>
               <p>Procurement Hub Stream &nbsp;|&nbsp; email: {companyEmail}</p>
             </div>
           </div>
 
           <h3 className="text-xl font-bold text-slate-900 mb-6 tracking-tight uppercase border-b pb-2 flex justify-between">
-            <span>{rfq.is_purchase_order ? "PURCHASE ORDER" : "REQUEST FOR QUOTATION"}</span>
-            <span className="text-slate-400 font-normal text-xs font-mono">STATUS: {safeText(rfq.status).toUpperCase()}</span>
+            <span>
+              {rfq.is_purchase_order
+                ? "PURCHASE ORDER"
+                : "REQUEST FOR QUOTATION"}
+            </span>
+            <span className="text-slate-400 font-normal text-xs font-mono">
+              STATUS: {safeText(rfq.status).toUpperCase()}
+            </span>
           </h3>
 
           {/* Core Entity Reference Information Boxes */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-[11px] space-y-1">
-              <h4 className="font-bold text-slate-900 text-xs uppercase mb-1 flex items-center gap-1"><Package className="w-3 h-3 text-slate-400" /> Supplier Data</h4>
-              <p><span className="text-slate-400">Company:</span> <strong className="text-slate-800">{supplierName}</strong></p>
-              <p><span className="text-slate-400">VAT No:</span> {safeText(rfq.supplier?.vat_number)}</p>
-              <p><span className="text-slate-400">Email:</span> {safeText(rfq.supplier?.email)}</p>
-              <p><span className="text-slate-400">Ref Code:</span> {safeText(rfq.supplier_reference)}</p>
+              <h4 className="font-bold text-slate-900 text-xs uppercase mb-1 flex items-center gap-1">
+                <Package className="w-3 h-3 text-slate-400" /> Supplier Data
+              </h4>
+              <p>
+                <span className="text-slate-400">Company:</span>{" "}
+                <strong className="text-slate-800">
+                  <EntityLink type="supplier" id={rfq.supplier?.id}>
+                    {supplierName}
+                  </EntityLink>
+                </strong>
+              </p>
+              <p>
+                <span className="text-slate-400">VAT No:</span>{" "}
+                {safeText(rfq.supplier?.vat_number)}
+              </p>
+              <p>
+                <span className="text-slate-400">Email:</span>{" "}
+                {safeText(rfq.supplier?.email)}
+              </p>
+              <p>
+                <span className="text-slate-400">Ref Code:</span>{" "}
+                {safeText(rfq.supplier_reference)}
+              </p>
             </div>
 
             <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-[11px] space-y-1">
-              <h4 className="font-bold text-slate-900 text-xs uppercase mb-1 flex items-center gap-1"><Info className="w-3 h-3 text-slate-400" /> Registry Data</h4>
+              <h4 className="font-bold text-slate-900 text-xs uppercase mb-1 flex items-center gap-1">
+                <Info className="w-3 h-3 text-slate-400" /> Registry Data
+              </h4>
               {rfq.is_purchase_order ? (
-                <p><span className="text-slate-400">PO Number:</span> <strong>{rfq.po_number || rfq.display_number}</strong></p>
+                <p>
+                  <span className="text-slate-400">PO Number:</span>{" "}
+                  <strong>{rfq.po_number || rfq.display_number}</strong>
+                </p>
               ) : (
-                <p><span className="text-slate-400">RFQ Number:</span> <strong>{rfq.display_number || rfq.rfq_number}</strong></p>
+                <p>
+                  <span className="text-slate-400">RFQ Number:</span>{" "}
+                  <strong>{rfq.display_number || rfq.rfq_number}</strong>
+                </p>
               )}
               {/* <p><span className="text-slate-400">PR Connected:</span> {safeText(rfq.purchase_request?.pr_number)}</p> */}
               {/* <p><span className="text-slate-400">PR Status:</span> {safeText(rfq.purchase_request?.status)}</p> */}
@@ -1309,26 +1419,60 @@ export default function RFQDetails() {
 
           {/* Workflow Schedule Matrix Box */}
           <div className="bg-slate-50 rounded-xl p-4 text-[11px] border border-slate-100 grid grid-cols-4 gap-4 mb-6">
-            <div><span className="text-slate-400 block">RFQ Creation Date</span><strong className="text-slate-800">{formatDate(rfq.rfq_date)}</strong></div>
-            <div><span className="text-slate-400 block">Required Date</span><strong className="text-slate-800">{formatDate(rfq.required_date)}</strong></div>
-            <div><span className="text-slate-400 block">Delivery Address Config</span><strong className="text-slate-800">{safeText(rfq.delivery_address)}</strong></div>
+            <div>
+              <span className="text-slate-400 block">RFQ Creation Date</span>
+              <strong className="text-slate-800">
+                {formatDate(rfq.rfq_date)}
+              </strong>
+            </div>
+            <div>
+              <span className="text-slate-400 block">Required Date</span>
+              <strong className="text-slate-800">
+                {formatDate(rfq.required_date)}
+              </strong>
+            </div>
+            <div>
+              <span className="text-slate-400 block">
+                Delivery Address Config
+              </span>
+              <strong className="text-slate-800">
+                {safeText(rfq.delivery_address)}
+              </strong>
+            </div>
             {/* <div><span className="text-slate-400 block">Created At Timestamp</span><strong className="text-slate-800">{formatDate(rfq.created_at)}</strong></div> */}
             {/* <div><span className="text-slate-400 block">System Operator</span><strong className="text-slate-800">{safeText(rfq.procurement_user?.name)}</strong></div> */}
           </div>
 
           {/* Financial Settings Metric Bar */}
           {/* <div className="bg-slate-50 rounded-xl p-4 text-[11px] border border-slate-100 grid grid-cols-4 gap-4 mb-6"> */}
-            {/* <div><span className="text-slate-400 block">Payment Logistics Profile</span><strong className="text-slate-800">{safeText(rfq.payment_terms_text)}</strong></div> */}
-            {/* <div><span className="text-slate-400 block">Payment Days Duration</span><strong className="text-slate-800">{safeText(rfq.payment_days)} Days</strong></div> */}
-            {/* <div><span className="text-slate-400 block">Delivery Typology</span><strong className="text-slate-800 uppercase">{safeText(rfq.delivery_type)}</strong></div> */}
+          {/* <div><span className="text-slate-400 block">Payment Logistics Profile</span><strong className="text-slate-800">{safeText(rfq.payment_terms_text)}</strong></div> */}
+          {/* <div><span className="text-slate-400 block">Payment Days Duration</span><strong className="text-slate-800">{safeText(rfq.payment_days)} Days</strong></div> */}
+          {/* <div><span className="text-slate-400 block">Delivery Typology</span><strong className="text-slate-800 uppercase">{safeText(rfq.delivery_type)}</strong></div> */}
           {/* </div> */}
 
           {/* PO-specific info row */}
           {rfq.is_purchase_order && (
             <div className="bg-slate-50 rounded-xl p-4 text-[11px] border border-slate-100 grid grid-cols-3 gap-4 mb-6">
-              <div><span className="text-slate-400 block">PO Number</span><strong className="text-slate-800">{safeText(rfq.po_number || rfq.display_number)}</strong></div>
-              <div><span className="text-slate-400 block">PO Date</span><strong className="text-slate-800">{formatDate(rfq.po_date || rfq.confirmed_at || rfq.created_at)}</strong></div>
-              <div><span className="text-slate-400 block">Payment Terms</span><strong className="text-slate-800">{safeText(rfq.payment_terms_text)}</strong></div>
+              <div>
+                <span className="text-slate-400 block">PO Number</span>
+                <strong className="text-slate-800">
+                  {safeText(rfq.po_number || rfq.display_number)}
+                </strong>
+              </div>
+              <div>
+                <span className="text-slate-400 block">PO Date</span>
+                <strong className="text-slate-800">
+                  {formatDate(
+                    rfq.po_date || rfq.confirmed_at || rfq.created_at,
+                  )}
+                </strong>
+              </div>
+              <div>
+                <span className="text-slate-400 block">Payment Terms</span>
+                <strong className="text-slate-800">
+                  {safeText(rfq.payment_terms_text)}
+                </strong>
+              </div>
             </div>
           )}
 
@@ -1352,21 +1496,49 @@ export default function RFQDetails() {
             <tbody className="divide-y divide-slate-100 text-[11px] text-slate-700">
               {rfq.items?.map((item, index) => (
                 <tr key={item.id || index} className="align-top">
-                  <td className="py-3 px-1 text-center text-slate-400">{index + 1}</td>
+                  <td className="py-3 px-1 text-center text-slate-400">
+                    {index + 1}
+                  </td>
                   <td className="py-3 px-2">
-                    <span className="font-bold text-slate-900 block">{item.item_name}</span>
-                    {item.notes && <span className="text-[10px] text-slate-400 block">Note: {item.notes}</span>}
+                    <span className="font-bold text-slate-900 block">
+                      {item.item_name}
+                    </span>
+                    {item.specifications && (
+                      <span className="text-[10px] text-slate-500 block">
+                        {item.specifications}
+                      </span>
+                    )}
+                    {item.notes && (
+                      <span className="text-[10px] text-slate-400 block">
+                        Note: {item.notes}
+                      </span>
+                    )}
                     {/* <span className="text-[9px] text-slate-400 block font-mono">Item ID: {item.item_id} | Created: {safeText(item.created_at)}</span> */}
                   </td>
-                  <td className="py-3 px-2 text-center text-slate-500">{item.unit?.name || "طن"} <span className="text-[9px] font-mono block">({safeText(item.unit?.id)})</span></td>
+                  <td className="py-3 px-2 text-center text-slate-500">
+                    {item.unit?.name || "طن"}{" "}
+                    <span className="text-[9px] font-mono block">
+                      ({safeText(item.unit?.id)})
+                    </span>
+                  </td>
                   <td className="py-3 px-2 text-right font-medium">
-                    <div className="font-bold text-slate-900">{formatNumber(item.quantity)}</div>
+                    <div className="font-bold text-slate-900">
+                      {formatNumber(item.quantity)}
+                    </div>
                     {/* <div className="text-[9px] text-slate-400 font-mono">Rem: {item.remaining_quantity} | Acc: {item.quantity_accepted}</div> */}
                   </td>
-                  <td className="py-3 px-2 text-right text-slate-500 font-mono">{formatMoney(item.target_price)}</td>
-                  <td className="py-3 px-2 text-right font-mono">{formatMoney(item.unit_price)}</td>
-                  <td className="py-3 px-2 text-right text-slate-400 font-mono">{formatNumber(item.vat_rate)}%</td>
-                  <td className="py-3 px-2 text-right font-bold text-slate-900 font-mono">{formatMoney(item.line_total)}</td>
+                  <td className="py-3 px-2 text-right text-slate-500 font-mono">
+                    {formatMoney(item.target_price)}
+                  </td>
+                  <td className="py-3 px-2 text-right font-mono">
+                    {formatMoney(item.unit_price)}
+                  </td>
+                  <td className="py-3 px-2 text-right text-slate-400 font-mono">
+                    {formatNumber(item.vat_rate)}%
+                  </td>
+                  <td className="py-3 px-2 text-right font-bold text-slate-900 font-mono">
+                    {formatMoney(item.line_total)}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -1377,38 +1549,55 @@ export default function RFQDetails() {
             <div className="w-80 space-y-1.5 text-[11px] border-t border-slate-100 pt-3">
               <div className="flex justify-between text-slate-500 px-2">
                 <span>Subtotal Summation</span>
-                <span className="font-semibold text-slate-900 font-mono">{formatMoney(rfq.subtotal)} {currency?.code || "SAR"}</span>
+                <span className="font-semibold text-slate-900 font-mono">
+                  {formatMoney(rfq.subtotal)} {currency?.code || "SAR"}
+                </span>
               </div>
               <div className="flex justify-between text-slate-500 px-2">
                 <span>Discount Deduction</span>
-                <span className="font-semibold text-slate-900 font-mono">{formatMoney(rfq.discount_amount)} {currency?.code || "SAR"}</span>
+                <span className="font-semibold text-slate-900 font-mono">
+                  {formatMoney(rfq.discount_amount)} {currency?.code || "SAR"}
+                </span>
               </div>
               <div className="flex justify-between text-slate-500 px-2">
-                <span>Tax Allocation / VAT ({formatNumber(rfq.vat_rate)}%)</span>
-                <span className="font-semibold text-slate-900 font-mono">{formatMoney(rfq.vat_amount || rfq.tax_amount)} {currency?.code || "SAR"}</span>
+                <span>
+                  Tax Allocation / VAT ({formatNumber(rfq.vat_rate)}%)
+                </span>
+                <span className="font-semibold text-slate-900 font-mono">
+                  {formatMoney(rfq.vat_amount || rfq.tax_amount)}{" "}
+                  {currency?.code || "SAR"}
+                </span>
               </div>
               <div className="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-100 text-slate-900 mt-2">
-                <span className="font-bold text-slate-900 text-xs">Total Evaluated Summary</span>
-                <span className="font-black text-sm font-mono text-slate-950">{formatMoney(rfq.total_amount)} {currency?.code || "SAR"}</span>
+                <span className="font-bold text-slate-900 text-xs">
+                  Total Evaluated Summary
+                </span>
+                <span className="font-black text-sm font-mono text-slate-950">
+                  {formatMoney(rfq.total_amount)} {currency?.code || "SAR"}
+                </span>
               </div>
             </div>
           </div>
- 
 
           {/* Notes & Terms */}
           <div className="grid grid-cols-2 gap-4 mb-8 text-[11px]">
             {rfq.notes && (
               <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
-                <h4 className="font-bold text-slate-800 uppercase text-[10px] mb-1">Notes</h4>
+                <h4 className="font-bold text-slate-800 uppercase text-[10px] mb-1">
+                  Notes
+                </h4>
                 <p className="text-slate-600 leading-relaxed">{rfq.notes}</p>
               </div>
             )}
             {/* Always show Terms & Conditions for PO; otherwise only if content exists */}
             {(rfq.terms_and_conditions || rfq.is_purchase_order) && (
               <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
-                <h4 className="font-bold text-slate-800 uppercase text-[10px] mb-1">Terms & Conditions</h4>
+                <h4 className="font-bold text-slate-800 uppercase text-[10px] mb-1">
+                  Terms & Conditions
+                </h4>
                 <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
-                  {rfq.terms_and_conditions || "Standard terms and conditions apply. Delivery as per agreed schedule. Payment as per payment terms above."}
+                  {rfq.terms_and_conditions ||
+                    "Standard terms and conditions apply. Delivery as per agreed schedule. Payment as per payment terms above."}
                 </p>
               </div>
             )}
@@ -1418,14 +1607,70 @@ export default function RFQDetails() {
           <div className="grid grid-cols-2 gap-12 text-center text-[11px] font-bold text-slate-700 pt-12 border-t border-slate-200 mt-12">
             <div className="space-y-10">
               <div className="h-px bg-slate-200 mx-4"></div>
-              <p>{rfq.is_purchase_order ? "Authorized Buyer Signature & Stamp" : "Procurement Officer Signature"}</p>
+              <p>
+                {rfq.is_purchase_order
+                  ? "Authorized Buyer Signature & Stamp"
+                  : "Procurement Officer Signature"}
+              </p>
             </div>
             <div className="space-y-10">
               <div className="h-px bg-slate-200 mx-4"></div>
-              <p>{rfq.is_purchase_order ? "Supplier Authorized Signature & Stamp" : "Approver Signature"}</p>
+              <p>
+                {rfq.is_purchase_order
+                  ? "Supplier Authorized Signature & Stamp"
+                  : "Approver Signature"}
+              </p>
             </div>
           </div>
 
+          {/* Activity / Chat Log */}
+          <div className="page-break pt-8 mt-12 border-t border-slate-200">
+            <h4 className="text-xs font-bold text-slate-800 tracking-wider uppercase mb-4 flex items-center gap-2">
+              <MessageSquare className="w-3.5 h-3.5 text-slate-400" />
+              {rfq.is_purchase_order
+                ? "Purchase Order Activity Log"
+                : "RFQ Activity Log"}
+            </h4>
+            {chatComments.length === 0 ? (
+              <p className="text-[11px] text-slate-400 italic">
+                No activity log entries.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {chatComments.map((comment) => (
+                  <div
+                    key={comment.id}
+                    className={`text-[11px] bg-slate-50 border border-slate-100 rounded-lg p-3 ${
+                      comment.parent_id ? "ml-6" : ""
+                    }`}
+                  >
+                    <div className="flex justify-between items-center mb-1 gap-3">
+                      <span className="font-bold text-slate-800">
+                        {comment.parent_id && (
+                          <span className="text-slate-400 font-normal mr-1">
+                            ↳
+                          </span>
+                        )}
+                        {comment.user?.name || "System Log"}
+                      </span>
+                      <span className="text-slate-400 shrink-0">
+                        {formatDateTime(comment.created_at)}
+                      </span>
+                    </div>
+                    <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
+                      {resolveMentions(
+                        comment.comment ||
+                          comment.message ||
+                          comment.description ||
+                          "",
+                        chatUsers,
+                      )}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import useDeleteUnit from '../../../hooks/units/useDeleteUnit'
 import useChangeUnitStatus from '../../../hooks/units/useChangeUnitStatus'
 import useDeleteSupplier from '../../../hooks/suppliers/useDeleteSupplier'
+import ContactLink from '../../shared/ContactLink'
 
 export default function SuppliersTable({ searc,  sortOrder, page,per_page,  data, loading }) {
   // navigate 
@@ -52,11 +53,26 @@ export default function SuppliersTable({ searc,  sortOrder, page,per_page,  data
 
   { title: "VAT", dataIndex: "vat_number", key: "vat_number" },
 
-  { title: "Email", dataIndex: "email", key: "email" },
+  {
+    title: "Email",
+    dataIndex: "email",
+    key: "email",
+    render: (v) => <ContactLink type="email" value={v} />,
+  },
 
-  { title: "Mobile", dataIndex: "mobile", key: "mobile" },
+  {
+    title: "Mobile",
+    dataIndex: "mobile",
+    key: "mobile",
+    render: (v) => <ContactLink type="mobile" value={v} />,
+  },
 
-  { title: "Phone", dataIndex: "phone", key: "phone" },
+  {
+    title: "Phone",
+    dataIndex: "phone",
+    key: "phone",
+    render: (v) => <ContactLink type="phone" value={v} />,
+  },
 
   { title: "Source", dataIndex: "source_of_supply", key: "source_of_supply" },
 

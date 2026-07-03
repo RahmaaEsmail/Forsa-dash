@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import StatisticCard from './StatisticsCard'
 
 const formatMoney = (value) => {
@@ -10,6 +11,8 @@ const formatMoney = (value) => {
 };
 
 export default function HomeStatistics({ data }) {
+  const navigate = useNavigate();
+
   if (!data) return null;
 
   return (
@@ -65,21 +68,23 @@ export default function HomeStatistics({ data }) {
         rating={data?.rfqs?.by_status?.draft + " Drafts"} 
         icon={"/images/carbon_chart-logistic-regression.svg"}
       />
-      <StatisticCard 
-        title="Active Customers" 
-        up={true} 
-        number={String(data?.customers?.active || 0)} 
-        bgIcon={"#8280FF"} 
-        rating={"Total " + data?.customers?.total} 
+      <StatisticCard
+        title="Active Customers"
+        up={true}
+        number={String(data?.customers?.active || 0)}
+        bgIcon={"#8280FF"}
+        rating={"Total " + data?.customers?.total}
         icon={"/images/carbon_dashboard.svg"}
+        onClick={() => navigate('/customers')}
       />
-      <StatisticCard 
-        title="Active Suppliers" 
-        up={true} 
-        number={String(data?.suppliers?.active || 0)} 
-        bgIcon={"#00B69B"} 
-        rating={"Total " + data?.suppliers?.total} 
+      <StatisticCard
+        title="Active Suppliers"
+        up={true}
+        number={String(data?.suppliers?.active || 0)}
+        bgIcon={"#00B69B"}
+        rating={"Total " + data?.suppliers?.total}
         icon={"/images/icon-park-twotone_transporter.svg"}
+        onClick={() => navigate('/suppliers')}
       />
     </div>
   )

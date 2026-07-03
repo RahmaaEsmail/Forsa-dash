@@ -8,6 +8,7 @@ import Pagination from '../../shared/Pagination';
 import Loading from '../../shared/Loading';
 import { DeleteModal } from '../../shared/DeleteModal';
 import { useDeleteQuotation } from '../../../hooks/quotations/useDeleteQuotation';
+import EntityLink from '../../shared/EntityLink';
 // import { useDeleteQuotation } from '../../hooks/quotations/useDeleteQuotation';
 
 const statusVariants = {
@@ -58,7 +59,11 @@ export default function QuotationTable({ data, isLoading, page, setPage }) {
       title: "Customer",
       dataIndex: "customer",
       key: "customer",
-      render: (customer) => <span>{customer?.name || customer?.company_name || 'N/A'}</span>
+      render: (customer) => (
+        <EntityLink type="customer" id={customer?.id}>
+          {customer?.name || customer?.company_name || 'N/A'}
+        </EntityLink>
+      )
     },
     {
       title: "PR Number",

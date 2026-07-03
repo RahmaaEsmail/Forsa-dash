@@ -10,6 +10,7 @@ import useDeletePurchaseRequest from '../../../hooks/purchaseRequest/useDeletePu
 import ChangePurchaseStatusModal from './ChangePurchaseStatusModal';
 import Pagination from '../../shared/Pagination';
 import CreateRFQModal from './CreateRFQModal';
+import EntityLink from '../../shared/EntityLink';
 
 export default function PurchaseRequestTable({ page, setPage, purchase_data }) {
   const purchase_loading = !purchase_data;
@@ -108,7 +109,10 @@ export default function PurchaseRequestTable({ page, setPage, purchase_data }) {
       render: (_, row) => {
         return (
           <div className="flex flex-col gap-2">
-           {(row?.customer?.first_name !== "" && row?.customer?.first_name!= null)&&  <p className="break-words">{row?.customer?.first_name + " " + row?.customer?.last_name || "Unknown"}</p>} {/* Added break-words */}
+           {(row?.customer?.first_name !== "" && row?.customer?.first_name!= null)&&
+             <EntityLink type="customer" id={row?.customer?.id} className="break-words">
+               {row?.customer?.first_name + " " + row?.customer?.last_name || "Unknown"}
+             </EntityLink>} {/* Added break-words */}
             <div className="flex gap-2 items-center">
               <MessageCircle size={15} />
               <a href={`mailto:${row?.customer?.email}`} target="_blank" className="break-words">

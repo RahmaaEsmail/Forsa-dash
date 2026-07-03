@@ -7,11 +7,25 @@ import RFQStatusTabs from '../../components/pages/RFQs/RFQStatusTabs'
 import RFQFilter from '../../components/pages/RFQs/RFQFilter'
 import { useNavigate } from 'react-router-dom'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
+import { exportToExcel } from '../../utils/exportToExcel'
+
+const RFQ_COL_MAP = {
+  rfq_number: 'RFQ Number',
+  'supplier.company_name': 'Supplier',
+  'purchase_request.pr_number': 'PR Number',
+  'customer.company_name': 'Customer',
+  status: 'Status',
+  total_amount: 'Total Amount',
+  'currency.code': 'Currency',
+  created_at: 'Created At',
+};
 
 export default function RFQs() {
   const navigate = useNavigate();
   const [activeView, setActiveView] = useState("rfq");
   const [filters, setFilters] = useState({});
+  const [rfqData, setRfqData] = useState([]);
+  const [poData, setPoData] = useState([]);
 
   const handleFilter = (newFilters) => {
     setFilters(newFilters);
@@ -21,14 +35,24 @@ export default function RFQs() {
     setFilters({});
   };
 
+  const handleExport = () => {
+    const data = activeView === 'rfq' ? rfqData : poData;
+    const label = activeView === 'rfq' ? 'rfqs' : 'purchase_orders';
+    exportToExcel(data, label, RFQ_COL_MAP);
+  };
+
   return (
     <div className="flex pb-6 flex-col gap-8">
       <PageHeader title={"Request for Quotation"}>
         <div className='flex gap-2 items-center'>
-          {/* <Button className={"bg-white border border-primary text-primary font-bold hover:bg-slate-50 transition-all"}>
-            <Download className="w-4 h-4 mr-2" />
-            <span>Download</span>
-          </Button> */}
+          <Button
+            variant="outline"
+            className="border-primary text-primary font-bold hover:bg-primary/5 gap-2"
+            onClick={handleExport}
+          >
+            <Download className="w-4 h-4" />
+            Export Excel
+          </Button>
         </div>
       </PageHeader>
 
@@ -55,13 +79,13 @@ export default function RFQs() {
 
           <TabsContent value="rfq" className="mt-0">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-              <RFQTable view="rfq" filters={filters} />
+              <RFQTable view="rfq" filters={filters} onDataLoaded={setRfqData} />
             </div>
           </TabsContent>
           
           <TabsContent value="po" className="mt-0">
              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-              <RFQTable view="po" filters={filters} />
+              <RFQTable view="po" filters={filters} onDataLoaded={setPoData} />
             </div>
           </TabsContent>
         </Tabs>

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Pagination from '../../shared/Pagination';
 import Loading from '../../shared/Loading';
 import { useDeleteGRN } from '../../../hooks/grns/useGRNs';
+import EntityLink from '../../shared/EntityLink';
 
 const statusVariants = {
   draft: "bg-slate-100 text-slate-700 border-none",
@@ -44,7 +45,11 @@ export default function GRNTable({ data, isLoading, page, setPage }) {
     },
     {
       title: "Supplier",
-      render: (_, row) => <span>{row.rfq?.supplier?.company_name || 'N/A'}</span>
+      render: (_, row) => (
+        <EntityLink type="supplier" id={row.rfq?.supplier?.id}>
+          {row.rfq?.supplier?.company_name || 'N/A'}
+        </EntityLink>
+      )
     },
     {
       title: "Status",

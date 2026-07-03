@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "../../../ui/table";
 import { DatePicker } from "./DatePicker";
+import { exportToExcel } from "../../../../utils/exportToExcel";
 
 
 const thBase =
@@ -38,32 +39,48 @@ export default function HomeTable({
   const canPrev = safePage > 1;
   const canNext = safePage < totalPages;
 
+  const handleExport = () => {
+    exportToExcel(data, title.replace(/\s+/g, '_').toLowerCase());
+  };
+
   return (
     <div className="bg-white rounded-main p-4 overflow-hidden border border-[#E6EFF5]">
-      {/* Header */}
-      <div className="flex ms-auto w-fit  items-center gap-3 text-secondary">
+      {/* Header row: pagination + export */}
+      <div className="flex items-center justify-between gap-3 text-secondary">
         <button
           type="button"
-          onClick={() => canPrev && onPageChange?.(safePage - 1)}
-          disabled={!canPrev}
-          className="disabled:opacity-40 disabled:cursor-not-allowed"
-          aria-label="Previous"
+          onClick={handleExport}
+          className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 hover:border-primary/40 transition-all text-slate-500 hover:text-primary"
+          title={`Export "${title}" to Excel`}
         >
-          <ChevronLeft size={18} />
+          <Download size={14} />
         </button>
 
-        <span className="text-sm font-semibold">{rangeLabel}</span>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => canPrev && onPageChange?.(safePage - 1)}
+            disabled={!canPrev}
+            className="disabled:opacity-40 disabled:cursor-not-allowed"
+            aria-label="Previous"
+          >
+            <ChevronLeft size={18} />
+          </button>
 
-        <button
-          type="button"
-          onClick={() => canNext && onPageChange?.(safePage + 1)}
-          disabled={!canNext}
-          className="disabled:opacity-40 disabled:cursor-not-allowed"
-          aria-label="Next"
-        >
-          <ChevronRight size={18} />
-        </button>
+          <span className="text-sm font-semibold">{rangeLabel}</span>
+
+          <button
+            type="button"
+            onClick={() => canNext && onPageChange?.(safePage + 1)}
+            disabled={!canNext}
+            className="disabled:opacity-40 disabled:cursor-not-allowed"
+            aria-label="Next"
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
       </div>
+
       <div className="pt-8 pb-4 flex items-center justify-between gap-6">
         <h2 className="font-bold  text-secondary text-large">{title}</h2>
 

@@ -1,8 +1,11 @@
 import { TrendingDown, TrendingUp } from "lucide-react";
 
-export default function StatisticCard({ title, number, icon, bgIcon, rating, up, desc }) {
+export default function StatisticCard({ title, number, icon, bgIcon, rating, up, desc, onClick }) {
   return (
-    <div className="bg-white rounded-main p-5 flex flex-col gap-[17px]">
+    <div
+      onClick={onClick}
+      className={`bg-white rounded-main p-5 flex flex-col gap-[17px] ${onClick ? "cursor-pointer transition-shadow hover:shadow-md" : ""}`}
+    >
       <div className="flex justify-between items-center">
         <p className="text-base font-medium text-secondary">{title}</p>
 

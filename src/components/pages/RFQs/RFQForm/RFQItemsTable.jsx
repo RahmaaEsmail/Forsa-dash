@@ -8,6 +8,10 @@ import { Plus, Trash2, PackagePlus, ToggleLeft } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../ui/select";
 import CreateProductModal from '../../PurchaseRequests/CreateProductModal';
+import SearchableAsyncSelect from '../../../shared/SearchableAsyncSelect';
+import { handleGetAllProducts } from '../../../../services/products';
+import { handleGetAllUnits } from '../../../../services/units';
+import { useQuery } from '@tanstack/react-query';
 
 export default function RFQItemsTable({ items, isEdit = false, prData }) {
   const { control, register, watch, setValue } = useFormContext();
@@ -22,6 +26,37 @@ export default function RFQItemsTable({ items, isEdit = false, prData }) {
 
   const watchItems = watch("items") || [];
   const currency = watch("currency_code") || "SAR";
+
+  const { data: unitsData } = useQuery({
+    queryKey: ["units-all"],
+    queryFn: ({ signal }) => handleGetAllUnits({ signal, per_page: 200 }),
+  });
+
+  const handleProductSelect = (product, index) => {
+    if (product) {
+      setValue(`items.${index}.item_name`, product.name?.en || product.name?.ar || product.name || "");
+      setValue(`items.${index}.specifications`, product.description || "");
+      if (product.units && product.units.length > 0) {
+        setValue(`items.${index}.unit_name`, product.units[0].name?.en || product.units[0].name?.ar || product.units[0].name || "");
+      } else {
+        setValue(`items.${index}.unit_name`, "");
+      }
+      setValue(`items.${index}.target_price`, product.selling_price || product.cost_price || 0);
+      setValue(`items.${index}.unit_price`, 0);
+    } else {
+      setValue(`items.${index}.item_name`, "");
+      setValue(`items.${index}.specifications`, "");
+      setValue(`items.${index}.unit_name`, "");
+      setValue(`items.${index}.target_price`, 0);
+      setValue(`items.${index}.unit_price`, 0);
+    }
+  };
+
+  const handleCreateProduct = (searchValue, index) => {
+    setNewProductName(searchValue);
+    setActiveItemIndex(index);
+    setIsProductModalOpen(true);
+  };
 
   const columns = [
     {
@@ -46,24 +81,18 @@ export default function RFQItemsTable({ items, isEdit = false, prData }) {
         return (
           <div className="min-w-[220px] text-left space-y-1">
             {isCustom ? (
-              <div className="flex items-center gap-1">
-                <Input
-                  {...register(`items.${index}.item_name`)}
-                  placeholder="Enter product name..."
-                  className="bg-transparent border h-10 rounded-md text-sm flex-1 focus:ring-1 focus:ring-primary"
+              <div className="flex items-center gap-1 w-full">
+                <SearchableAsyncSelect
+                  control={control}
+                  name={`items.${index}.item_id`}
+                  placeholder={watchItems[index]?.item_name || "Search product..."}
+                  fetchFn={handleGetAllProducts}
+                  queryKeyPrefix="products"
+                  onSelectOption={(prod) => handleProductSelect(prod, index)}
+                  onCreateNew={(search) => handleCreateProduct(search, index)}
+                  createLabel="Create New Product"
+                  className="w-full"
                 />
-                <button
-                  type="button"
-                  title="Create this product in catalog"
-                  onClick={() => {
-                    setNewProductName(watchItems[index]?.item_name || "");
-                    setActiveItemIndex(index);
-                    setIsProductModalOpen(true);
-                  }}
-                  className="p-1.5 text-primary hover:bg-primary/10 rounded-md shrink-0"
-                >
-                  <PackagePlus className="w-4 h-4" />
-                </button>
               </div>
             ) : (
               <Controller
@@ -101,10 +130,14 @@ export default function RFQItemsTable({ items, isEdit = false, prData }) {
             <button
               type="button"
               onClick={() => {
-                setValue(`items.${index}.is_custom`, !isCustom);
-                if (isCustom) {
-                  setValue(`items.${index}.item_name`, "");
-                }
+                const newCustomValue = !isCustom;
+                setValue(`items.${index}.is_custom`, newCustomValue);
+                setValue(`items.${index}.item_id`, "");
+                setValue(`items.${index}.item_name`, "");
+                setValue(`items.${index}.specifications`, "");
+                setValue(`items.${index}.unit_name`, "");
+                setValue(`items.${index}.target_price`, 0);
+                setValue(`items.${index}.unit_price`, 0);
               }}
               className="text-[11px] text-slate-400 hover:text-primary flex items-center gap-1 transition-colors"
             >
@@ -316,9 +349,6 @@ export default function RFQItemsTable({ items, isEdit = false, prData }) {
                   <span className="text-gray-900 font-bold">Total:</span>
                   <span className="text-primary text-xl font-bold">{grandTotal.toFixed(2)} {currency}</span>
                </div>
-               <div className="pt-2 text-right">
-                  <span className="text-emerald-500 text-sm font-bold">Submit 15</span>
-               </div>
             </div>
           </div>
         </TabsContent>
@@ -330,7 +360,15 @@ export default function RFQItemsTable({ items, isEdit = false, prData }) {
         initialName={newProductName}
         onCreated={(id, firstUnitId) => {
           if (activeItemIndex !== null) {
-            // product was saved to catalog; item_name stays as typed
+            setValue(`items.${activeItemIndex}.item_id`, String(id));
+            setValue(`items.${activeItemIndex}.item_name`, newProductName);
+            if (firstUnitId && unitsData?.data) {
+              const matchedUnit = unitsData.data.find(u => String(u.id) === String(firstUnitId));
+              if (matchedUnit) {
+                const uName = matchedUnit.name?.en || matchedUnit.name?.ar || matchedUnit.name || "";
+                setValue(`items.${activeItemIndex}.unit_name`, uName);
+              }
+            }
           }
         }}
       />

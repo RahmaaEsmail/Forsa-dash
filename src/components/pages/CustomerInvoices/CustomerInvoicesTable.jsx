@@ -13,6 +13,7 @@ import useMarkPaidCustomerInvoice from '../../../hooks/customer-invoices/useMark
 import useCancelCustomerInvoice from '../../../hooks/customer-invoices/useCancelCustomerInvoice'
 import CancelInvoiceModal from './CancelInvoiceModal'
 import MarkPaidModal from './MarkPaidModal'
+import EntityLink from '../../shared/EntityLink'
 
 export default function CustomerInvoicesTable({ data, loading }) {
   const navigate = useNavigate();
@@ -90,7 +91,11 @@ export default function CustomerInvoicesTable({ data, loading }) {
     },
     {
       title: "Customer",
-      render: (_, row) => row.customer?.company_name || row.customer?.name || "N/A",
+      render: (_, row) => (
+        <EntityLink type="customer" id={row.customer?.id}>
+          {row.customer?.company_name || row.customer?.name || "N/A"}
+        </EntityLink>
+      ),
     },
     {
       title: "Status",

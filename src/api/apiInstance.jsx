@@ -18,20 +18,21 @@ apiInstance.interceptors.request.use(
     }
     return req;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 apiInstance.interceptors.response.use(
   (res) => res,
   (error) => {
-    // const status = error?.response?.status;
-    // const url = error?.config?.url || "";
-    // const isAuthEndpoint = url.includes("auth/login") || url.includes("auth/refresh");
-    // if (status === 401 && !isAuthEndpoint) {
-    //   localStorage.removeItem(config.localStorageTokenName);
-    //   localStorage.removeItem(config.localStorageUserData);
-    //   window.location.href = "/login";
-    // }
+    const status = error?.response?.status;
+    const url = error?.config?.url || "";
+    const isAuthEndpoint =
+      url.includes("auth/login") || url.includes("auth/refresh");
+    if (status === 401 && !isAuthEndpoint) {
+      localStorage.removeItem(config.localStorageTokenName);
+      localStorage.removeItem(config.localStorageUserData);
+      window.location.href = "/login";
+    }
     return Promise.reject(error);
-  }
+  },
 );

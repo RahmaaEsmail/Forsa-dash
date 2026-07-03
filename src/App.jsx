@@ -1,55 +1,49 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import AppRoutes from './routes/AppRoutes';
 import { Toaster } from './components/ui/sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import userProfileOptions from './hooks/auth/userProfileOptions';
 import { toast } from 'sonner';
-import refreshTokenOptions from './hooks/auth/refreshTokenOptions';
+import { handleRefreshToken } from './services/auth';
 import { config } from './api/config';
+import { useLocation } from 'react-router-dom';
 import { QUERY_KEYS } from './constants';
 
 export default function App() {
+  const location = useLocation();
   const queryClient = useQueryClient();
-  const [enableRefresh, setEnableRefresh] = useState(false);
-
-  // Refresh query runs ONLY when the profile returns 401
-  const { error: refreshTokenError, isSuccess: refreshSuccess } = useQuery({
-    ...refreshTokenOptions(),
-    enabled: enableRefresh,
-  });
+  const hasToken = !!localStorage.getItem(config.localStorageTokenName);
 
   const {
     data: userData,
-    isError: userDataIsError,
-    error: userDataErrorObj,
-  } = useQuery(userProfileOptions());
+  } = useQuery({
+    ...userProfileOptions(),
+    enabled: hasToken,
+  });
 
-  // Profile failed with 401 → trigger refresh
+  // Periodically refresh the token every 5 minutes when logged in
   useEffect(() => {
-    if (userDataIsError && userDataErrorObj?.status === 401) {
-      setEnableRefresh(true);
-    }
-  }, [userDataIsError, userDataErrorObj]);
+    if (!hasToken) return;
 
-  // Refresh succeeded → refetch profile with new token
-  useEffect(() => {
-    if (refreshSuccess) {
-      setEnableRefresh(false);
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.user_profile_key });
-    }
-  }, [refreshSuccess, queryClient]);
+    const interval = setInterval(() => {
+      handleRefreshToken()
+        .then(() => {
+          // Profile data could be updated or query invalidated if needed
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.user_profile_key });
+        })
+        .catch((err) => {
+          const status = err?.response?.status || err?.status;
+          if (status === 401) {
+            toast.error('Session expired, please log in again');
+            localStorage.removeItem(config.localStorageTokenName);
+            localStorage.removeItem(config.localStorageUserData);
+            window.location.href = '/login';
+          }
+        });
+    }, 1000 * 60 * 5); // 5 minutes
 
-  // Refresh failed with 401 → session truly expired, logout
-  useEffect(() => {
-    if (refreshTokenError) {
-      if (refreshTokenError?.status === 401) {
-        toast.error('Session expired, please log in again');
-        localStorage.removeItem(config.localStorageTokenName);
-        localStorage.removeItem(config.localStorageUserData);
-        window.location.href = '/login';
-      }
-    }
-  }, [refreshTokenError]);
+    return () => clearInterval(interval);
+  }, [hasToken, queryClient]);
 
   return (
     <div>

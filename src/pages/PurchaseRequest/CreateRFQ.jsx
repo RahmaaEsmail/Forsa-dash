@@ -50,6 +50,7 @@ export default function CreateRFQ() {
       notes: "",
       terms_and_conditions: "",
       delivery_address: "",
+      supplier_address_id: "",
       items: []
     }
   });
@@ -86,6 +87,7 @@ export default function CreateRFQ() {
             notes: data.notes || "",
             terms_and_conditions: data.terms_and_conditions || "",
             delivery_address: data.delivery_address || "",
+            supplier_address_id: data.supplier_address_id ?? "",
             rfq_number: data.rfq_number,
             items: data.items?.map(item => ({
               id: item.id,
@@ -218,6 +220,7 @@ export default function CreateRFQ() {
         receipt_date: values.receipt_date ? format(values.receipt_date, "yyyy-MM-dd") : null,
         notes: values.notes,
         delivery_address: values.delivery_address || "",
+        ...(values.supplier_address_id ? { supplier_address_id: Number(values.supplier_address_id) } : {}),
         items: values.items
           .filter(item => item.selected)
           .map(item => {
@@ -371,7 +374,7 @@ export default function CreateRFQ() {
           <div className="space-y-6">
             <RFQGeneralInfo isEdit={isEdit} prData={prData} />
             <RFQItemsTable isEdit={isEdit} prData={prData} />
-            <RFQSummary />
+            {/* <RFQSummary /> */}
           </div>
         </div>
 

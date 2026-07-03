@@ -3,7 +3,7 @@ import { apiInstance } from "../api/apiInstance";
 
 export const handleGetAllProducts = async ({
   page,
-  per_page,
+  per_page = 10000000000,
   search,
   category_id,
   visibility,
@@ -61,3 +61,18 @@ export const handleProductDetails = async({id,signal}) => {
   })
   return response?.data;
 }
+
+export const handleProductPurchaseHistory = async({id,signal}) => {
+  const response = await apiInstance.get(`${userEndpoints.get_products}/${id}/purchase-history` , {
+    signal
+  })
+  return response?.data;
+}
+
+export const handleProductSalesHistory = async({id,signal}) => {
+  const response = await apiInstance.get(`${userEndpoints.get_products}/${id}/sales-history` , {
+    signal
+  })
+  return response?.data;
+}
+

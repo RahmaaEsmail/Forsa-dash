@@ -9,6 +9,7 @@ import Loading from '../../shared/Loading';
 import useChangeDeliveryNoteStatus from '../../../hooks/delivery-notes/useChangeDeliveryNotesStatus';
 import useDeleteDeliveryNote from '../../../hooks/delivery-notes/useDeleteDeliveryNotes';
 import { toast } from 'sonner';
+import EntityLink from '../../shared/EntityLink';
 
 const statusVariants = {
   draft: "bg-slate-100 text-slate-700 border-none",
@@ -48,7 +49,11 @@ export default function DeliveryNoteTable({ data, isLoading, page, setPage }) {
       title: "Customer",
       dataIndex: "customer",
       key: "customer",
-      render: (customer) => <span>{customer?.company_name || 'N/A'}</span>
+      render: (customer) => (
+        <EntityLink type="customer" id={customer?.id}>
+          {customer?.company_name || 'N/A'}
+        </EntityLink>
+      )
     },
     {
       title: "Quotation",

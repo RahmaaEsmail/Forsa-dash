@@ -6,6 +6,18 @@ import QuotationFilter from '../../components/pages/Quotations/QuotationFilter'
 import QuotationTable from '../../components/pages/Quotations/QuotationTable'
 import { useNavigate } from 'react-router-dom'
 import { useListQuotations } from '../../hooks/quotations/useListQuotations'
+import { exportToExcel } from '../../utils/exportToExcel'
+
+const QUOTATION_COL_MAP = {
+  quotation_number: 'Quotation #',
+  quotation_date:   'Date',
+  'customer.name':  'Customer',
+  'customer.company_name': 'Company',
+  'purchase_request.pr_number': 'PR Number',
+  total_amount:     'Total Amount',
+  'currency.code':  'Currency',
+  status:           'Status',
+};
 
 export default function Quotations() {
   const navigate = useNavigate();
@@ -23,24 +35,25 @@ export default function Quotations() {
 
   const handleFilterChange = (newFilters) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
-    setPage(1); // Reset to first page when filtering
+    setPage(1);
   };
 
   const handleReset = () => {
-    setFilters({
-      search: '',
-      status: undefined,
-    });
+    setFilters({ search: '', status: undefined });
     setPage(1);
   };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl animate-in fade-in duration-500 space-y-8">
       <PageHeader title="Quotations Management" subTitle="Manage and track all customer quotations in one place.">
-        {/* <div className='flex gap-3 items-center'>
-          <Button variant="outline" className="h-11 px-6 rounded-xl border-slate-200 text-slate-600 gap-2 font-bold hover:bg-slate-50">
+        <div className='flex gap-3 items-center'>
+          <Button
+            variant="outline"
+            className="h-11 px-6 rounded-xl border-primary text-primary gap-2 font-bold hover:bg-primary/5"
+            onClick={() => exportToExcel(quotations?.data || [], 'quotations', QUOTATION_COL_MAP)}
+          >
             <Download className="w-4 h-4" />
-            Export Data
+            Export Excel
           </Button>
 
           <Button 
@@ -50,7 +63,7 @@ export default function Quotations() {
             <Plus className="w-4 h-4" />
             Create Quotation
           </Button>
-        </div> */}
+        </div>
       </PageHeader>
 
       <QuotationFilter 

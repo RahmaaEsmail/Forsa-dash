@@ -28,7 +28,6 @@ const rowBase =
   "border-b !p-5 border-border/60 last:border-b-0 hover:bg-black/[0.02]";
 
 export default function ProductTable({ data = product_data }) {
-
   console.log("data", data);
   const columnsCount = 16; // ✅ تحديث عدد الأعمدة
 
@@ -37,8 +36,12 @@ export default function ProductTable({ data = product_data }) {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openUpdateStatusModal, setOpenUpdateStatusModal] = useState(false);
 
-  const { mutate: deleteProduct, isPending, isSuccess } = useDeleteProduct()
-  const { mutate: updateStatusProduct, isPending: isPendingStatus, isSuccess: isSuccessStatus } = useUpdateActiveStatus()
+  const { mutate: deleteProduct, isPending, isSuccess } = useDeleteProduct();
+  const {
+    mutate: updateStatusProduct,
+    isPending: isPendingStatus,
+    isSuccess: isSuccessStatus,
+  } = useUpdateActiveStatus();
 
   function handleDeleteProduct() {
     deleteProduct(openDeleteModal?.id);
@@ -53,21 +56,39 @@ export default function ProductTable({ data = product_data }) {
       <Table className="w-full table-auto">
         <TableHeader>
           <TableRow className="border-b border-border/60">
-            <TableHead className={`${thBase} text-left`}>Product Image</TableHead>
-            <TableHead className={`${thBase} text-left`}>Product Name</TableHead>
-            <TableHead className={`${thBase} text-left`}>Product Description</TableHead>
+            <TableHead className={`${thBase} text-left`}>
+              Product Image
+            </TableHead>
+            <TableHead className={`${thBase} text-left`}>
+              Product Name
+            </TableHead>
+            <TableHead className={`${thBase} text-left`}>
+              Product Description
+            </TableHead>
             <TableHead className={`${thBase} text-center`}>Status</TableHead>
             <TableHead className={`${thBase} text-left`}>Category</TableHead>
-            <TableHead className={`${thBase} text-center`}>Visibility</TableHead>
-            <TableHead className={`${thBase} text-left`}>Sub Category</TableHead>
+            <TableHead className={`${thBase} text-center`}>
+              Visibility
+            </TableHead>
+            <TableHead className={`${thBase} text-left`}>
+              Sub Category
+            </TableHead>
             <TableHead className={`${thBase} text-center`}>Brand</TableHead>
-            <TableHead className={`${thBase} text-center`}>Model</TableHead>
+            {/* <TableHead className={`${thBase} text-center`}>Model</TableHead> */}
             <TableHead className={`${thBase} text-center`}>Currency</TableHead>
-            <TableHead className={`${thBase} text-center`}>Cost Price</TableHead>
-            <TableHead className={`${thBase} text-center`}>Selling Price</TableHead>
+            <TableHead className={`${thBase} text-center`}>
+              Cost Price
+            </TableHead>
+            <TableHead className={`${thBase} text-center`}>
+              Selling Price
+            </TableHead>
             <TableHead className={`${thBase} text-center`}>Units</TableHead>
-            <TableHead className={`${thBase} text-center`}>Date Added</TableHead>
-            <TableHead className={`${thBase} text-center`}>Last Updated</TableHead>
+            <TableHead className={`${thBase} text-center`}>
+              Date Added
+            </TableHead>
+            <TableHead className={`${thBase} text-center`}>
+              Last Updated
+            </TableHead>
             <TableHead className={`${thBase} text-center`}>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -78,8 +99,10 @@ export default function ProductTable({ data = product_data }) {
               <TableRow key={prod?.id} className={rowBase}>
                 <TableCell className={`${tdBase} text-left`}>
                   <img
-                    onError={(e) => e.currentTarget.src = "/images/imageplaceholder.png"}
-                    src={prod?.image || '/images/imageplaceholder.png'}
+                    onError={(e) =>
+                      (e.currentTarget.src = "/images/imageplaceholder.png")
+                    }
+                    src={prod?.image || "/images/imageplaceholder.png"}
                     alt={prod?.name?.en || "product"}
                     className="w-24 h-24 rounded-md object-cover"
                   />
@@ -88,13 +111,17 @@ export default function ProductTable({ data = product_data }) {
                 <TableCell className={`${tdBase} text-left`}>
                   <div className="flex flex-col">
                     <span className="font-medium">{prod?.name?.en}</span>
-                    <span className="text-sm text-gray-500">{prod?.name?.ar}</span>
+                    <span className="text-sm text-gray-500">
+                      {prod?.name?.ar}
+                    </span>
                   </div>
                 </TableCell>
 
                 <TableCell className={`${tdBase} text-left w-37.5`}>
                   <div className="flex flex-col">
-                    <span className="font-medium truncate">{prod?.description}</span>
+                    <span className="font-medium truncate">
+                      {prod?.description}
+                    </span>
                   </div>
                 </TableCell>
 
@@ -107,7 +134,9 @@ export default function ProductTable({ data = product_data }) {
                 </TableCell>
 
                 <TableCell className={`${tdBase} text-center`}>
-                  <ProductVisibilityBadge value={prod?.is_active ? "Active" : "Inactive"} />
+                  <ProductVisibilityBadge
+                    value={prod?.is_active ? "Active" : "Inactive"}
+                  />
                 </TableCell>
 
                 <TableCell className={`${tdBase} text-left`}>
@@ -118,9 +147,9 @@ export default function ProductTable({ data = product_data }) {
                   {prod?.brand || "---"}
                 </TableCell>
 
-                <TableCell className={`${tdBase} text-center`}>
+                {/* <TableCell className={`${tdBase} text-center`}>
                   {prod?.model || "---"}
-                </TableCell>
+                </TableCell> */}
 
                 <TableCell className={`${tdBase} text-center`}>
                   {prod?.currency || "---"}
@@ -128,13 +157,17 @@ export default function ProductTable({ data = product_data }) {
 
                 <TableCell className={`${tdBase} text-center`}>
                   <span className="font-medium text-green-600">
-                    {prod?.cost_price ? `${prod.currency} ${parseFloat(prod.cost_price).toFixed(2)}` : "---"}
+                    {prod?.cost_price
+                      ? `${prod.currency} ${parseFloat(prod.cost_price).toFixed(2)}`
+                      : "---"}
                   </span>
                 </TableCell>
 
                 <TableCell className={`${tdBase} text-center`}>
                   <span className="font-medium text-blue-600">
-                    {prod?.selling_price ? `${prod.currency} ${parseFloat(prod.selling_price).toFixed(2)}` : "---"}
+                    {prod?.selling_price
+                      ? `${prod.currency} ${parseFloat(prod.selling_price).toFixed(2)}`
+                      : "---"}
                   </span>
                 </TableCell>
 
@@ -148,23 +181,25 @@ export default function ProductTable({ data = product_data }) {
                         </span>
                       ))}
                     </div>
-                  ) : "---"}
+                  ) : (
+                    "---"
+                  )}
                 </TableCell>
 
                 <TableCell className={`${tdBase} text-center`}>
-                  {dayjs(prod?.created_at).format('YYYY-MM-DD HH:mm')}
+                  {dayjs(prod?.created_at).format("YYYY-MM-DD HH:mm")}
                 </TableCell>
 
                 <TableCell className={`${tdBase} text-center`}>
-                  {dayjs(prod?.updated_at).format('YYYY-MM-DD HH:mm')}
+                  {dayjs(prod?.updated_at).format("YYYY-MM-DD HH:mm")}
                 </TableCell>
 
                 <TableCell className={`${tdBase} text-center`}>
                   <div className="flex gap-1 items-center justify-center">
                     <Button
                       onClick={() => navigate(`/add_product?id=${prod?.id}`)}
-                      title="Edit Product" 
-                      variant="ghost" 
+                      title="Edit Product"
+                      variant="ghost"
                       size="icon"
                     >
                       <Edit className="h-4 w-4" />
@@ -172,8 +207,8 @@ export default function ProductTable({ data = product_data }) {
 
                     <Button
                       onClick={() => setOpenDeleteModal(prod)}
-                      title="Delete Product" 
-                      variant="ghost" 
+                      title="Delete Product"
+                      variant="ghost"
                       size="icon"
                     >
                       <Trash className="h-4 w-4" />
@@ -181,17 +216,17 @@ export default function ProductTable({ data = product_data }) {
 
                     <Button
                       onClick={() => setOpenUpdateStatusModal(prod)}
-                      title="Toggle Status" 
-                      variant="ghost" 
+                      title="Toggle Status"
+                      variant="ghost"
                       size="icon"
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
 
-                    <Button 
+                    <Button
                       onClick={() => navigate(`/product-details/${prod?.id}`)}
-                      title="Product Details" 
-                      variant="ghost" 
+                      title="Product Details"
+                      variant="ghost"
                       size="icon"
                     >
                       <Fullscreen className="h-4 w-4" />
@@ -214,23 +249,25 @@ export default function ProductTable({ data = product_data }) {
         </TableBody>
       </Table>
 
-      <DeleteModal 
-        isSuccess={isSuccess} 
-        isLoading={isPending} 
-        onDelete={handleDeleteProduct} 
-        open={openDeleteModal} 
-        setOpen={setOpenDeleteModal} 
-        title={`Delete product #${openDeleteModal?.name?.en || openDeleteModal?.name}?`} 
-        desc={"Are you sure you want to delete this item? This action cannot be undone."} 
+      <DeleteModal
+        isSuccess={isSuccess}
+        isLoading={isPending}
+        onDelete={handleDeleteProduct}
+        open={openDeleteModal}
+        setOpen={setOpenDeleteModal}
+        title={`Delete product #${openDeleteModal?.name?.en || openDeleteModal?.name}?`}
+        desc={
+          "Are you sure you want to delete this item? This action cannot be undone."
+        }
       />
-      
-      <ActiveInActiveStatusModal 
-        isSuccess={isSuccessStatus} 
-        isLoading={isPendingStatus} 
-        onSuccess={handleUpdateStatus} 
-        open={openUpdateStatusModal} 
-        setOpen={setOpenUpdateStatusModal} 
-        title={`Change status for product #${openUpdateStatusModal?.name?.en || openUpdateStatusModal?.name?.ar}?`} 
+
+      <ActiveInActiveStatusModal
+        isSuccess={isSuccessStatus}
+        isLoading={isPendingStatus}
+        onSuccess={handleUpdateStatus}
+        open={openUpdateStatusModal}
+        setOpen={setOpenUpdateStatusModal}
+        title={`Change status for product #${openUpdateStatusModal?.name?.en || openUpdateStatusModal?.name?.ar}?`}
       />
     </div>
   );
