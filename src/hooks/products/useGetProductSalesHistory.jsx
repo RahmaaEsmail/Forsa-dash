@@ -7,7 +7,7 @@ export default function useProductSalesHistory() {
 
   return useMutation({
     mutationKey: "product-Sales-history",
-    mutationFn: ({ id, signal }) => handleProductSalesHistory({ id, signal }),
+    mutationFn: ({ id, page, per_page, signal }) => handleProductSalesHistory({ id, page, per_page, signal }),
     onSuccess: (res) => {},
     onError: (res) => {
       console.log("res", res);

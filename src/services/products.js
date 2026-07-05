@@ -62,15 +62,17 @@ export const handleProductDetails = async({id,signal}) => {
   return response?.data;
 }
 
-export const handleProductPurchaseHistory = async({id,signal}) => {
+export const handleProductPurchaseHistory = async({id, page, per_page, signal}) => {
   const response = await apiInstance.get(`${userEndpoints.get_products}/${id}/purchase-history` , {
+    params: { page, per_page },
     signal
   })
   return response?.data;
 }
 
-export const handleProductSalesHistory = async({id,signal}) => {
+export const handleProductSalesHistory = async({id, page, per_page, signal}) => {
   const response = await apiInstance.get(`${userEndpoints.get_products}/${id}/sales-history` , {
+    params: { page, per_page },
     signal
   })
   return response?.data;

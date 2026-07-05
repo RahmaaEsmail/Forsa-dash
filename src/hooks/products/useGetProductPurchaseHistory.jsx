@@ -11,8 +11,8 @@ export default function useProductPurchaseHistory() {
 
   return useMutation({
     mutationKey: "product-purchase-history",
-    mutationFn: ({ id, signal }) =>
-      handleProductPurchaseHistory({ id, signal }),
+    mutationFn: ({ id, page, per_page, signal }) =>
+      handleProductPurchaseHistory({ id, page, per_page, signal }),
     onSuccess: (res) => {},
     onError: (res) => {
       console.log("res", res);

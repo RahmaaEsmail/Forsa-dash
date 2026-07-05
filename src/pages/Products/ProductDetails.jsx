@@ -1,9 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import PageHeader from "../../components/shared/PageHeader";
+import Pagination from "../../components/shared/Pagination";
 import { useParams } from "react-router-dom";
 import useProductDetails from "../../hooks/products/useProductDetails";
 import Loading from "../../components/shared/Loading";
-import { MessageSquare, ShoppingCart, TrendingUp, Loader2, PackageSearch } from "lucide-react";
+import {
+  MessageSquare,
+  ShoppingCart,
+  TrendingUp,
+  Loader2,
+  PackageSearch,
+} from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import ActivityLog from "../../layout/ActivityLog/ActivityLog";
@@ -12,20 +19,22 @@ import useProductSalesHistory from "@/hooks/products/useGetProductSalesHistory";
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 const STATUS_COLORS = {
-  draft:                   "bg-gray-100 text-gray-600",
-  rfq_sent:                "bg-blue-100 text-blue-700",
-  buyer_approval:          "bg-yellow-100 text-yellow-700",
-  price_gathering_approval:"bg-orange-100 text-orange-700",
-  po_approval:             "bg-purple-100 text-purple-700",
-  purchase_ordered:        "bg-green-100 text-green-700",
-  cancelled:               "bg-red-100 text-red-700",
-  delivered:               "bg-emerald-100 text-emerald-700",
+  draft: "bg-gray-100 text-gray-600",
+  rfq_sent: "bg-blue-100 text-blue-700",
+  buyer_approval: "bg-yellow-100 text-yellow-700",
+  price_gathering_approval: "bg-orange-100 text-orange-700",
+  po_approval: "bg-purple-100 text-purple-700",
+  purchase_ordered: "bg-green-100 text-green-700",
+  cancelled: "bg-red-100 text-red-700",
+  delivered: "bg-emerald-100 text-emerald-700",
 };
 
 function StatusBadge({ status }) {
   const colorClass = STATUS_COLORS[status] ?? "bg-slate-100 text-slate-600";
   return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${colorClass}`}>
+    <span
+      className={`px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${colorClass}`}
+    >
       {status?.replace(/_/g, " ")}
     </span>
   );
@@ -42,7 +51,14 @@ function EmptyState({ label }) {
 }
 
 // ─── Table Wrapper ────────────────────────────────────────────────────────────
-function HistoryTable({ title, icon: Icon, color, isLoading, children }) {
+function HistoryTable({
+  title,
+  icon: Icon,
+  color,
+  isLoading,
+  pagination,
+  children,
+}) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
       <div className={`flex items-center gap-3 px-6 py-4 border-b ${color}`}>
@@ -58,23 +74,33 @@ function HistoryTable({ title, icon: Icon, color, isLoading, children }) {
           <span className="text-sm">Loading...</span>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          {children}
-        </div>
+        <>
+          <div className="overflow-x-auto">{children}</div>
+          {pagination && (
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/20">
+              {pagination}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
 }
 
 // ─── Shared th / td classes ───────────────────────────────────────────────────
-const TH = "px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap";
+const TH =
+  "px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap";
 const TD = "px-5 py-3.5 text-sm text-slate-700 whitespace-nowrap";
 const TR = "border-b border-slate-50 hover:bg-slate-50/60 transition-colors";
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function ProductDetails() {
   const { id } = useParams();
-  const { mutate: handleGetProductDetails, data, isPending } = useProductDetails();
+  const {
+    mutate: handleGetProductDetails,
+    data,
+    isPending,
+  } = useProductDetails();
   const {
     mutate: handleGetProductPurchaseHistory,
     data: purchase_data,
@@ -87,17 +113,60 @@ export default function ProductDetails() {
   } = useProductSalesHistory();
   const [showLog, setShowLog] = useState(false);
 
+  const [purchasePage, setPurchasePage] = useState(1);
+  const [salesPage, setSalesPage] = useState(1);
+  const itemsPerPage = 10;
+
   const product = data?.data;
   const purchaseRows = purchase_data?.data || [];
-  const salesRows    = sales_data?.data    || [];
+  const salesRows = sales_data?.data || [];
+
+  // Hybrid pagination handling
+  const hasPurchaseMeta = !!purchase_data?.meta;
+  const purchaseTotal = hasPurchaseMeta
+    ? purchase_data?.meta?.total || 0
+    : purchaseRows.length;
+  const displayPurchaseRows = useMemo(() => {
+    if (hasPurchaseMeta) return purchaseRows;
+    const start = (purchasePage - 1) * itemsPerPage;
+    return purchaseRows.slice(start, start + itemsPerPage);
+  }, [purchaseRows, purchasePage, hasPurchaseMeta]);
+
+  const hasSalesMeta = !!sales_data?.meta;
+  const salesTotal = hasSalesMeta
+    ? sales_data?.meta?.total || 0
+    : salesRows.length;
+  const displaySalesRows = useMemo(() => {
+    if (hasSalesMeta) return salesRows;
+    const start = (salesPage - 1) * itemsPerPage;
+    return salesRows.slice(start, start + itemsPerPage);
+  }, [salesRows, salesPage, hasSalesMeta]);
 
   useEffect(() => {
     if (id) {
       handleGetProductDetails({ id });
-      handleGetProductPurchaseHistory({ id });
-      handleGetProductSalesHistory({ id });
     }
   }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      handleGetProductPurchaseHistory({
+        id,
+        page: purchasePage,
+        per_page: itemsPerPage,
+      });
+    }
+  }, [id, purchasePage]);
+
+  useEffect(() => {
+    if (id) {
+      handleGetProductSalesHistory({
+        id,
+        page: salesPage,
+        per_page: itemsPerPage,
+      });
+    }
+  }, [id, salesPage]);
 
   if (isPending) return <Loading />;
   if (!product)
@@ -126,9 +195,12 @@ export default function ProductDetails() {
           {/* Left: Image */}
           <div className="flex flex-col gap-4">
             <img
-              src={product.image}
-              alt={product.name.en}
+              src={product.image || "/images/imageplaceholder.png"}
+              alt={product.name?.en || "Product Image"}
               className="w-full h-auto rounded-lg border object-cover"
+              onError={(e) => {
+                e.currentTarget.src = "/images/imageplaceholder.png";
+              }}
             />
             <div className="flex gap-2 flex-wrap">
               {product.attachments?.map((file, index) => (
@@ -147,7 +219,9 @@ export default function ProductDetails() {
           {/* Right: Details & Pricing */}
           <div className="md:col-span-2 flex flex-col gap-6">
             <div className="border-b pb-4">
-              <h2 className="text-2xl font-bold text-gray-800">{product.name.en}</h2>
+              <h2 className="text-2xl font-bold text-gray-800">
+                {product.name.en}
+              </h2>
               <p className="text-gray-500">Category: {product.category.name}</p>
             </div>
 
@@ -212,8 +286,18 @@ export default function ProductDetails() {
           icon={ShoppingCart}
           color="bg-blue-50 text-blue-700"
           isLoading={isPurchase_loading}
+          pagination={
+            purchaseTotal > itemsPerPage && (
+              <Pagination
+                page={purchasePage}
+                per_page={itemsPerPage}
+                total={purchaseTotal}
+                onPageChange={setPurchasePage}
+              />
+            )
+          }
         >
-          {purchaseRows.length === 0 ? (
+          {displayPurchaseRows.length === 0 ? (
             <EmptyState label="purchase records" />
           ) : (
             <table className="w-full">
@@ -230,16 +314,20 @@ export default function ProductDetails() {
                 </tr>
               </thead>
               <tbody>
-                {purchaseRows.map((row, i) => (
+                {displayPurchaseRows.map((row, i) => (
                   <tr key={row.rfq_item_id ?? i} className={TR}>
                     <td className={`${TD} font-medium text-primary`}>
                       {row.display_number || row.rfq_number || "—"}
                       {row.po_number && (
-                        <span className="ml-2 text-[10px] text-slate-400">PO: {row.po_number}</span>
+                        <span className="ml-2 text-[10px] text-slate-400">
+                          PO: {row.po_number}
+                        </span>
                       )}
                     </td>
                     <td className={TD}>{row.supplier?.company_name || "—"}</td>
-                    <td className={TD}>{row.date ? new Date(row.date).toLocaleDateString() : "—"}</td>
+                    <td className={TD}>
+                      {row.date ? new Date(row.date).toLocaleDateString() : "—"}
+                    </td>
                     <td className={TD}>{row.quantity ?? "—"}</td>
                     <td className={TD}>
                       {row.unit_price != null
@@ -268,8 +356,18 @@ export default function ProductDetails() {
           icon={TrendingUp}
           color="bg-emerald-50 text-emerald-700"
           isLoading={is_sales_loading}
+          pagination={
+            salesTotal > itemsPerPage && (
+              <Pagination
+                page={salesPage}
+                per_page={itemsPerPage}
+                total={salesTotal}
+                onPageChange={setSalesPage}
+              />
+            )
+          }
         >
-          {salesRows.length === 0 ? (
+          {displaySalesRows.length === 0 ? (
             <EmptyState label="sales records" />
           ) : (
             <table className="w-full">
@@ -288,7 +386,7 @@ export default function ProductDetails() {
                 </tr>
               </thead>
               <tbody>
-                {salesRows.map((row, i) => (
+                {displaySalesRows.map((row, i) => (
                   <tr key={row.quotation_item_id ?? i} className={TR}>
                     <td className={`${TD} font-medium text-primary`}>
                       {row.quotation_number || "—"}
@@ -296,7 +394,9 @@ export default function ProductDetails() {
                     <td className={TD}>
                       {row.customer?.company_name || row.customer?.name || "—"}
                     </td>
-                    <td className={TD}>{row.date ? new Date(row.date).toLocaleDateString() : "—"}</td>
+                    <td className={TD}>
+                      {row.date ? new Date(row.date).toLocaleDateString() : "—"}
+                    </td>
                     <td className={TD}>{row.quantity ?? "—"}</td>
                     <td className={TD}>
                       {row.selling_price != null
@@ -312,15 +412,19 @@ export default function ProductDetails() {
                       {row.line_total != null
                         ? Number(row.line_total).toLocaleString()
                         : row.total != null
-                        ? Number(row.total).toLocaleString()
-                        : "—"}
+                          ? Number(row.total).toLocaleString()
+                          : "—"}
                     </td>
                     <td className={TD}>
                       {row.margin_percentage != null ? (
-                        <span className={`font-semibold ${Number(row.margin_percentage) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
+                        <span
+                          className={`font-semibold ${Number(row.margin_percentage) >= 0 ? "text-emerald-600" : "text-red-500"}`}
+                        >
                           {Number(row.margin_percentage).toFixed(1)}%
                         </span>
-                      ) : "—"}
+                      ) : (
+                        "—"
+                      )}
                     </td>
                     <td className={TD}>{row.currency?.code || "—"}</td>
                     <td className={TD}>
