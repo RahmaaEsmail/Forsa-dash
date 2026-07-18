@@ -234,22 +234,6 @@ export default function RFQItemsTable({ items, isEdit = false, prData }) {
       ),
     },
     {
-      title: "Target Price",
-      className: "px-4",
-      render: (_, __, index) => (
-        <div className="w-[100px]">
-          <Input
-            type="number"
-            {...register(`items.${index}.target_price`, {
-              valueAsNumber: true,
-            })}
-            className="h-8 bg-transparent border-none text-center"
-            placeholder="0.00"
-          />
-        </div>
-      ),
-    },
-    {
       title: "Discounts",
       className: "px-4",
       render: (_, __, index) => (
@@ -277,6 +261,22 @@ export default function RFQItemsTable({ items, isEdit = false, prData }) {
           </div>
         );
       },
+    },
+    {
+      title: "Target Price",
+      className: "px-4",
+      render: (_, __, index) => (
+        <div className="w-[100px]">
+          <Input
+            type="number"
+            {...register(`items.${index}.target_price`, {
+              valueAsNumber: true,
+            })}
+            className="h-8 bg-transparent border-none text-center"
+            placeholder="0.00"
+          />
+        </div>
+      ),
     },
     {
       title: "",

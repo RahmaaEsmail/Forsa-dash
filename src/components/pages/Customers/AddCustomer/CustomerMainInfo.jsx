@@ -20,6 +20,8 @@ export default function CustomerMainInfo() {
             name="customer_type"
             label="Customer Type"
             options={typeOptions}
+            isRequired
+            errors={errors?.customer_type}
          />
       </div>
 
@@ -30,7 +32,7 @@ export default function CustomerMainInfo() {
             <CustomInput label={"Company Name"} name={"company_name"} register={register} errors={errors?.company_name} isRequired />
             <CustomInput label={"Website"} name={"website"} register={register} errors={errors?.website} />
             <CustomInput label={"Tax Number"} name={"tax_number"} register={register} errors={errors?.tax_number} />
-            <CustomInput label={"Commercial Register"} name={"commercial_register"} register={register} errors={errors?.commercial_register} />
+            <CustomInput label={"Commercial Register"} name={"commercial_register"} register={register} errors={errors?.commercial_register} isRequired />
           </>
         ) : (
           <>
@@ -43,8 +45,8 @@ export default function CustomerMainInfo() {
 
       <h3 className="text-secondary font-bold text-lg border-b pb-2 mt-4">Contact & Additional Info</h3>
       <div className='grid grid-cols-2 gap-8'>
-        <CustomInput label={"Email Address"} name={"email"} register={register} errors={errors?.email} type="email" isRequired />
-        <CustomInput label={"Phone Number"} name={"phone"} register={register} errors={errors?.phone} />
+        <CustomInput label={"Email Address"} name={"email"} register={register} errors={errors?.email} type="email" />
+        <CustomInput label={"Phone Number"} name={"phone"} register={register} errors={errors?.phone} isRequired />
         <CustomInput label={"Mobile Number"} name={"mobile"} register={register} errors={errors?.mobile} />
         <CustomInput label={"Notes"} name={"notes"} register={register} errors={errors?.notes} />
       </div>

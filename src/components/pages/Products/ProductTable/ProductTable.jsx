@@ -27,9 +27,9 @@ const tdBase =
 const rowBase =
   "border-b !p-5 border-border/60 last:border-b-0 hover:bg-black/[0.02]";
 
-export default function ProductTable({ data = product_data }) {
+export default function ProductTable({ data = product_data, selectedRowKeys = [], onSelectedRowKeysChange }) {
   console.log("data", data);
-  const columnsCount = 16; // ✅ تحديث عدد الأعمدة
+  const columnsCount = onSelectedRowKeysChange ? 17 : 16; // ✅ تحديث عدد الأعمدة
 
   const navigate = useNavigate();
 
@@ -56,6 +56,32 @@ export default function ProductTable({ data = product_data }) {
       <Table className="w-full table-auto">
         <TableHeader>
           <TableRow className="border-b border-border/60">
+            {onSelectedRowKeysChange && (
+              <TableHead className={`${thBase} text-center w-12`}>
+                <input
+                  type="checkbox"
+                  checked={data.length > 0 && data.every(prod => selectedRowKeys.includes(prod.id))}
+                  ref={(input) => {
+                    if (input) {
+                      const allKeys = data.map(prod => prod.id);
+                      const allSelected = allKeys.length > 0 && allKeys.every(k => selectedRowKeys.includes(k));
+                      const someSelected = allKeys.some(k => selectedRowKeys.includes(k)) && !allSelected;
+                      input.indeterminate = someSelected;
+                    }
+                  }}
+                  onChange={() => {
+                    const allKeys = data.map(prod => prod.id);
+                    const allSelected = allKeys.length > 0 && allKeys.every(k => selectedRowKeys.includes(k));
+                    if (allSelected) {
+                      onSelectedRowKeysChange(selectedRowKeys.filter(k => !allKeys.includes(k)));
+                    } else {
+                      onSelectedRowKeysChange(Array.from(new Set([...selectedRowKeys, ...allKeys])));
+                    }
+                  }}
+                  className="h-4 w-4 rounded border-gray-305 text-primary focus:ring-primary cursor-pointer"
+                />
+              </TableHead>
+            )}
             <TableHead className={`${thBase} text-left`}>
               Product Image
             </TableHead>
@@ -97,6 +123,23 @@ export default function ProductTable({ data = product_data }) {
           {data?.length > 0 ? (
             data?.map((prod) => (
               <TableRow key={prod?.id} className={rowBase}>
+                {onSelectedRowKeysChange && (
+                  <TableCell className={`${tdBase} text-center w-12`}>
+                    <input
+                      type="checkbox"
+                      checked={selectedRowKeys.includes(prod.id)}
+                      onChange={() => {
+                        const isSelected = selectedRowKeys.includes(prod.id);
+                        if (isSelected) {
+                          onSelectedRowKeysChange(selectedRowKeys.filter(k => k !== prod.id));
+                        } else {
+                          onSelectedRowKeysChange([...selectedRowKeys, prod.id]);
+                        }
+                      }}
+                      className="h-4 w-4 rounded border-gray-305 text-primary focus:ring-primary cursor-pointer"
+                    />
+                  </TableCell>
+                )}
                 <TableCell className={`${tdBase} text-left`}>
                   <img
                     onError={(e) =>

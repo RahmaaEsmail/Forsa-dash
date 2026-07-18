@@ -56,6 +56,7 @@ export default function SupplierAddress() {
                   { label: "Shipping", value: "shipping" },
                   { label: "Billing", value: "billing" },
                 ]}
+                errors={errors?.addresses?.[index]?.type}
               />
               <CustomInput
                 label="Label"
@@ -63,20 +64,23 @@ export default function SupplierAddress() {
                 name={`addresses.${index}.label`}
                 placeholder="e.g. Main Office, Warehouse"
                 icon={<Building2 className="w-4 h-4 text-slate-400" />}
+                errors={errors}
               />
               <CustomInput
                 label="Address Line 1"
                 register={register}
                 name={`addresses.${index}.address_line_1`}
-                isRequired={true}
+                isRequired={false}
                 placeholder="Street, Building No."
                 icon={<MapPin className="w-4 h-4 text-slate-400" />}
+                errors={errors}
               />
               <CustomInput
                 label="Address Line 2"
                 register={register}
                 name={`addresses.${index}.address_line_2`}
                 placeholder="District, Suite"
+                errors={errors}
               />
               <CustomInput
                 label="City"
@@ -84,26 +88,30 @@ export default function SupplierAddress() {
                 name={`addresses.${index}.city`}
                 isRequired={true}
                 placeholder="Enter City"
+                errors={errors}
               />
               <CustomInput
                 label="State / Province"
                 register={register}
                 name={`addresses.${index}.state`}
                 placeholder="Enter State"
+                errors={errors}
               />
               <CustomInput
                 label="Postal Code"
                 register={register}
                 name={`addresses.${index}.postal_code`}
                 placeholder="12345"
+                errors={errors}
               />
               <CustomInput
                 label="Country"
                 register={register}
                 name={`addresses.${index}.country`}
-                isRequired={true}
+                isRequired={false}
                 placeholder="Saudi Arabia"
                 icon={<Globe className="w-4 h-4 text-slate-400" />}
+                errors={errors}
               />
 
               <div className="flex items-center gap-2 pt-4">

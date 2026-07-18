@@ -6,7 +6,7 @@ import QuotationFilter from '../../components/pages/Quotations/QuotationFilter'
 import QuotationTable from '../../components/pages/Quotations/QuotationTable'
 import { useNavigate } from 'react-router-dom'
 import { useListQuotations } from '../../hooks/quotations/useListQuotations'
-import { exportToExcel } from '../../utils/exportToExcel'
+import ExportExcelModal from '../../components/shared/ExportExcelModal'
 
 const QUOTATION_COL_MAP = {
   quotation_number: 'Quotation #',
@@ -22,6 +22,8 @@ const QUOTATION_COL_MAP = {
 export default function Quotations() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     search: '',
     status: undefined,
@@ -50,10 +52,10 @@ export default function Quotations() {
           <Button
             variant="outline"
             className="h-11 px-6 rounded-xl border-primary text-primary gap-2 font-bold hover:bg-primary/5"
-            onClick={() => exportToExcel(quotations?.data || [], 'quotations', QUOTATION_COL_MAP)}
+            onClick={() => setIsExportModalOpen(true)}
           >
             <Download className="w-4 h-4" />
-            Export Excel
+            {selectedRowKeys.length > 0 ? `Export Selected (${selectedRowKeys.length})` : 'Export Excel'}
           </Button>
 
           <Button 
@@ -77,6 +79,17 @@ export default function Quotations() {
         isLoading={isLoading} 
         page={page} 
         setPage={setPage} 
+        selectedRowKeys={selectedRowKeys}
+        onSelectedRowKeysChange={setSelectedRowKeys}
+      />
+
+      <ExportExcelModal
+        open={isExportModalOpen}
+        onOpenChange={setIsExportModalOpen}
+        data={quotations?.data || []}
+        selectedRowKeys={selectedRowKeys}
+        columnMap={QUOTATION_COL_MAP}
+        filename="quotations"
       />
     </div>
   )

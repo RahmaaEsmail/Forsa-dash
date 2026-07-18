@@ -8,7 +8,7 @@ import Pagination from "../../components/shared/Pagination";
 import { useNavigate } from "react-router-dom";
 import useGetProducts from "../../hooks/products/useGetProducts";
 import Loading from "../../components/shared/Loading";
-import { exportToExcel } from "../../utils/exportToExcel";
+import ExportExcelModal from "../../components/shared/ExportExcelModal";
 
 const PRODUCT_COL_MAP = {
   id:            '#',
@@ -34,6 +34,8 @@ export default function Products() {
 
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -61,10 +63,10 @@ export default function Products() {
           <Button
             variant="outline"
             className="border-primary text-primary font-bold hover:bg-primary/5 gap-2"
-            onClick={() => exportToExcel(data?.data || [], 'products', PRODUCT_COL_MAP)}
+            onClick={() => setIsExportModalOpen(true)}
           >
             <Download className="w-4 h-4" />
-            Export Excel
+            {selectedRowKeys.length > 0 ? `Export Selected (${selectedRowKeys.length})` : 'Export Excel'}
           </Button>
           <Button onClick={() => navigate(`/add_product`)} className={"px-3!"}>
             <Plus />
@@ -79,7 +81,11 @@ export default function Products() {
         <Loading />
       ) : (
         <>
-          <ProductTable data={data?.data || []} />
+          <ProductTable 
+            data={data?.data || []} 
+            selectedRowKeys={selectedRowKeys} 
+            onSelectedRowKeysChange={setSelectedRowKeys} 
+          />
           <Pagination
             total={data?.meta?.total ?? data?.data?.length ?? 0}
             page={page}
@@ -88,6 +94,15 @@ export default function Products() {
           />
         </>
       )}
+
+      <ExportExcelModal
+        open={isExportModalOpen}
+        onOpenChange={setIsExportModalOpen}
+        data={data?.data || []}
+        selectedRowKeys={selectedRowKeys}
+        columnMap={PRODUCT_COL_MAP}
+        filename="products"
+      />
     </div>
   );
 }

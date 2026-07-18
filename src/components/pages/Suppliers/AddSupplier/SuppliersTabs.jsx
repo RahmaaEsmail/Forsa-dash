@@ -208,6 +208,13 @@ export default function SuppliersTabs() {
     };
     delete processedValues.categories;
 
+    // Filter out payment terms that have no payment_term_id set
+    if (processedValues.payment_terms) {
+      processedValues.payment_terms = processedValues.payment_terms.filter(
+        term => term.payment_term_id !== "" && term.payment_term_id !== null && term.payment_term_id !== undefined
+      );
+    }
+
     if (editId) {
       updateSupplier({ id: editId, body: processedValues }, {
         onSuccess: (data) => {

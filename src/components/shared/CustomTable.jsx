@@ -15,14 +15,16 @@ export default function CustomTable({
   dataSource = [],
   rowKey = "id",
   loading = false,
+  selectedRowKeys = [],
+  onSelectedRowKeysChange,
 
   // styles
   className = "",
   containerClassName = "bg-white px-5! rounded-main overflow-hidden border border-border/60",
   headerRowClassName = "border-b border-border/60",
-  headerCellClassName = "p-6 text-base font-bold text-secondary whitespace-nowrap",
+  headerCellClassName = "py-3 px-4 text-sm font-bold text-secondary whitespace-nowrap",
   bodyRowClassName = "border-b border-border/60 last:border-b-0 hover:bg-black/[0.02]",
-  bodyCellClassName = "p-6 text-base text-center font-normal text-placeholder whitespace-nowrap",
+  bodyCellClassName = "py-3 px-4 text-sm text-center font-normal text-placeholder whitespace-nowrap",
 
   // empty
   emptyProps = {
@@ -34,12 +36,70 @@ export default function CustomTable({
   rowClassName,
   onRow,
 }) {
-  const colCount = columns?.length || 1;
-
   const getRowKey = (record, index) => {
     if (typeof rowKey === "function") return rowKey(record, index);
     return record?.[rowKey] ?? index;
   };
+
+  const finalColumns = React.useMemo(() => {
+    if (!onSelectedRowKeysChange) return columns;
+
+    const allKeys = dataSource.map((record, idx) => getRowKey(record, idx));
+    const allSelected = allKeys.length > 0 && allKeys.every(k => selectedRowKeys.includes(k));
+    const someSelected = allKeys.some(k => selectedRowKeys.includes(k)) && !allSelected;
+
+    const handleSelectAllChange = (e) => {
+      if (allSelected) {
+        onSelectedRowKeysChange(selectedRowKeys.filter(k => !allKeys.includes(k)));
+      } else {
+        const newSelection = Array.from(new Set([...selectedRowKeys, ...allKeys]));
+        onSelectedRowKeysChange(newSelection);
+      }
+    };
+
+    const checkboxCol = {
+      key: "selection-checkbox",
+      width: "50px",
+      align: "center",
+      title: (
+        <input
+          type="checkbox"
+          checked={allSelected}
+          ref={(input) => {
+            if (input) input.indeterminate = someSelected;
+          }}
+          onChange={handleSelectAllChange}
+          className="h-4 w-4 rounded border-gray-305 text-primary focus:ring-primary cursor-pointer"
+        />
+      ),
+      render: (_, record, index) => {
+        const key = getRowKey(record, index);
+        const isSelected = selectedRowKeys.includes(key);
+
+        const handleRowCheckboxChange = (e) => {
+          if (isSelected) {
+            onSelectedRowKeysChange(selectedRowKeys.filter(k => k !== key));
+          } else {
+            onSelectedRowKeysChange([...selectedRowKeys, key]);
+          }
+        };
+
+        return (
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={handleRowCheckboxChange}
+            onClick={(e) => e.stopPropagation()}
+            className="h-4 w-4 rounded border-gray-305 text-primary focus:ring-primary cursor-pointer"
+          />
+        );
+      }
+    };
+
+    return [checkboxCol, ...columns];
+  }, [columns, dataSource, selectedRowKeys, onSelectedRowKeysChange, rowKey]);
+
+  const colCount = finalColumns?.length || 1;
 
   const resolveRowClassName = (record, index) => {
     const extra =
@@ -57,7 +117,7 @@ export default function CustomTable({
       <Table className="w-full table-auto">
         <TableHeader>
           <TableRow className={headerRowClassName}>
-            {columns?.map((col, idx) => (
+            {finalColumns?.map((col, idx) => (
               <TableHead
                 key={col?.key ?? col?.dataIndex ?? idx}
                 className={`${headerCellClassName} ${col?.className || ""}`}
@@ -90,7 +150,7 @@ export default function CustomTable({
                 className={resolveRowClassName(record, rowIndex)}
                 {...resolveRowProps(record, rowIndex)}
               >
-                {columns.map((col, colIndex) => {
+                {finalColumns.map((col, colIndex) => {
                   const value = col?.dataIndex ? record?.[col.dataIndex] : undefined;
 
                   return (

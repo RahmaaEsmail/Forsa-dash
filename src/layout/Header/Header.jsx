@@ -1,4 +1,4 @@
-import { Menu, MoveDown, Search } from 'lucide-react'
+import { Menu, MoveDown, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Input } from '../../components/ui/input'
 import { Button } from '../../components/ui/button'
@@ -8,7 +8,7 @@ import { NavLink } from 'react-router-dom'
 import { config } from '../../api/config'
 
 export default function Header() {
-  const { toggle } = useSidebar();
+  const { toggle, isMinimized, toggleMinimize } = useSidebar() || {};
   const { data: unreadCountData } = useUnreadCount();
   
   console.log("data" , unreadCountData)
@@ -32,6 +32,21 @@ export default function Header() {
           aria-label='Open menu'
         >
           <Menu className='w-5 h-5 text-secondary' />
+        </Button>
+
+        {/* Toggle Minimize Arrow – visible only on desktop */}
+        <Button
+          variant='ghost'
+          size='icon'
+          className='shrink-0 hidden md:inline-flex text-secondary hover:bg-slate-100 rounded-full'
+          onClick={toggleMinimize}
+          aria-label={isMinimized ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {isMinimized ? (
+            <ChevronRight className='w-5 h-5' />
+          ) : (
+            <ChevronLeft className='w-5 h-5' />
+          )}
         </Button>
 
         <div className='flex flex-col gap-0.5 min-w-0'>

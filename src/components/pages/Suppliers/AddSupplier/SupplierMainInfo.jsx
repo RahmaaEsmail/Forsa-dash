@@ -141,7 +141,7 @@ export default function SupplierMainInfo() {
         label={"VAT Number"}
         register={register}
         name={"vat_number"}
-        isRequired={false}
+        isRequired={true}
         type="text"
         errors={errors}
         placeholder={"Enter VAT Number"}
@@ -151,7 +151,7 @@ export default function SupplierMainInfo() {
         label={"Commercial Register"}
         register={register}
         name={"commercial_register"}
-        isRequired={false}
+        isRequired={true}
         type="text"
         errors={errors}
         placeholder={"Enter CR"}

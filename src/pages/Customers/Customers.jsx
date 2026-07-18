@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PageHeader from '../../components/shared/PageHeader';
 import { Button } from '../../components/ui/button';
 import { Download, Plus } from 'lucide-react';
@@ -9,12 +9,14 @@ import getCustomerOptions from '../../hooks/customers/getCustomerOptions';
 import { useCustomerStore } from '../../store/zustand/customerStore';
 import Pagination from '../../components/shared/Pagination';
 import CustomerFilterations from '../../components/pages/Customers/CustomerFilterations';
-import { exportToExcel } from '../../utils/exportToExcel';
+import ExportExcelModal from '../../components/shared/ExportExcelModal';
 
 export default function Customers() {
   const navigate = useNavigate();
   const { filters, setFilters } = useCustomerStore();
   const { page, per_page, search } = filters;
+  const [selectedRowKeys, setSelectedRowKeys] = React.useState([]);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
    
   const {
     data: all_customers,
@@ -50,10 +52,10 @@ export default function Customers() {
           <Button
             variant="outline"
             className="border-primary text-primary font-bold hover:bg-primary/5 gap-2"
-            onClick={() => exportToExcel(all_customers?.data || [], 'customers', CUSTOMER_COL_MAP)}
+            onClick={() => setIsExportModalOpen(true)}
           >
             <Download className="w-4 h-4" />
-            Export Excel
+            {selectedRowKeys.length > 0 ? `Export Selected (${selectedRowKeys.length})` : 'Export Excel'}
           </Button>
           <Button
             onClick={() => navigate("/create-customer")}
@@ -69,6 +71,8 @@ export default function Customers() {
       <CustomersTable 
         data={all_customers?.data}
         loading={fetch_customers}
+        selectedRowKeys={selectedRowKeys}
+        onSelectedRowKeysChange={setSelectedRowKeys}
       />
 
       <Pagination 
@@ -76,6 +80,15 @@ export default function Customers() {
         per_page={per_page} 
         total={totals}  
         onPageChange={handlePageChange}
+      />
+
+      <ExportExcelModal
+        open={isExportModalOpen}
+        onOpenChange={setIsExportModalOpen}
+        data={all_customers?.data || []}
+        selectedRowKeys={selectedRowKeys}
+        columnMap={CUSTOMER_COL_MAP}
+        filename="customers"
       />
     </div>
   );

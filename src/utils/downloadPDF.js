@@ -22,51 +22,32 @@ function colorToRgb(color) {
 }
 
 /**
- * Walks all accessible stylesheets in the document, finds any property value
- * containing "oklch", converts it to rgb, and returns a CSS string with
- * !important overrides that can be injected into the cloned document.
+ * Serializes all accessible style rules from the current document,
+ * replacing any oklch color references with their standard rgb/rgba equivalents.
  */
-function buildOklchOverrides() {
-  const overrides = {};
-
-  function processRules(rules) {
-    Array.from(rules || []).forEach((rule) => {
-      if (rule.selectorText && rule.style) {
-        let decls = "";
-        Array.from(rule.style).forEach((prop) => {
-          const val = rule.style.getPropertyValue(prop);
-          if (val.includes("oklch")) {
-            decls += `${prop}: ${colorToRgb(val)} !important; `;
-          }
-        });
-        if (decls) {
-          overrides[rule.selectorText] =
-            (overrides[rule.selectorText] || "") + decls;
-        }
-      }
-      // Recurse into @media, @supports, @layer, etc.
-      if (rule.cssRules) {
-        processRules(rule.cssRules);
-      }
-    });
-  }
-
+function getSanitizedStyles() {
+  let cssText = "";
   Array.from(document.styleSheets).forEach((sheet) => {
     try {
-      processRules(sheet.cssRules);
-    } catch {
-      // cross-origin stylesheet — skip
+      const rules = sheet.cssRules || sheet.rules;
+      if (rules) {
+        Array.from(rules).forEach((rule) => {
+          cssText += rule.cssText + "\n";
+        });
+      }
+    } catch (e) {
+      // Ignore cross-origin stylesheet errors
     }
   });
 
-  return Object.entries(overrides)
-    .map(([sel, decls]) => `${sel} { ${decls} }`)
-    .join("\n");
+  // Convert oklch(...) occurrences in the CSS string
+  return cssText.replace(/oklch\([^)]+\)/g, (match) => {
+    return colorToRgb(match);
+  });
 }
 
 /**
- * Downloads the given DOM element as a PDF file, transparently working around
- * html2canvas's lack of support for oklch() CSS color values.
+ * Downloads the given DOM element as a PDF file, sanitizing oklch colors.
  *
  * @param {HTMLElement} element  The element to render
  * @param {object}      options
@@ -88,7 +69,8 @@ export async function downloadAsPDF(element, options = {}) {
     return;
   }
 
-  const oklchOverrideCSS = buildOklchOverrides();
+  // Get sanitized styles BEFORE cloning
+  const cleanCSS = getSanitizedStyles();
 
   await html2pdf()
     .set({
@@ -102,11 +84,48 @@ export async function downloadAsPDF(element, options = {}) {
         backgroundColor: "#ffffff",
         logging: false,
         onclone: (clonedDoc) => {
-          if (oklchOverrideCSS) {
+          // 1. Remove all existing link stylesheets and style tags to prevent html2canvas parsing oklch
+          const links = clonedDoc.querySelectorAll("link[rel='stylesheet']");
+          links.forEach((link) => link.remove());
+
+          const styles = clonedDoc.querySelectorAll("style");
+          styles.forEach((style) => style.remove());
+
+          // 2. Inject the sanitized CSS rules
+          if (cleanCSS) {
             const style = clonedDoc.createElement("style");
-            style.textContent = oklchOverrideCSS;
+            style.textContent = cleanCSS;
             clonedDoc.head.appendChild(style);
           }
+
+          // 3. Convert any computed oklch colors on elements directly to inline RGB/RGBA
+          const allElements = clonedDoc.querySelectorAll("*");
+          const view = clonedDoc.defaultView || window;
+          allElements.forEach((el) => {
+            try {
+              const style = view.getComputedStyle(el);
+              const properties = [
+                "color",
+                "backgroundColor",
+                "borderColor",
+                "borderTopColor",
+                "borderRightColor",
+                "borderBottomColor",
+                "borderLeftColor",
+                "fill",
+                "stroke",
+              ];
+              properties.forEach((prop) => {
+                const val = style[prop];
+                if (val && val.includes("oklch")) {
+                  const rgbVal = colorToRgb(val);
+                  el.style[prop] = rgbVal;
+                }
+              });
+            } catch (e) {
+              // Ignore errors on hidden or unstyled nodes
+            }
+          });
         },
       },
       jsPDF: { unit: "mm", format: "a4", orientation },

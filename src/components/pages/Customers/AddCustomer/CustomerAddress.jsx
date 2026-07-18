@@ -44,9 +44,9 @@ export default function CustomerAddress() {
            <div className='grid grid-cols-2 gap-4'>
              <CustomInput label="Type (e.g., both, billing, shipping)" name={`addresses.${index}.type`} register={register} errors={errors?.addresses?.[index]?.type} />
              <CustomInput label="Label (e.g., Head Office, Home)" name={`addresses.${index}.label`} register={register} errors={errors?.addresses?.[index]?.label} />
-             <CustomInput label="Address Line 1" name={`addresses.${index}.address_line_1`} register={register} errors={errors?.addresses?.[index]?.address_line_1} />
+             <CustomInput label="Address Line 1" name={`addresses.${index}.address_line_1`} register={register} errors={errors?.addresses?.[index]?.address_line_1} isRequired />
              <CustomInput label="Address Line 2" name={`addresses.${index}.address_line_2`} register={register} errors={errors?.addresses?.[index]?.address_line_2} />
-             <CustomInput label="City" name={`addresses.${index}.city`} register={register} errors={errors?.addresses?.[index]?.city} />
+             <CustomInput label="City" name={`addresses.${index}.city`} register={register} errors={errors?.addresses?.[index]?.city} isRequired />
              <CustomInput label="State" name={`addresses.${index}.state`} register={register} errors={errors?.addresses?.[index]?.state} />
              <CustomInput label="Postal Code" name={`addresses.${index}.postal_code`} register={register} errors={errors?.addresses?.[index]?.postal_code} />
              <CustomInput label="Country" name={`addresses.${index}.country`} register={register} errors={errors?.addresses?.[index]?.country} />

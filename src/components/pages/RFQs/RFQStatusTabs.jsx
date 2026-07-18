@@ -8,15 +8,16 @@ const statuses = [
   { label: "Price Gathering Approval", key: "price_gathering_approval" },
   { label: "PO Approval", key: "po_approval" },
   { label: "Purchase Ordered", key: "purchase_ordered" },
+  { label: "Canceled", key: "canceled" },
 ];
 
 export default function RFQStatusTabs({ currentStatus = "draft" }) {
+  const normalizedStatus = currentStatus === 'cancelled' ? 'canceled' : currentStatus;
   const displayStatuses = [...statuses];
-  if (currentStatus === 'canceled') {
-    displayStatuses.push({ label: "Canceled", key: "canceled" });
-  }
 
-  const currentIndex = displayStatuses.findIndex(s => s.key === currentStatus) === -1 ? 0 : displayStatuses.findIndex(s => s.key === currentStatus);
+  const currentIndex = displayStatuses.findIndex(s => s.key === normalizedStatus) === -1 
+    ? 0 
+    : displayStatuses.findIndex(s => s.key === normalizedStatus);
 
   return (
     <div className="w-full overflow-x-auto pb-2">

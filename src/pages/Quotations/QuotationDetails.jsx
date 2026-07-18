@@ -1,8 +1,8 @@
 // // import React, { useState, useEffect } from 'react'
 // // import { useNavigate, useParams } from 'react-router-dom'
-// // import { 
-// //   ArrowLeft, 
-// //   Printer, 
+// // import {
+// //   ArrowLeft,
+// //   Printer,
 // //   ChevronRight,
 // //   Save,
 // //   Send,
@@ -119,16 +119,16 @@
 // //               </p>
 // //             </div>
 // //             <div className="flex gap-3">
-// //               <Button 
-// //                 variant="outline" 
+// //               <Button
+// //                 variant="outline"
 // //                 onClick={() => setIsDeleteModalOpen(true)}
 // //                 disabled={deleteQuotation.isPending}
 // //                 className="rounded-xl border-red-200 text-primary gap-2 font-bold hover:bg-red-50 h-11 px-6"
 // //               >
 // //                 <Trash2 className="w-4 h-4" /> Delete
 // //               </Button>
-// //               <Button 
-// //                 variant="outline" 
+// //               <Button
+// //                 variant="outline"
 // //                 className="rounded-xl border-slate-200 text-slate-600 gap-2 font-bold hover:bg-slate-50 h-11 px-6"
 // //                 onClick={() => navigate('/quotations')}
 // //               >
@@ -147,7 +147,7 @@
 // //           {/* Action Bar */}
 // //           <div className="flex flex-wrap justify-end items-center gap-3 py-2">
 // //             {quotation?.status !== 'cancelled' && quotation?.status !== 'delivered' && (
-// //               <Button 
+// //               <Button
 // //                 variant="outline"
 // //                 onClick={() => setIsCancelModalOpen(true)}
 // //                 disabled={updateStatus.isPending}
@@ -159,8 +159,8 @@
 // //             )}
 
 // //             {quotation?.status === 'draft' && (
-// //               <Button 
-// //                 onClick={() => handleStatusAction('client-approve')} 
+// //               <Button
+// //                 onClick={() => handleStatusAction('client-approve')}
 // //                 disabled={updateStatus.isPending}
 // //                 className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
 // //               >
@@ -170,8 +170,8 @@
 // //             )}
 
 // //             {quotation?.status === 'client_approval' && (
-// //               <Button 
-// //                 onClick={() => handleStatusAction('manager-approve')} 
+// //               <Button
+// //                 onClick={() => handleStatusAction('manager-approve')}
 // //                 disabled={updateStatus.isPending}
 // //                 className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
 // //               >
@@ -181,8 +181,8 @@
 // //             )}
 
 // //             {quotation?.status === 'sales_manager_approval' && (
-// //               <Button 
-// //                 onClick={() => handleStatusAction('proforma')} 
+// //               <Button
+// //                 onClick={() => handleStatusAction('proforma')}
 // //                 disabled={updateStatus.isPending}
 // //                 className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
 // //               >
@@ -192,8 +192,8 @@
 // //             )}
 
 // //             {quotation?.status === 'proforma_invoice' && (
-// //               <Button 
-// //                 onClick={() => setIsPaymentModalOpen(true)} 
+// //               <Button
+// //                 onClick={() => setIsPaymentModalOpen(true)}
 // //                 disabled={updateStatus.isPending}
 // //                 className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
 // //               >
@@ -203,8 +203,8 @@
 // //             )}
 
 // //             {quotation?.status === 'paid_payment' && (
-// //               <Button 
-// //                 onClick={() => handleStatusAction('deliver')} 
+// //               <Button
+// //                 onClick={() => handleStatusAction('deliver')}
 // //                 disabled={updateStatus.isPending}
 // //                 className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
 // //               >
@@ -227,21 +227,21 @@
 // //         </div>
 // //       </div>
 
-// //       <PaymentReceivedModal 
+// //       <PaymentReceivedModal
 // //         open={isPaymentModalOpen}
 // //         onOpenChange={setIsPaymentModalOpen}
 // //         isLoading={updateStatus.isPending}
 // //         onConfirm={(data) => handleStatusAction('payment-received', data, () => setIsPaymentModalOpen(false))}
 // //       />
 
-// //       <CancelQuotationModal 
+// //       <CancelQuotationModal
 // //         open={isCancelModalOpen}
 // //         onOpenChange={setIsCancelModalOpen}
 // //         isLoading={updateStatus.isPending}
 // //         onConfirm={(data) => handleStatusAction('cancel', data, () => setIsCancelModalOpen(false))}
 // //       />
 
-// //       <DeleteModal 
+// //       <DeleteModal
 // //         open={isDeleteModalOpen}
 // //         setOpen={setIsDeleteModalOpen}
 // //         title="Delete Quotation"
@@ -253,7 +253,6 @@
 // //     </FormProvider>
 // //   )
 // // }
-
 
 // import React, { useState, useEffect, useRef } from 'react'
 // import { useNavigate, useParams } from 'react-router-dom'
@@ -345,7 +344,7 @@
 //     body > * {
 //       display: none !important;
 //     }
-    
+
 //     /* Ensure the main React root elements aren't blocking display layout passes */
 //     #root, html, body {
 //       background: white !important;
@@ -371,13 +370,13 @@
 //       border: none !important;
 //     }
 
-//     @page { 
-//       size: A4; 
-//       margin: 15mm 10mm 15mm 10mm; 
+//     @page {
+//       size: A4;
+//       margin: 15mm 10mm 15mm 10mm;
 //     }
-    
-//     .no-print { 
-//       display: none !important; 
+
+//     .no-print {
+//       display: none !important;
 //     }
 //   }
 // `}} />
@@ -702,11 +701,11 @@
 //   )
 // }
 
-import React, { useState, useEffect, useRef } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { 
-  ArrowLeft, 
-  Printer, 
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  ArrowLeft,
+  Printer,
   ChevronRight,
   Send,
   CheckCircle2,
@@ -715,30 +714,30 @@ import {
   FileText,
   XCircle,
   Trash2,
-  Truck
-} from 'lucide-react'
-import { useForm, FormProvider } from 'react-hook-form'
-import { useQuotationDetails } from '../../hooks/quotations/useQuotationDetails'
-import { useUpdateQuotationStatus } from '../../hooks/quotations/useUpdateQuotationStatus'
-import { useDeleteQuotation } from '../../hooks/quotations/useDeleteQuotation'
-import Loading from '../../components/shared/Loading'
-import { Button } from '../../components/ui/button'
-import useListSettings from '../../hooks/Settings/useListSettings'
-import { Card, CardContent } from '../../components/ui/card'
-import { Badge } from '../../components/ui/badge'
-import { DeleteModal } from '../../components/shared/DeleteModal'
-import { format } from 'date-fns'
+  Truck,
+} from "lucide-react";
+import { useForm, FormProvider } from "react-hook-form";
+import { useQuotationDetails } from "../../hooks/quotations/useQuotationDetails";
+import { useUpdateQuotationStatus } from "../../hooks/quotations/useUpdateQuotationStatus";
+import { useDeleteQuotation } from "../../hooks/quotations/useDeleteQuotation";
+import Loading from "../../components/shared/Loading";
+import { Button } from "../../components/ui/button";
+import useListSettings from "../../hooks/Settings/useListSettings";
+import { Card, CardContent } from "../../components/ui/card";
+import { Badge } from "../../components/ui/badge";
+import { DeleteModal } from "../../components/shared/DeleteModal";
+import { format } from "date-fns";
 
 // Components
-import QuotationStatusTabs from '../../components/pages/Quotations/QuotationStatusTabs'
-import PaymentReceivedModal from '../../components/pages/Quotations/PaymentReceivedModal'
-import CancelQuotationModal from '../../components/pages/Quotations/CancelQuotationModal'
+import QuotationStatusTabs from "../../components/pages/Quotations/QuotationStatusTabs";
+import PaymentReceivedModal from "../../components/pages/Quotations/PaymentReceivedModal";
+import CancelQuotationModal from "../../components/pages/Quotations/CancelQuotationModal";
 
 export default function QuotationDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const printRef = useRef(null);
-  
+
   const { data: quotationResponse, isLoading } = useQuotationDetails(id);
   const updateStatus = useUpdateQuotationStatus();
   const deleteQuotation = useDeleteQuotation();
@@ -747,53 +746,84 @@ export default function QuotationDetails() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const { data: settingsData } = useListSettings();
-  const getSetting = (key) => settingsData?.data?.find(s => s.key === key)?.value;
+  const getSetting = (key) => {
+    const val = settingsData?.data?.find((s) => s.key === key)?.value;
+    return val === "null" || !val ? null : val;
+  };
 
-  const companyPhone = getSetting('phone') || getSetting('company_phone') || '+966 55 598 0730';
-  const companyEmail = getSetting('email') || getSetting('company_email') || 'Sales@forsageneraltrading.com';
-  const companyVat = getSetting('vat') || getSetting('vat_number') || '300123456700003';
-  const companyAddress = getSetting('address') || getSetting('company_address') || 'King Fahd Road, Olaya District, Riyadh 12211';
+  const companyPhone =
+    getSetting("phone") || getSetting("company_phone") || "+966 55 598 0730";
+  const companyEmail =
+    getSetting("email") ||
+    getSetting("company_email") ||
+    "Sales@forsageneraltrading.com";
+  const companyVat =
+    getSetting("vat") ||
+    getSetting("vat_number") ||
+    getSetting("company_tax_number") ||
+    "300123456700003";
+  const companyAddress =
+    getSetting("address") || getSetting("company_address") || "Cairo, Egypt";
 
   const quotation = quotationResponse?.data;
 
   const methods = useForm({
-    defaultValues: { items: [] }
+    defaultValues: { items: [] },
   });
 
   useEffect(() => {
     if (quotation) {
       methods.reset({
         rfq_id: quotation.purchase_request?.id?.toString(),
-        items: quotation.items || []
+        items: quotation.items || [],
       });
     }
   }, [quotation, methods]);
 
   const handleStatusAction = (status, body = {}, onSuccess) => {
-    updateStatus.mutate({ id, status, body }, {
-      onSuccess: () => { if (onSuccess) onSuccess(); }
-    });
+    updateStatus.mutate(
+      { id, status, body },
+      {
+        onSuccess: () => {
+          if (onSuccess) onSuccess();
+        },
+      },
+    );
   };
 
   const handleDelete = () => {
     deleteQuotation.mutate(id, {
-      onSuccess: () => { navigate('/quotations'); }
+      onSuccess: () => {
+        navigate("/quotations");
+      },
     });
   };
 
   const handlePrint = () => {
+    const originalTitle = document.title;
+    const documentName = quotation?.quotation_number || id;
+    document.title = documentName;
     window.print();
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 100);
   };
 
   if (isLoading) return <Loading />;
 
   // Formatting numeric strings securely
-  const formatAmount = (val) => parseFloat(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const formatAmount = (val) =>
+    parseFloat(val || 0).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
 
   return (
     <FormProvider {...methods}>
       {/* GLOBAL CSS PRINT OVERRIDES FOR EXACT MATCH */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @media print {
           body { visibility: hidden; background: white !important; }
           .no-print { display: none !important; }
@@ -808,14 +838,21 @@ export default function QuotationDetails() {
           }
           #printable-quotation-area-wrapper * { visibility: visible !important; }
           
-          @page { size: A4; margin: 15mm 10mm 15mm 10mm; }
+          @page { size: A4; margin: 0; padding :0; }
         }
-      `}} />
+      `,
+        }}
+      />
 
       <div className="container mx-auto px-4 py-8 max-w-7xl animate-in fade-in duration-500 no-print">
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-xs text-slate-400 mb-6 font-medium">
-          <span className="hover:text-primary cursor-pointer" onClick={() => navigate('/quotations')}>Quotations</span>
+          <span
+            className="hover:text-primary cursor-pointer"
+            onClick={() => navigate("/quotations")}
+          >
+            Quotations
+          </span>
           <ChevronRight className="w-3 h-3" />
           <span className="text-slate-900">Quotation Details</span>
         </div>
@@ -824,35 +861,44 @@ export default function QuotationDetails() {
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                 Quotation <span className="text-slate-400 font-normal text-lg">#{quotation?.quotation_number}</span>
-                 <Badge variant="outline" className="bg-primary/10 text-primary border-none rounded-md px-2 uppercase text-[10px]">
-                   {quotation?.status?.replace('_', ' ')}
-                 </Badge>
+                Quotation{" "}
+                <span className="text-slate-400 font-normal text-lg">
+                  #{quotation?.quotation_number}
+                </span>
+                <Badge
+                  variant="outline"
+                  className="bg-primary/10 text-primary border-none rounded-md px-2 uppercase text-[10px]"
+                >
+                  {quotation?.status?.replace("_", " ")}
+                </Badge>
               </h1>
               <p className="text-sm text-slate-500 mt-1">
-                Created on {quotation?.quotation_date ? format(new Date(quotation.quotation_date), "PPP") : 'N/A'}
+                Created on{" "}
+                {quotation?.quotation_date
+                  ? format(new Date(quotation.quotation_date), "PPP")
+                  : "N/A"}
               </p>
             </div>
             <div className="flex gap-3">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={handlePrint}
                 className="rounded-xl border-slate-200 text-slate-600 gap-2 font-bold hover:bg-slate-50 h-11 px-6"
               >
                 <Printer className="w-4 h-4" /> Download/Print PDF
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setIsDeleteModalOpen(true)}
                 disabled={deleteQuotation.isPending}
                 className="rounded-xl border-red-200 text-primary gap-2 font-bold hover:bg-red-50 h-11 px-6"
               >
                 <Trash2 className="w-4 h-4" /> Delete
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="rounded-xl border-slate-200 text-slate-600 gap-2 font-bold hover:bg-slate-50 h-11 px-6"
-                onClick={() => navigate('/quotations')}
+                onClick={() => navigate("/quotations")}
               >
                 <ArrowLeft className="w-4 h-4" /> Back
               </Button>
@@ -860,25 +906,26 @@ export default function QuotationDetails() {
           </div>
 
           <Card className="border border-slate-100 shadow-sm bg-white rounded-2xl overflow-hidden px-8 py-4">
-             <QuotationStatusTabs currentStatus={quotation?.status} />
+            <QuotationStatusTabs currentStatus={quotation?.status} />
           </Card>
 
           {/* Action Bar */}
           <div className="flex flex-wrap justify-end items-center gap-3 py-2">
-            {quotation?.status !== 'cancelled' && quotation?.status !== 'delivered' && (
-              <Button 
-                variant="outline"
-                onClick={() => setIsCancelModalOpen(true)}
-                disabled={updateStatus.isPending}
-                className="h-11 px-6 rounded-xl border-red-200 text-primary font-bold hover:bg-red-50 gap-2"
-              >
-                <XCircle className="w-4 h-4" /> Cancel Quotation
-              </Button>
-            )}
+            {quotation?.status !== "cancelled" &&
+              quotation?.status !== "delivered" && (
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCancelModalOpen(true)}
+                  disabled={updateStatus.isPending}
+                  className="h-11 px-6 rounded-xl border-red-200 text-primary font-bold hover:bg-red-50 gap-2"
+                >
+                  <XCircle className="w-4 h-4" /> Cancel Quotation
+                </Button>
+              )}
 
-            {quotation?.status === 'draft' && (
-              <Button 
-                onClick={() => handleStatusAction('client-approve')} 
+            {quotation?.status === "draft" && (
+              <Button
+                onClick={() => handleStatusAction("client-approve")}
                 disabled={updateStatus.isPending}
                 className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
               >
@@ -887,9 +934,9 @@ export default function QuotationDetails() {
               </Button>
             )}
 
-            {quotation?.status === 'client_approval' && (
-              <Button 
-                onClick={() => handleStatusAction('manager-approve')} 
+            {quotation?.status === "client_approval" && (
+              <Button
+                onClick={() => handleStatusAction("manager-approve")}
                 disabled={updateStatus.isPending}
                 className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
               >
@@ -898,9 +945,9 @@ export default function QuotationDetails() {
               </Button>
             )}
 
-            {quotation?.status === 'sales_manager_approval' && (
-              <Button 
-                onClick={() => handleStatusAction('proforma')} 
+            {quotation?.status === "sales_manager_approval" && (
+              <Button
+                onClick={() => handleStatusAction("proforma")}
                 disabled={updateStatus.isPending}
                 className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
               >
@@ -909,9 +956,9 @@ export default function QuotationDetails() {
               </Button>
             )}
 
-            {quotation?.status === 'proforma_invoice' && (
-              <Button 
-                onClick={() => setIsPaymentModalOpen(true)} 
+            {quotation?.status === "proforma_invoice" && (
+              <Button
+                onClick={() => setIsPaymentModalOpen(true)}
                 disabled={updateStatus.isPending}
                 className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
               >
@@ -920,8 +967,9 @@ export default function QuotationDetails() {
               </Button>
             )}
 
-            {(quotation?.status === 'paid_payment' || quotation?.status === 'approved') && (
-              <Button 
+            {(quotation?.status === "paid_payment" ||
+              quotation?.status === "approved") && (
+              <Button
                 onClick={() => navigate(`/create-delivery-note/${id}`)}
                 className="h-11 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2 shadow-lg shadow-blue-600/20"
               >
@@ -930,9 +978,9 @@ export default function QuotationDetails() {
               </Button>
             )}
 
-            {quotation?.status === 'paid_payment' && (
-              <Button 
-                onClick={() => handleStatusAction('deliver')} 
+            {quotation?.status === "paid_payment" && (
+              <Button
+                onClick={() => handleStatusAction("deliver")}
                 disabled={updateStatus.isPending}
                 className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
               >
@@ -941,7 +989,7 @@ export default function QuotationDetails() {
               </Button>
             )}
 
-            {quotation?.status === 'delivered' && (
+            {quotation?.status === "delivered" && (
               <div className="flex items-center gap-2 text-emerald-600 font-bold bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100">
                 <CheckCircle2 className="w-5 h-5" /> Completed & Delivered
               </div>
@@ -952,49 +1000,81 @@ export default function QuotationDetails() {
 
       {/* DYNAMIC HIGH-FIDELITY QUOTATION DESIGN WITH CORRECT ID WRAPPER STRATEGY */}
       <div id="printable-quotation-area-wrapper" className="bg-white py-6">
-        <div className="max-w-[850px] mx-auto bg-white shadow-md p-12 border border-slate-200 rounded-sm" id="printable-quotation-area" ref={printRef}>
-          
+        <div
+          className="max-w-[850px] mx-auto bg-white shadow-md p-12 border border-slate-200 rounded-sm"
+          id="printable-quotation-area"
+          ref={printRef}
+        >
           {/* Header Section */}
           <div className="flex justify-between items-start border-b-2 border-primary pb-6 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <div className='mx-8.75 flex justify-center items-center'>
-                  <img src='/images/LOGO.svg' className='h-22 w-39.25 object-cover' alt="Logo" />
+                <div className="mx-8.75 flex justify-center items-center">
+                  <img
+                    src="/images/LOGO.svg"
+                    className="h-22 w-39.25 object-cover"
+                    alt="Logo"
+                  />
                 </div>
               </div>
             </div>
             <div className="text-right text-xs text-slate-500 space-y-1">
-              <h2 className="font-extrabold text-base text-slate-900 tracking-wide">FORSA TRADING & CONTRACTING</h2>
-              <p>{companyAddress}</p>
-              <p><span className="font-semibold text-slate-700">VAT No:</span> {companyVat}</p>
-              <p className="pt-1">📞 {companyPhone} &nbsp;|&nbsp; ✉️ {companyEmail}</p>
+              <h2 className="font-extrabold text-base text-slate-900 tracking-wide">
+                FORSA TRADING & CONTRACTING
+              </h2>
+              <p>
+                {companyAddress} | VAT: {companyVat}
+              </p>
+              <p className="pt-1">
+                📞 {companyPhone} &nbsp;|&nbsp; ✉️ {companyEmail}
+              </p>
             </div>
           </div>
 
-          <h3 className="text-2xl font-bold text-primary mb-6 tracking-tight">Quotation</h3>
+          <h3 className="text-2xl font-bold text-primary mb-6 tracking-tight">
+            Quotation
+          </h3>
 
           {/* Cards Meta Section */}
           <div className="grid grid-cols-2 gap-6 mb-8">
             {/* Bill To */}
             <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-5 text-xs text-slate-600 space-y-2">
               <h4 className="text-primary font-bold text-sm mb-2">Bill To</h4>
-              <p className="text-slate-900 font-extrabold text-base">{quotation?.customer?.company_name || 'ABC Construction Co.'}</p>
+              <p className="text-slate-900 font-extrabold text-base">
+                {quotation?.customer?.company_name || "ABC Construction Co."}
+              </p>
               <p>📍 King Abdullah Road, Al Khobar</p>
-              <p><span className="text-slate-400">Project:</span> Al Khobar Commercial Complex</p>
-              <p><span className="text-slate-400">Vendor:</span> Eng. Ahmed Al-Sayed</p>
+              <p>
+                <span className="text-slate-400">Project:</span> Al Khobar
+                Commercial Complex
+              </p>
+              <p>
+                <span className="text-slate-400">Vendor:</span> Eng. Ahmed
+                Al-Sayed
+              </p>
             </div>
 
             {/* Quote Details */}
             <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-5 text-xs text-slate-600">
-              <h4 className="text-primary font-bold text-sm mb-3">Quote Details</h4>
+              <h4 className="text-primary font-bold text-sm mb-3">
+                Quote Details
+              </h4>
               <div className="grid grid-cols-2 gap-y-3">
                 <div>
-                  <span className="text-slate-400 block mb-0.5">Quotation No:</span>
-                  <span className="text-slate-900 font-bold">{quotation?.quotation_number}</span>
+                  <span className="text-slate-400 block mb-0.5">
+                    Quotation No:
+                  </span>
+                  <span className="text-slate-900 font-bold">
+                    {quotation?.quotation_number}
+                  </span>
                 </div>
                 <div>
                   <span className="text-slate-400 block mb-0.5">Date:</span>
-                  <span className="text-slate-900 font-bold">{quotation?.quotation_date ? format(new Date(quotation.quotation_date), "dd/MM/yyyy") : 'N/A'}</span>
+                  <span className="text-slate-900 font-bold">
+                    {quotation?.quotation_date
+                      ? format(new Date(quotation.quotation_date), "dd/MM/yyyy")
+                      : "N/A"}
+                  </span>
                 </div>
                 <div>
                   <span className="text-slate-400 block mb-0.5">Validity:</span>
@@ -1002,12 +1082,19 @@ export default function QuotationDetails() {
                 </div>
                 <div>
                   <span className="text-slate-400 block mb-0.5">Currency:</span>
-                  <span className="text-slate-900 font-bold">{quotation?.currency?.code || 'SAR'} ({quotation?.currency?.name || 'Saudi Riyal'})</span>
+                  <span className="text-slate-900 font-bold">
+                    {quotation?.currency?.code || "SAR"} (
+                    {quotation?.currency?.name || "Saudi Riyal"})
+                  </span>
                 </div>
               </div>
               <div className="mt-3 pt-3 border-t border-slate-200/60">
-                <span className="text-slate-400 block mb-0.5">Payment Terms:</span>
-                <span className="text-slate-900 font-medium">50% Advance, 50% on Delivery</span>
+                <span className="text-slate-400 block mb-0.5">
+                  Payment Terms:
+                </span>
+                <span className="text-slate-900 font-medium">
+                  50% Advance, 50% on Delivery
+                </span>
               </div>
             </div>
           </div>
@@ -1027,19 +1114,35 @@ export default function QuotationDetails() {
             <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
               {quotation?.items?.map((item, index) => (
                 <tr key={item.id || index} className="align-top">
-                  <td className="py-4 px-2 text-center text-slate-400 font-medium">{index + 1}</td>
-                  <td className="py-4 px-4">
-                    <span className="font-bold text-slate-900 block mb-1">{item.item_name || 'Steel Rebar'}</span>
-                    <span className="text-slate-400 text-[11px] block italic">{item.item?.name || 'حديد تسليح'}</span>
+                  <td className="py-4 px-2 text-center text-slate-400 font-medium">
+                    {index + 1}
                   </td>
-                  <td className="py-4 px-4 text-center font-medium">{parseInt(item.quantity)}</td>
-                  <td className="py-4 px-4 text-center text-slate-500">{item.unit?.name || 'Pcs'}</td>
-                  <td className="py-4 px-4 text-right font-medium">{formatAmount(item.selling_price)}</td>
-                  <td className="py-4 px-4 text-right font-bold text-slate-900">{formatAmount(item.line_total)}</td>
+                  <td className="py-4 px-4">
+                    <span className="font-bold text-slate-900 block mb-1">
+                      {item.item_name || "Steel Rebar"}
+                    </span>
+                    <span className="text-slate-400 text-[11px] block italic">
+                      {item.item?.name || "حديد تسليح"}
+                    </span>
+                  </td>
+                  <td className="py-4 px-4 text-center font-medium">
+                    {parseInt(item.quantity)}
+                  </td>
+                  <td className="py-4 px-4 text-center text-slate-500">
+                    {item.unit?.name || "Pcs"}
+                  </td>
+                  <td className="py-4 px-4 text-right font-medium">
+                    {formatAmount(item.selling_price)}
+                  </td>
+                  <td className="py-4 px-4 text-right font-bold text-slate-900">
+                    {formatAmount(item.line_total)}
+                  </td>
                 </tr>
               )) || (
                 <tr>
-                  <td colSpan="6" className="py-8 text-center text-slate-400">No items available in this quotation.</td>
+                  <td colSpan="6" className="py-8 text-center text-slate-400">
+                    No items available in this quotation.
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -1050,36 +1153,69 @@ export default function QuotationDetails() {
             <div className="w-80 space-y-2 text-xs border-t border-slate-100 pt-4">
               <div className="flex justify-between text-slate-500 px-2">
                 <span>Subtotal</span>
-                <span className="font-semibold text-slate-900">{formatAmount(quotation?.subtotal)} <span className="text-[10px] text-slate-400 font-normal">SAR</span></span>
+                <span className="font-semibold text-slate-900">
+                  {formatAmount(quotation?.subtotal)}{" "}
+                  <span className="text-[10px] text-slate-400 font-normal">
+                    SAR
+                  </span>
+                </span>
               </div>
               <div className="flex justify-between text-slate-500 px-2">
                 <span>VAT (15%)</span>
-                <span className="font-semibold text-slate-900">{formatAmount(quotation?.tax_amount)} <span className="text-[10px] text-slate-400 font-normal">SAR</span></span>
+                <span className="font-semibold text-slate-900">
+                  {formatAmount(quotation?.tax_amount)}{" "}
+                  <span className="text-[10px] text-slate-400 font-normal">
+                    SAR
+                  </span>
+                </span>
               </div>
               <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100 text-slate-900 mt-2">
-                <span className="font-bold text-primary text-sm">Grand Total</span>
-                <span className="font-black text-base text-primary">{formatAmount(quotation?.total_amount)} <span className="text-[11px] font-bold">SAR</span></span>
+                <span className="font-bold text-primary text-sm">
+                  Grand Total
+                </span>
+                <span className="font-black text-base text-primary">
+                  {formatAmount(quotation?.total_amount)}{" "}
+                  <span className="text-[11px] font-bold">SAR</span>
+                </span>
               </div>
             </div>
           </div>
 
           {/* Terms & Bank Details */}
           <div className="grid grid-cols-2 gap-6 border-t border-slate-100 pt-6 text-[11px] text-slate-500 mb-12">
-            <div>
-              <h5 className="font-bold text-slate-800 text-xs mb-2">Terms & Conditions</h5>
-              <ul className="list-disc pl-4 space-y-1 text-slate-500">
-                <li>Prices are valid for 15 Days from the date of quotation.</li>
+            <div className="text-[18px] text-slate-900 font-bold leading-relaxed">
+              <h5 className="font-bold text-slate-900 text-[15px] mb-2 uppercase">
+                Terms & Conditions
+              </h5>
+              <ul className="list-disc pl-4 space-y-1">
+                <li>
+                  Prices are valid for 15 Days from the date of quotation.
+                </li>
                 <li>Delivery within 3-5 working days from PO confirmation.</li>
-                <li>Goods once sold cannot be returned unless manufacturing defect.</li>
+                <li>
+                  Goods once sold cannot be returned unless manufacturing
+                  defect.
+                </li>
                 <li>All disputes subject to Riyadh jurisdiction.</li>
               </ul>
             </div>
             <div>
-              <h5 className="font-bold text-slate-800 text-xs mb-2">Bank Details</h5>
+              <h5 className="font-bold text-slate-800 text-xs mb-2">
+                Bank Details
+              </h5>
               <div className="bg-slate-50/60 p-3 rounded-xl border border-slate-100 space-y-1 text-slate-600">
-                <p><span className="text-slate-400">Bank Name:</span> Al Rajhi Bank</p>
-                <p><span className="text-slate-400">Account Name:</span> FORSA Trading Est.</p>
-                <p><span className="text-slate-400">IBAN:</span> SA56 8000 0000 1234 5678 9012</p>
+                <p>
+                  <span className="text-slate-400">Bank Name:</span> Al Rajhi
+                  Bank
+                </p>
+                <p>
+                  <span className="text-slate-400">Account Name:</span> FORSA
+                  Trading Est.
+                </p>
+                <p>
+                  <span className="text-slate-400">IBAN:</span> SA56 8000 0000
+                  1234 5678 9012
+                </p>
               </div>
             </div>
           </div>
@@ -1100,26 +1236,31 @@ export default function QuotationDetails() {
               <p>Authorized Signature</p>
             </div>
           </div>
-
         </div>
       </div>
 
       {/* Modals Management Container */}
-      <PaymentReceivedModal 
+      <PaymentReceivedModal
         open={isPaymentModalOpen}
         onOpenChange={setIsPaymentModalOpen}
         isLoading={updateStatus.isPending}
-        onConfirm={(data) => handleStatusAction('payment-received', data, () => setIsPaymentModalOpen(false))}
+        onConfirm={(data) =>
+          handleStatusAction("payment-received", data, () =>
+            setIsPaymentModalOpen(false),
+          )
+        }
       />
 
-      <CancelQuotationModal 
+      <CancelQuotationModal
         open={isCancelModalOpen}
         onOpenChange={setIsCancelModalOpen}
         isLoading={updateStatus.isPending}
-        onConfirm={(data) => handleStatusAction('cancel', data, () => setIsCancelModalOpen(false))}
+        onConfirm={(data) =>
+          handleStatusAction("cancel", data, () => setIsCancelModalOpen(false))
+        }
       />
 
-      <DeleteModal 
+      <DeleteModal
         open={isDeleteModalOpen}
         setOpen={setIsDeleteModalOpen}
         title="Delete Quotation"
@@ -1129,5 +1270,5 @@ export default function QuotationDetails() {
         onDelete={handleDelete}
       />
     </FormProvider>
-  )
+  );
 }

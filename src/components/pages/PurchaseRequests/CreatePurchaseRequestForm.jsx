@@ -39,8 +39,11 @@ export default function CreatePurchaseRequestForm() {
             isRequired={true}
             fetchFn={handleGetAllCustomers}
             queryKeyPrefix="customers"
-            // onCreateNew={handleCreateCustomer}
-            // createLabel="Create New Client"
+            onCreateNew={(search) => {
+              setNewCustomerName(search);
+              setIsCustomerModalOpen(true);
+            }}
+            createLabel="Create New Client"
           />
 
           {/* <CustomInput
@@ -101,7 +104,7 @@ export default function CreatePurchaseRequestForm() {
         onOpenChange={setIsCustomerModalOpen}
         initialName={newCustomerName}
         onCreated={(id) => {
-           // Attempt to auto-select it if possible, otherwise it will just be available in the dropdown
+           setValue("customer_id", id.toString());
         }}
       />
 

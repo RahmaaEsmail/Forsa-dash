@@ -71,7 +71,10 @@ export default function RFQFilter({ onFilter, onReset, filters = {} }) {
               <SelectItem value="draft">Draft</SelectItem>
               <SelectItem value="rfq_sent">RFQ Sent</SelectItem>
               <SelectItem value="buyer_approval">Buyer Approval</SelectItem>
-              <SelectItem value="price_gathering">Price Gathering</SelectItem>
+              <SelectItem value="price_gathering_approval">Price Gathering Approval</SelectItem>
+              <SelectItem value="po_approval">PO Approval</SelectItem>
+              <SelectItem value="purchase_ordered">Purchase Ordered</SelectItem>
+              <SelectItem value="cancelled">Canceled</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>

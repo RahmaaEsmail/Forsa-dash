@@ -11,7 +11,7 @@ import { Badge } from '../../ui/badge'
 import { toast } from 'sonner'
 import EntityLink from '../../shared/EntityLink'
 
-export default function RFQTable({ prId, view = "rfq", filters = {}, onDataLoaded }) {
+export default function RFQTable({ prId, view = "rfq", filters = {}, onDataLoaded, selectedRowKeys, onSelectedRowKeysChange }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
@@ -142,18 +142,6 @@ export default function RFQTable({ prId, view = "rfq", filters = {}, onDataLoade
           >
             <Edit className="w-4 h-4" />
           </Button>
-          
-          {row.status != 'purchase_ordered' && row.status != 'cancelled' && (
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => handleCancelClick(row.id)}
-              title="Cancel RFQ"
-            >
-              <XCircle className="w-4 h-4 text-orange-500" />
-            </Button>
-          )}
-
           {row.status === 'purchase_ordered' && (
             <Button 
               variant="ghost" 
@@ -162,18 +150,6 @@ export default function RFQTable({ prId, view = "rfq", filters = {}, onDataLoade
               title="Create GRN"
             >
               <PackagePlus className="w-4 h-4 text-emerald-600" />
-            </Button>
-          )}
-
-          {row.status !== 'canceled' && row.status !== 'cancelled' && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => handleDelete(row.id)}
-              disabled={deleteMutation.isPending}
-              title="Delete RFQ"
-            >
-              <Trash2 className="w-4 h-4 text-red-500" />
             </Button>
           )}
         </div>
@@ -190,6 +166,8 @@ export default function RFQTable({ prId, view = "rfq", filters = {}, onDataLoade
         columns={columns}
         dataSource={rfqsData?.data || []}
         rowKey="id"
+        selectedRowKeys={selectedRowKeys}
+        onSelectedRowKeysChange={onSelectedRowKeysChange}
       />
       
       <CancelRFQModal 

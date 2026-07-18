@@ -10,9 +10,12 @@ import { handleGetAllPaymentTerms } from '../../../services/purchase-request'
 import CustomTable from '../../shared/CustomTable'
 import { Input } from '../../ui/input'
 import useCreateRFQ from '../../../hooks/purchaseRequest/useCreateRFQ'
+import CreateSupplierModal from './CreateSupplierModal'
 
 export default function CreateRFQModal({ open, onOpenChange, pr }) {
   const { mutate: createRFQ, isPending } = useCreateRFQ();
+  const [isSupplierModalOpen, setIsSupplierModalOpen] = useState(false);
+  const [newSupplierName, setNewSupplierName] = useState("");
   const { register, handleSubmit, control, watch, setValue } = useForm({
     defaultValues: {
       supplier_id: "",
@@ -31,6 +34,11 @@ export default function CreateRFQModal({ open, onOpenChange, pr }) {
   });
 
   const items = watch("items");
+
+  const handleCreateSupplier = (searchValue) => {
+    setNewSupplierName(searchValue);
+    setIsSupplierModalOpen(true);
+  };
 
   const onSubmit = (values) => {
     const payload = {
@@ -103,6 +111,8 @@ export default function CreateRFQModal({ open, onOpenChange, pr }) {
               isRequired={true}
               fetchFn={handleGetAllSupplier}
               queryKeyPrefix="suppliers"
+              onCreateNew={handleCreateSupplier}
+              createLabel="Create New Supplier"
             />
 
             <SearchableAsyncSelect
@@ -158,6 +168,15 @@ export default function CreateRFQModal({ open, onOpenChange, pr }) {
             </Button>
           </DialogFooter>
         </form>
+
+        <CreateSupplierModal
+          open={isSupplierModalOpen}
+          onOpenChange={setIsSupplierModalOpen}
+          initialName={newSupplierName}
+          onCreated={(id) => {
+            setValue("supplier_id", String(id));
+          }}
+        />
       </DialogContent>
     </Dialog>
   )

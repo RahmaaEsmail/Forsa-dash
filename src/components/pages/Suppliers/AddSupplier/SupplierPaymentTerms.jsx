@@ -61,9 +61,10 @@ export default function SupplierPaymentTerms() {
                 control={control}
                 name={`payment_terms.${index}.payment_term_id`}
                 options={termsOptions}
-                isRequired={true}
+                isRequired={false}
                 isLoading={isLoading}
                 placeholder="Select payment term"
+                errors={errors?.payment_terms?.[index]?.payment_term_id}
               />
               <CustomInput
                 label="Credit Limit"

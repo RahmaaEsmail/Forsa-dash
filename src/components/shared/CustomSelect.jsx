@@ -671,6 +671,7 @@ export default function CustomSelect({
       <Controller
         control={control}
         name={name}
+        rules={{ required: isRequired ? `${label || name} is required` : false }}
         render={({ field }) => {
           const singleValue =
             field.value != null && !Array.isArray(field.value)

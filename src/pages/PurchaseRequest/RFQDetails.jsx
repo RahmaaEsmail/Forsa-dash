@@ -908,6 +908,7 @@
 
 import React, { useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { downloadAsPDF } from "../../utils/downloadPDF";
 import {
   ArrowLeft,
   BadgeDollarSign,
@@ -1092,8 +1093,10 @@ export default function RFQDetails() {
   const printRef = useRef(null);
 
   const { data: settingsData } = useListSettings();
-  const getSetting = (key) =>
-    settingsData?.data?.find((s) => s.key === key)?.value;
+  const getSetting = (key) => {
+    const val = settingsData?.data?.find((s) => s.key === key)?.value;
+    return val === "null" || !val ? null : val;
+  };
 
   const companyPhone =
     getSetting("phone") || getSetting("company_phone") || "+966 55 598 0730";
@@ -1102,11 +1105,12 @@ export default function RFQDetails() {
     getSetting("company_email") ||
     "procurement@forsa.com";
   const companyVat =
-    getSetting("vat") || getSetting("vat_number") || "300123456700003";
+    getSetting("vat") ||
+    getSetting("vat_number") ||
+    getSetting("company_tax_number") ||
+    "300123456700003";
   const companyAddress =
-    getSetting("address") ||
-    getSetting("company_address") ||
-    "King Fahd Road, Olaya District, Riyadh 12211";
+    getSetting("address") || getSetting("company_address") || "Cairo, Egypt";
 
   const { data: rfqResponse, isLoading, isError } = useRFQDetails(rfqId);
 
@@ -1128,8 +1132,15 @@ export default function RFQDetails() {
     Array.isArray(logsData) ? logsData : logsData?.data || [],
   );
 
-  const handlePrint = () => {
+  const handleDownloadPDF = () => {
+    const originalTitle = document.title;
+    const documentName =
+      rfq?.po_number || rfq?.display_number || rfq?.rfq_number || rfqId;
+    document.title = documentName;
     window.print();
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 100);
   };
 
   if (isLoading) {
@@ -1186,7 +1197,7 @@ export default function RFQDetails() {
           }
           #printable-rfq-area-wrapper * { visibility: visible !important; }
           
-          @page { size: A4; margin: 15mm 10mm 15mm 10mm; }
+          @page { size: A4; margin: 0; padding : 0; }
           .page-break {
             page-break-before: always;
           }
@@ -1229,7 +1240,7 @@ export default function RFQDetails() {
           <div className="flex flex-wrap gap-2">
             <Button
               variant="outline"
-              onClick={handlePrint}
+              onClick={handleDownloadPDF}
               className="rounded-2xl border-slate-200 text-slate-600 gap-2 font-bold hover:bg-slate-50"
             >
               <Printer className="w-4 h-4" /> Download/Print PDF
@@ -1436,7 +1447,10 @@ export default function RFQDetails() {
                 Delivery Address Config
               </span>
               <strong className="text-slate-800">
-                {safeText(rfq.delivery_address)}
+                {safeText(rfq.delivery_address).replace(
+                  "Saudi Arabia",
+                  "Kingdom of Saudi Arabia",
+                )}
               </strong>
             </div>
             {/* <div><span className="text-slate-400 block">Created At Timestamp</span><strong className="text-slate-800">{formatDate(rfq.created_at)}</strong></div> */}
@@ -1487,7 +1501,6 @@ export default function RFQDetails() {
                 <th className="py-2 px-2">Description</th>
                 <th className="py-2 px-2 text-center">Unit</th>
                 <th className="py-2 px-2 text-right">Qty</th>
-                <th className="py-2 px-2 text-right">Target Price</th>
                 <th className="py-2 px-2 text-right">Unit Price</th>
                 <th className="py-2 px-2 text-right">VAT %</th>
                 <th className="py-2 px-2 text-right">Total</th>
@@ -1526,9 +1539,6 @@ export default function RFQDetails() {
                       {formatNumber(item.quantity)}
                     </div>
                     {/* <div className="text-[9px] text-slate-400 font-mono">Rem: {item.remaining_quantity} | Acc: {item.quantity_accepted}</div> */}
-                  </td>
-                  <td className="py-3 px-2 text-right text-slate-500 font-mono">
-                    {formatMoney(item.target_price)}
                   </td>
                   <td className="py-3 px-2 text-right font-mono">
                     {formatMoney(item.unit_price)}
@@ -1580,22 +1590,24 @@ export default function RFQDetails() {
           </div>
 
           {/* Notes & Terms */}
-          <div className="grid grid-cols-2 gap-4 mb-8 text-[11px]">
+          <div className="flex flex-col gap-4 mb-8">
             {rfq.notes && (
               <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
-                <h4 className="font-bold text-slate-800 uppercase text-[10px] mb-1">
+                <h4 className="font-bold text-slate-800 uppercase text-sm mb-1.5">
                   Notes
                 </h4>
-                <p className="text-slate-600 leading-relaxed">{rfq.notes}</p>
+                <p className="text-[14px] text-slate-700 leading-relaxed">
+                  {rfq.notes}
+                </p>
               </div>
             )}
             {/* Always show Terms & Conditions for PO; otherwise only if content exists */}
             {(rfq.terms_and_conditions || rfq.is_purchase_order) && (
               <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
-                <h4 className="font-bold text-slate-800 uppercase text-[10px] mb-1">
+                <h4 className="font-bold text-slate-900 uppercase text-[15px] mb-2">
                   Terms & Conditions
                 </h4>
-                <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
+                <p className="text-[18px] text-slate-900 font-bold leading-relaxed whitespace-pre-wrap">
                   {rfq.terms_and_conditions ||
                     "Standard terms and conditions apply. Delivery as per agreed schedule. Payment as per payment terms above."}
                 </p>

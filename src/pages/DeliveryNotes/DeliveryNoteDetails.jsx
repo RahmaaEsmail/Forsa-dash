@@ -65,7 +65,7 @@
 //           </Button>
 
 //           {dn?.status === 'draft' && (
-//             <Button 
+//             <Button
 //               onClick={() => navigate(`/edit-delivery-note/${id}`)}
 //               className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
 //             >
@@ -92,9 +92,9 @@
 //                   </Badge>
 //                </div>
 //                <CardContent className="p-0">
-//                   <CustomTable 
-//                     columns={columns} 
-//                     dataSource={dn?.items || []} 
+//                   <CustomTable
+//                     columns={columns}
+//                     dataSource={dn?.items || []}
 //                     rowKey="id"
 //                     className="border-none"
 //                   />
@@ -181,29 +181,28 @@
 //   )
 // }
 
-
-import React, { useState, useRef } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import PageHeader from '../../components/shared/PageHeader'
-import { Button } from '../../components/ui/button'
-import useListSettings from '../../hooks/Settings/useListSettings'
-import useDeliveryNoteDetails from '../../hooks/delivery-notes/useDeliveryNoteDetails'
-import Loading from '../../components/shared/Loading'
-import { Badge } from '../../components/ui/badge'
-import { Card, CardContent } from '../../components/ui/card'
-import CustomTable from '../../components/shared/CustomTable'
-import { 
-  Edit, 
-  FileText, 
-  ChevronRight, 
-  Calendar, 
-  MapPin, 
-  Phone, 
-  Info, 
-  Package, 
-  ArrowLeft, 
-  Printer
-} from 'lucide-react'
+import React, { useState, useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import PageHeader from "../../components/shared/PageHeader";
+import { Button } from "../../components/ui/button";
+import useListSettings from "../../hooks/Settings/useListSettings";
+import useDeliveryNoteDetails from "../../hooks/delivery-notes/useDeliveryNoteDetails";
+import Loading from "../../components/shared/Loading";
+import { Badge } from "../../components/ui/badge";
+import { Card, CardContent } from "../../components/ui/card";
+import CustomTable from "../../components/shared/CustomTable";
+import {
+  Edit,
+  FileText,
+  ChevronRight,
+  Calendar,
+  MapPin,
+  Phone,
+  Info,
+  Package,
+  ArrowLeft,
+  Printer,
+} from "lucide-react";
 
 const statusVariants = {
   draft: "bg-slate-100 text-slate-700 border-slate-200",
@@ -218,12 +217,21 @@ export default function DeliveryNoteDetails() {
   const printRef = useRef(null);
 
   const { data: settingsData } = useListSettings();
-  const getSetting = (key) => settingsData?.data?.find(s => s.key === key)?.value;
+  const getSetting = (key) =>
+    settingsData?.data?.find((s) => s.key === key)?.value;
 
-  const companyPhone = getSetting('phone') || getSetting('company_phone') || '+966 55 598 0730';
-  const companyEmail = getSetting('email') || getSetting('company_email') || 'Sales@forsageneraltrading.com';
-  const companyVat = getSetting('vat') || getSetting('vat_number') || '300123456700003';
-  const companyAddress = getSetting('address') || getSetting('company_address') || 'King Fahd Road, Olaya District, Riyadh 12211';
+  const companyPhone =
+    getSetting("phone") || getSetting("company_phone") || "+966 55 598 0730";
+  const companyEmail =
+    getSetting("email") ||
+    getSetting("company_email") ||
+    "Sales@forsageneraltrading.com";
+  const companyVat =
+    getSetting("vat") || getSetting("vat_number") || "300123456700003";
+  const companyAddress =
+    getSetting("address") ||
+    getSetting("company_address") ||
+    "King Fahd Road, Olaya District, Riyadh 12211";
 
   const { data: dnResponse, isLoading } = useDeliveryNoteDetails(id);
 
@@ -236,16 +244,21 @@ export default function DeliveryNoteDetails() {
   };
 
   const formatNumber = (val) => {
-    if (!val) return '0';
+    if (!val) return "0";
     const num = parseFloat(val);
-    return Number.isInteger(num) ? num.toString() : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return Number.isInteger(num)
+      ? num.toString()
+      : num.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
   };
 
   const columns = [
     {
       title: "No.",
       className: "w-16 text-center text-slate-400 font-medium text-sm py-4",
-      render: (_, __, index) => index + 1
+      render: (_, __, index) => index + 1,
     },
     {
       title: "Description",
@@ -253,36 +266,41 @@ export default function DeliveryNoteDetails() {
       render: (_, record) => (
         <div className="flex flex-col">
           <span className="font-bold text-slate-900 text-sm">
-            {record.item_name || record.item?.name || 'Steel Rebar'}
+            {record.item_name || record.item?.name || "Steel Rebar"}
           </span>
-          {record.item?.name && record.item_name && record.item_name !== record.item?.name && (
-            <span className="text-slate-400 text-xs mt-0.5 font-medium">{record.item.name}</span>
-          )}
+          {record.item?.name &&
+            record.item_name &&
+            record.item_name !== record.item?.name && (
+              <span className="text-slate-400 text-xs mt-0.5 font-medium">
+                {record.item.name}
+              </span>
+            )}
         </div>
-      )
+      ),
     },
     {
       title: "Qty Ordered",
       className: "text-center px-4 py-4 font-bold text-slate-900 text-sm",
-      render: (_, record) => formatNumber(record.quantity)
+      render: (_, record) => formatNumber(record.quantity),
     },
     {
       title: "Qty Delivered",
       className: "text-center px-4 py-4 font-black text-emerald-600 text-sm",
-      render: (_, record) => formatNumber(record.quantity_delivered)
+      render: (_, record) => formatNumber(record.quantity_delivered),
     },
     {
       title: "Unit",
       className: "text-center px-4 py-4 text-slate-500 font-medium text-sm",
-      render: (_, record) => record.unit?.name || 'طن'
-    }
+      render: (_, record) => record.unit?.name || "طن",
+    },
   ];
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl animate-in fade-in duration-500 space-y-8 pb-16">
-      
       {/* GLOBAL HIGH-FIDELITY PRINT CANVAS CSS INJECTION */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @media print {
           body { visibility: hidden; background: white !important; }
           .no-print { display: none !important; }
@@ -297,9 +315,11 @@ export default function DeliveryNoteDetails() {
           }
           #printable-delivery-note-wrapper * { visibility: visible !important; }
           
-          @page { size: A4; margin: 15mm 12mm 15mm 12mm; }
+          @page { size: A4; margin: 0; }
         }
-      `}} />
+      `,
+        }}
+      />
 
       {/* Screen Interactive Workspace Controls Header */}
       {/* <div className="no-print">
@@ -436,62 +456,111 @@ export default function DeliveryNoteDetails() {
       {/* HIGH-FIDELITY PRINT RENDERING CANVAS (MATCHES THE IMAGE TEMPLATE DIRECTLY)*/}
       {/* ========================================================================= */}
       <div id="printable-delivery-note-wrapper" className="bg-white py-6">
-        <div className="max-w-[850px] mx-auto bg-white p-12 border border-slate-200 rounded-sm" id="printable-delivery-note-canvas" ref={printRef}>
-          
+        <div
+          className="max-w-[850px] mx-auto bg-white p-12 border border-slate-200 rounded-sm"
+          id="printable-delivery-note-canvas"
+          ref={printRef}
+        >
           {/* Top Brand Header Layer */}
           <div className="flex justify-between items-start border-b-2 border-[#b9252c] pb-6 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <div className="mx-2 flex justify-center items-center">
-                  <img src="/images/LOGO.svg" className="h-20 w-36 object-cover" alt="Logo" />
+                  <img
+                    src="/images/LOGO.svg"
+                    className="h-20 w-36 object-cover"
+                    alt="Logo"
+                  />
                 </div>
               </div>
             </div>
             <div className="text-right text-xs text-slate-500 space-y-1">
-              <h2 className="font-extrabold text-base text-slate-900 tracking-wide">FORSA TRADING & CONTRACTING</h2>
+              <h2 className="font-extrabold text-base text-slate-900 tracking-wide">
+                FORSA TRADING & CONTRACTING
+              </h2>
               <p>{companyAddress}</p>
-              <p><span className="font-semibold text-slate-700">VAT No:</span> {companyVat}</p>
-              <p className="pt-1">📞 {companyPhone} &nbsp;|&nbsp; ✉️ {companyEmail}</p>
+              <p>
+                <span className="font-semibold text-slate-700">VAT No:</span>{" "}
+                {companyVat}
+              </p>
+              <p className="pt-1">
+                📞 {companyPhone} &nbsp;|&nbsp; ✉️ {companyEmail}
+              </p>
             </div>
           </div>
 
-          <h3 className="text-2xl font-bold text-[#b9252c] mb-6 tracking-tight">Delivery Note</h3>
+          <h3 className="text-2xl font-bold text-[#b9252c] mb-6 tracking-tight">
+            Delivery Note
+          </h3>
 
           {/* Reference Block Matrix Row */}
           <div className="grid grid-cols-2 gap-6 mb-8">
             {/* Delivery Target Recipient Info */}
             <div className="bg-slate-50 border border-slate-100 rounded-xl p-5 text-xs text-slate-600 space-y-2">
-              <h4 className="text-[#b9252c] font-bold text-sm mb-2 uppercase tracking-wide">Ship To / Client</h4>
-              <p className="text-slate-900 font-extrabold text-base">{dn?.customer?.company_name || 'ABC Construction Co.'}</p>
-              <p className="flex items-start gap-1"><span className="text-slate-400 shrink-0">📍 Location:</span> <span>{dn?.delivery_address || 'Industrial Area, Riyadh'}</span></p>
-              {dn?.customer?.phone && <p><span className="text-slate-400">📞 Phone:</span> {dn.customer.phone}</p>}
-              {dn?.contact_info && <p><span className="text-slate-400">👤 Contact Person:</span> {dn.contact_info}</p>}
+              <h4 className="text-[#b9252c] font-bold text-sm mb-2 uppercase tracking-wide">
+                Ship To / Client
+              </h4>
+              <p className="text-slate-900 font-extrabold text-base">
+                {dn?.customer?.company_name || "ABC Construction Co."}
+              </p>
+              <p className="flex items-start gap-1">
+                <span className="text-slate-400 shrink-0">📍 Location:</span>{" "}
+                <span>{dn?.delivery_address || "Industrial Area, Riyadh"}</span>
+              </p>
+              {dn?.customer?.phone && (
+                <p>
+                  <span className="text-slate-400">📞 Phone:</span>{" "}
+                  {dn.customer.phone}
+                </p>
+              )}
+              {dn?.contact_info && (
+                <p>
+                  <span className="text-slate-400">👤 Contact Person:</span>{" "}
+                  {dn.contact_info}
+                </p>
+              )}
             </div>
 
             {/* Registry Meta Attributes */}
             <div className="bg-slate-50 border border-slate-100 rounded-xl p-5 text-xs text-slate-600">
-              <h4 className="text-[#b9252c] font-bold text-sm mb-3 uppercase tracking-wide">Document Logistics</h4>
+              <h4 className="text-[#b9252c] font-bold text-sm mb-3 uppercase tracking-wide">
+                Document Logistics
+              </h4>
               <div className="grid grid-cols-2 gap-y-3">
                 <div>
-                  <span className="text-slate-400 block mb-0.5">Delivery Note No:</span>
-                  <span className="text-slate-900 font-bold">{dn?.do_number}</span>
+                  <span className="text-slate-400 block mb-0.5">
+                    Delivery Note No:
+                  </span>
+                  <span className="text-slate-900 font-bold">
+                    {dn?.do_number}
+                  </span>
                 </div>
                 <div>
                   <span className="text-slate-400 block mb-0.5">Date:</span>
-                  <span className="text-slate-900 font-bold">{dn?.delivery_date || '—'}</span>
+                  <span className="text-slate-900 font-bold">
+                    {dn?.delivery_date || "—"}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block mb-0.5">Reference Agreement:</span>
-                  <span className="text-slate-900 font-bold">#{dn?.quotation?.quotation_number || '—'}</span>
+                  <span className="text-slate-400 block mb-0.5">
+                    Reference Agreement:
+                  </span>
+                  <span className="text-slate-900 font-bold">
+                    #{dn?.quotation?.quotation_number || "—"}
+                  </span>
                 </div>
                 <div>
                   <span className="text-slate-400 block mb-0.5">Operator:</span>
-                  <span className="text-slate-900 font-medium">{dn?.created_by?.name || 'Super Admin'}</span>
+                  <span className="text-slate-900 font-medium">
+                    {dn?.created_by?.name || "Super Admin"}
+                  </span>
                 </div>
               </div>
               <div className="mt-3 pt-3 border-t border-slate-200/60 flex justify-between items-center">
                 <span className="text-slate-400">Delivery Status Context:</span>
-                <span className="text-emerald-600 font-extrabold uppercase tracking-wider">{dn?.status}</span>
+                <span className="text-emerald-600 font-extrabold uppercase tracking-wider">
+                  {dn?.status}
+                </span>
               </div>
             </div>
           </div>
@@ -509,21 +578,43 @@ export default function DeliveryNoteDetails() {
             </thead>
             <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
               {dn?.items?.map((item, index) => (
-                <tr key={item.id || index} className="align-top hover:bg-slate-50/30">
-                  <td className="py-4 px-3 text-center text-slate-400 font-medium">{index + 1}</td>
-                  <td className="py-4 px-4">
-                    <span className="font-bold text-slate-900 block mb-0.5">{item.item_name || item.item?.name || 'Steel Rebar'}</span>
-                    {item.item?.name && item.item_name && item.item_name !== item.item?.name && (
-                      <span className="text-slate-400 text-[11px] block italic">{item.item.name}</span>
-                    )}
+                <tr
+                  key={item.id || index}
+                  className="align-top hover:bg-slate-50/30"
+                >
+                  <td className="py-4 px-3 text-center text-slate-400 font-medium">
+                    {index + 1}
                   </td>
-                  <td className="py-4 px-4 text-center font-medium text-slate-600">{formatNumber(item.quantity)}</td>
-                  <td className="py-4 px-4 text-center font-black text-slate-900">{formatNumber(item.quantity_delivered)}</td>
-                  <td className="py-4 px-4 text-center text-slate-500 font-medium">{item.unit?.name || 'طن'}</td>
+                  <td className="py-4 px-4">
+                    <span className="font-bold text-slate-900 block mb-0.5">
+                      {item.item_name || item.item?.name || "Steel Rebar"}
+                    </span>
+                    {item.item?.name &&
+                      item.item_name &&
+                      item.item_name !== item.item?.name && (
+                        <span className="text-slate-400 text-[11px] block italic">
+                          {item.item.name}
+                        </span>
+                      )}
+                  </td>
+                  <td className="py-4 px-4 text-center font-medium text-slate-600">
+                    {formatNumber(item.quantity)}
+                  </td>
+                  <td className="py-4 px-4 text-center font-black text-slate-900">
+                    {formatNumber(item.quantity_delivered)}
+                  </td>
+                  <td className="py-4 px-4 text-center text-slate-500 font-medium">
+                    {item.unit?.name || "طن"}
+                  </td>
                 </tr>
               )) || (
                 <tr>
-                  <td colSpan="5" className="py-8 text-center text-slate-400 italic">No items allocated to this delivery note.</td>
+                  <td
+                    colSpan="5"
+                    className="py-8 text-center text-slate-400 italic"
+                  >
+                    No items allocated to this delivery note.
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -532,8 +623,12 @@ export default function DeliveryNoteDetails() {
           {/* Operational Notes / Instructions Layer Block */}
           {dn?.notes && (
             <div className="bg-slate-50 border border-slate-100 rounded-xl p-5 text-[11px] text-slate-600 mb-12">
-              <h5 className="font-bold text-slate-800 text-xs mb-2 uppercase tracking-wide text-[#b9252c]">Logistics Dispatch Notes</h5>
-              <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">{dn.notes}</p>
+              <h5 className="font-bold text-slate-800 text-xs mb-2 uppercase tracking-wide text-[#b9252c]">
+                Logistics Dispatch Notes
+              </h5>
+              <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
+                {dn.notes}
+              </p>
             </div>
           )}
 
@@ -560,10 +655,8 @@ export default function DeliveryNoteDetails() {
             <p className="font-semibold text-slate-500">www.forsa-sa.com</p>
             <p>sales@forsa-sa.com</p>
           </div>
-
         </div>
       </div>
-
     </div>
-  )
+  );
 }

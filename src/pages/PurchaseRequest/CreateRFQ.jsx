@@ -142,46 +142,7 @@ export default function CreateRFQ() {
     setErrorDialog({ open: true, title, message });
   };
 
-  const handleStatusChange = (status, reason = "") => {
-    if (!rfqId) return;
-
-    // Price validation for stages after rfq_sent
-    const priceRequiredStatuses = ["approve", "price-gathering-approve", "po-approve", "purchase-order"];
-    if (priceRequiredStatuses.includes(status) && !hasPrices) {
-      showErrorPopup(
-        "Prices Required",
-        "At least one item must have a unit price set before proceeding to the next stage. Please enter prices for the received quotations."
-      );
-      return;
-    }
-
-    if (isDirty) {
-      if (!window.confirm("You have unsaved changes. Changing status will reload the data and discard your current edits. Continue?")) {
-        return;
-      }
-    }
-
-    setIsUpdatingStatus(true);
-    handleChangeRFQStatus({
-      id: rfqId,
-      status: status,
-      body: status === "cancel" ? { cancellation_reason: reason || "Discarded by user" } : {}
-    })
-      .then(res => {
-        if (res?.success) {
-          toast.success(`RFQ ${status === "cancel" ? "canceled" : "status updated"} successfully!`);
-          setIsCancelModalOpen(false);
-          loadRFQDetails();
-        }
-      })
-      .catch(err => {
-        const message = err.response?.data?.message || err.response?.data?.error?.message || "Failed to update RFQ status.";
-        showErrorPopup("Status Change Failed", message);
-      })
-      .finally(() => setIsUpdatingStatus(false));
-  };
-
-  const onSubmit = (values) => {
+  const saveRFQChanges = (values) => {
     let payload;
 
     if (isEdit) {
@@ -243,14 +204,12 @@ export default function CreateRFQ() {
       ? handleUpdateRFQ({ id: rfqId, body: payload })
       : handleCreateRFQ({ prId: prId, body: payload });
 
-    action.then(res => {
+    return action.then(res => {
       if (res?.success) {
         toast.success(res.message || `RFQ ${isEdit ? 'updated' : 'created'} successfully!`);
         if (isEdit) {
-          // Stay on the edit page and reload fresh data
           loadRFQDetails();
         } else {
-          // After creating, land on the edit page of the new RFQ
           const newRfqId = res.data?.id || res.data?.rfq?.id || res.rfq?.id;
           if (newRfqId) {
             navigate(`/rfqs/${newRfqId}/edit`);
@@ -260,9 +219,72 @@ export default function CreateRFQ() {
             else navigate(`/rfqs`);
           }
         }
+        return res;
       }
-    }).catch(err => {
-      toast.error(err.response?.data?.message || err.response?.data?.error?.message || "Something went wrong");
+      throw new Error(res?.message || "Failed to save RFQ");
+    });
+  };
+
+  const handleStatusChange = (status, reason = "") => {
+    if (!rfqId) return;
+
+    const performStatusChange = (values) => {
+      setIsUpdatingStatus(true);
+      const currentItems = values.items || [];
+      const currentHasPrices = currentItems.some(item => Number(item.unit_price) > 0);
+
+      const priceRequiredStatuses = ["approve", "price-gathering-approve", "po-approve", "purchase-order"];
+      if (priceRequiredStatuses.includes(status) && !currentHasPrices) {
+        showErrorPopup(
+          "Prices Required",
+          "At least one item must have a unit price set before proceeding to the next stage. Please enter prices for the received quotations."
+        );
+        setIsUpdatingStatus(false);
+        return;
+      }
+
+      return handleChangeRFQStatus({
+        id: rfqId,
+        status: status,
+        body: status === "cancel" ? { cancellation_reason: reason || "Discarded by user" } : {}
+      })
+        .then(statusRes => {
+          if (statusRes?.success) {
+            toast.success(`RFQ ${status === "cancel" ? "canceled" : "status updated"} successfully!`);
+            setIsCancelModalOpen(false);
+            loadRFQDetails();
+          }
+        })
+        .catch(err => {
+          const message = err.response?.data?.message || err.response?.data?.error?.message || err.message || "Failed to update RFQ status.";
+          showErrorPopup("Status Change Failed", message);
+        })
+        .finally(() => setIsUpdatingStatus(false));
+    };
+
+    if (isEdit && rfqStatus === 'draft' && methods.formState.isDirty) {
+      methods.handleSubmit((values) => {
+        setIsUpdatingStatus(true);
+        saveRFQChanges(values)
+          .then((res) => {
+            if (res?.success) {
+              return performStatusChange(values);
+            }
+          })
+          .catch(err => {
+            const message = err.response?.data?.message || err.response?.data?.error?.message || err.message || "Failed to save RFQ.";
+            showErrorPopup("Save Failed", message);
+            setIsUpdatingStatus(false);
+          });
+      })();
+    } else {
+      performStatusChange(methods.getValues());
+    }
+  };
+
+  const onSubmit = (values) => {
+    saveRFQChanges(values).catch(err => {
+      toast.error(err.response?.data?.message || err.response?.data?.error?.message || err.message || "Something went wrong");
     });
   };
 
@@ -277,13 +299,23 @@ export default function CreateRFQ() {
             subTitle={isEdit ? `Edit RFQ #${methods.watch("rfq_number")}` : `PR #${prData?.data?.pr_number || prId}`}
           >
             <div className='flex gap-2 items-center'>
-              <Button
-                variant="outline"
-                className="border-primary text-primary h-10 px-6 font-bold"
-                onClick={() => navigate(-1)}
-              >
-                Discard
-              </Button>
+              {isEdit ? (
+                <Button
+                  variant="outline"
+                  className="border-red-500 text-red-500 hover:bg-red-50 h-10 px-6 font-bold"
+                  onClick={() => setIsCancelModalOpen(true)}
+                >
+                  Cancel
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="border-primary text-primary h-10 px-6 font-bold"
+                  onClick={() => navigate(-1)}
+                >
+                  Discard
+                </Button>
+              )}
 
               {isEdit && (
                 <Button

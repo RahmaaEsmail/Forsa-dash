@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import PageHeader from '../../components/shared/PageHeader'
 import { Button } from '../../components/ui/button'
 import { Download, Plus } from 'lucide-react'
@@ -10,12 +10,14 @@ import getSupplierOptions from '../../hooks/suppliers/getSupplierOptions'
 import { useSupplierStore } from '../../store/zustand/supplierStore'
 import Pagination from '../../components/shared/Pagination'
 import SupplierFilterations from '../../components/pages/Suppliers/SupplierFilteration'
-import { exportToExcel } from '../../utils/exportToExcel'
+import ExportExcelModal from '../../components/shared/ExportExcelModal'
 
 export default function Supplier() {
   const navigate = useNavigate();
   const {filters , setFilters} = useSupplierStore();
   const {page} = filters;
+  const [selectedRowKeys, setSelectedRowKeys] = React.useState([]);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
    
   const {
     data : all_suppliers,
@@ -60,10 +62,10 @@ export default function Supplier() {
           <Button
             variant="outline"
             className="border-primary text-primary font-bold hover:bg-primary/5 gap-2"
-            onClick={() => exportToExcel(all_suppliers?.data || [], 'suppliers', SUPPLIER_COL_MAP)}
+            onClick={() => setIsExportModalOpen(true)}
           >
             <Download className="w-4 h-4" />
-            Export Excel
+            {selectedRowKeys.length > 0 ? `Export Selected (${selectedRowKeys.length})` : 'Export Excel'}
           </Button>
           <Button
             onClick={() => navigate("/create-supplier")}
@@ -78,9 +80,20 @@ export default function Supplier() {
       <SuppliersTable 
         data={all_suppliers?.data}
         loading={fetch_suppliers}
+        selectedRowKeys={selectedRowKeys}
+        onSelectedRowKeysChange={setSelectedRowKeys}
       />
 
       <Pagination page={page} per_page={10} total={totals}  onPageChange={handlePageChange}/>
+
+      <ExportExcelModal
+        open={isExportModalOpen}
+        onOpenChange={setIsExportModalOpen}
+        data={all_suppliers?.data || []}
+        selectedRowKeys={selectedRowKeys}
+        columnMap={SUPPLIER_COL_MAP}
+        filename="suppliers"
+      />
     </div>
   )
 }

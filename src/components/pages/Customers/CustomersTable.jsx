@@ -10,13 +10,16 @@ import useDeleteCustomer from '../../../hooks/customers/useDeleteCustomer';
 import useChangeCustomerStatus from '../../../hooks/customers/useChangeCustomerStatus';
 import ContactLink from '../../shared/ContactLink';
 
-export default function CustomersTable({ data, loading }) {
+export default function CustomersTable({ data, loading, selectedRowKeys, onSelectedRowKeysChange }) {
+  // navigate 
   const navigate = useNavigate();
   
+  // modals
   const [deleteModal, setDeleteModal] = useState(false);
   const [changeStatusModal, setChangeStatusModal] = useState(false);
-  const [rowData, setRowData] = useState({});
 
+  // data
+  const [rowData, setRowData] = useState({});
   const {
     mutate: deleteCustomer,
     isPending: isDeleting,
@@ -25,43 +28,41 @@ export default function CustomersTable({ data, loading }) {
 
   const {
     mutate: changeCustomerStatus,
-    isPending: isChangingStatus,
+    isPending: isChanging,
     isSuccess: isChangeStatusSuccess
   } = useChangeCustomerStatus();
 
   function handleDeleteCustomer() {
-    if (rowData?.id) {
+    if (rowData?.id && deleteModal) {
       deleteCustomer({ id: rowData?.id });
-      setDeleteModal(false);
     }
   }
 
   function handleChangeStatus() {
-     if (rowData?.id) {
-        changeCustomerStatus({ id: rowData?.id });
-        setChangeStatusModal(false);
-     }
+    if (rowData?.id && changeStatusModal) {
+      changeCustomerStatus({ id: rowData?.id, body: { is_active: !rowData?.is_active } });
+    }
   }
 
   const columns = [
     { title: "#", dataIndex: "id", key: "id" },
-    { 
-      title: "Type", 
-      dataIndex: "customer_type", 
+    {
+      title: "Type",
+      dataIndex: "customer_type",
       key: "customer_type",
-      render: (t) => (
-          <Badge className={t === 'company' ? "bg-blue-100 text-blue-600" : "bg-purple-100 text-purple-600"}>
-            {t === 'company' ? "Company" : "Individual"}
-          </Badge>
+      render: (v) => (
+        <Badge className={v === 'company' ? "bg-blue-105 hover:bg-blue-105/90 text-primary" : "bg-green-105 hover:bg-green-105/90 text-success"}>
+          {v === 'company' ? "Company" : "Individual"}
+        </Badge>
       )
     },
     { 
       title: "Name", 
-      dataIndex: "name", 
-      key: "name",
+      dataIndex: "company_name", 
+      key: "company_name",
       render: (_, row) => row.customer_type === 'company' ? row.company_name : `${row.first_name || ''} ${row.last_name || ''}`
     },
-    { 
+    {
       title: "Email",
       dataIndex: "email",
       key: "email",
@@ -71,7 +72,7 @@ export default function CustomersTable({ data, loading }) {
       title: "Mobile",
       dataIndex: "mobile",
       key: "mobile",
-      render: (v) => <ContactLink type="mobile" value={v} />,
+      render: (v) => <ContactLink type="phone" value={v} />,
     },
     {
       title: "Active",
@@ -81,42 +82,33 @@ export default function CustomersTable({ data, loading }) {
         <Badge className={v ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}>
           {v ? "Active" : "Inactive"}
         </Badge>
-      ),
+      )
     },
     {
-      title: "Action",
+      title: "Actions",
+      dataIndex: "actions",
+      key: "actions",
       render: (_, row) => {
         return (
           <div className='flex gap-2 justify-center items-center'>
             <Button  
+              onClick={() => navigate(`/customer-details/${row?.id}`)}
+              title="Details" size='icon' variant='ghost'>
+              <Eye className="w-4 h-4" />
+            </Button>
+            <Button  
               onClick={() => navigate(`/create-customer?id=${row?.id}`)}
               title="Edit" size='icon' variant='ghost'>
-              <Edit />
+              <Edit className="w-4 h-4" />
             </Button>
-
             <Button
               onClick={() => {
                 setRowData(row);
                 setDeleteModal(true);
               }}
-              title="Delete" size='icon' variant='ghost'>
-              <Trash />
+              title="Delete" size='icon' variant='ghost' className="hover:text-red-600 hover:bg-red-50">
+              <Trash className="w-4 h-4" />
             </Button>
-
-            <Button
-              onClick={() => navigate(`/customer-details/${row?.id}`)}
-              title="View Details" size='icon' variant='ghost'>
-              <Eye />
-            </Button>
-
-            {/* <Button
-              onClick={() => {
-                setRowData(row);
-                setChangeStatusModal(true);
-              }}
-              title="Change Status" size='icon' variant='ghost'>
-              <Power />
-            </Button> */}
           </div>
         )
       }
@@ -131,6 +123,8 @@ export default function CustomersTable({ data, loading }) {
         columns={columns}
         dataSource={data || []}
         loading={loading}
+        selectedRowKeys={selectedRowKeys}
+        onSelectedRowKeysChange={onSelectedRowKeysChange}
       />
 
       <DeleteModal 
@@ -145,7 +139,7 @@ export default function CustomersTable({ data, loading }) {
       
       <ActiveInActiveStatusModal 
         isSuccess={isChangeStatusSuccess} 
-        isLoading={isChangingStatus} 
+        isLoading={isChanging} 
         onSuccess={handleChangeStatus} 
         open={changeStatusModal} 
         setOpen={setChangeStatusModal} 

@@ -8,6 +8,7 @@ import { useCurrencyFlags } from '../../../../hooks/useCurrencyFlags'
 import { handleGetAllCustomers } from '../../../../services/customers'
 import CustomSelect from '../../../shared/CustomSelect'
 import CustomInput from '../../../shared/CustomInput'
+import CreateSupplierModal from '../../PurchaseRequests/CreateSupplierModal'
 import EntityLink from '../../../shared/EntityLink'
 import { Card, CardContent } from '../../../ui/card'
 import { Label } from '../../../ui/label'
@@ -26,6 +27,13 @@ const getFirstCurrency = (currenciesObj) => {
 
 export default function RFQGeneralInfo({ prData , isEdit}) {
   const { register, control, setValue, watch, formState: { errors } } = useFormContext();
+  const [isSupplierModalOpen, setIsSupplierModalOpen] = React.useState(false);
+  const [newSupplierName, setNewSupplierName] = React.useState("");
+
+  const handleCreateSupplier = (searchValue) => {
+    setNewSupplierName(searchValue);
+    setIsSupplierModalOpen(true);
+  };
   const { data: flagData } = useCurrencyFlags();
   const { data: settingsData } = useListSettings();
   const {data : payment_terms} = useListPaymentTerms();
@@ -147,6 +155,8 @@ export default function RFQGeneralInfo({ prData , isEdit}) {
               isRequired={true}
               fetchFn={handleGetAllSupplier}
               queryKeyPrefix="suppliers"
+              onCreateNew={handleCreateSupplier}
+              createLabel="Create New Supplier"
             />
           ) : (
             <div className='flex flex-col gap-2'>
@@ -336,6 +346,14 @@ export default function RFQGeneralInfo({ prData , isEdit}) {
 
 
       </CardContent>
+      <CreateSupplierModal
+        open={isSupplierModalOpen}
+        onOpenChange={setIsSupplierModalOpen}
+        initialName={newSupplierName}
+        onCreated={(id) => {
+          setValue("supplier_id", String(id));
+        }}
+      />
     </Card>
   )
 }

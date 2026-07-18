@@ -43,15 +43,24 @@ const getModelFromPath = (pathname) => {
   return null;
 };
 
+import { useSidebar } from '../../context/SidebarContext';
+
 export default function DashLayout() {
+  return (
+    <SidebarProvider>
+      <DashLayoutContent />
+    </SidebarProvider>
+  );
+}
+
+function DashLayoutContent() {
+  const { isMinimized } = useSidebar();
   const location = useLocation();
   const modelInfo = getModelFromPath(location.pathname);
-  console.log("modelInfo", modelInfo);
   const [isOpen, setIsOpen] = useState(true); // Open by default for better user visibility
 
   // Automatically close sidebar when navigating to a page without activity logs
   useEffect(() => {
-    console.log("DashLayout: Current pathname:", location.pathname, "Resolved modelInfo:", modelInfo);
     if (!modelInfo) {
       setIsOpen(false);
     } else {
@@ -62,43 +71,44 @@ export default function DashLayout() {
   const hasActivityLog = !!modelInfo;
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen bg-[#F8F9FB] relative overflow-x-hidden">
-        {/* Fixed sidebar – slides in on mobile, always visible on md+ */}
-        <Sidebar />
+    <div className="min-h-screen bg-[#F8F9FB] relative overflow-x-hidden">
+      {/* Fixed sidebar – slides in on mobile, always visible on md+ */}
+      <Sidebar />
 
-        {/* Main content column with dynamic right margin */}
-        <div
-          className={`transition-all duration-300 md:ml-75 px-4 md:px-0 ${
-            hasActivityLog && isOpen ? 'md:mr-[370px]' : 'md:mr-10'
-          }`}
-        >
-          <Header />
-          <main className="mt-10 min-h-screen overflow-auto">
-            <Outlet />
-          </main>
-        </div>
-
-        {/* Floating Action Button (FAB) to open Activity Log when closed */}
-        {hasActivityLog && !isOpen && (
-          <button
-            onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-primary hover:bg-primary/95 text-white flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 group cursor-pointer border border-primary/20"
-            title="Open Activity Log"
-          >
-            <MessageSquare size={22} className="group-hover:rotate-6 transition-transform" />
-          </button>
-        )}
-
-        {/* Sidebar Activity Log */}
-        {hasActivityLog && isOpen && (
-          <ActivityLog
-            modelType={modelInfo.model_type}
-            modelId={modelInfo.model_id}
-            onClose={() => setIsOpen(false)}
-          />
-        )}
+      {/* Main content column with dynamic right margin */}
+      <div
+        className={`transition-all duration-300 px-4 md:px-0 ${
+          isMinimized ? 'md:ml-24' : 'md:ml-75'
+        } ${
+          hasActivityLog && isOpen ? 'md:mr-[370px]' : 'md:mr-10'
+        }`}
+      >
+        <Header />
+        <main className="mt-6 min-h-screen overflow-auto">
+          <Outlet />
+        </main>
       </div>
-    </SidebarProvider>
+
+      {/* Floating Action Button (FAB) to open Activity Log when closed */}
+      {hasActivityLog && !isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-primary hover:bg-primary/95 text-white flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 group cursor-pointer border border-primary/20"
+          title="Open Activity Log"
+        >
+          <MessageSquare size={22} className="group-hover:rotate-6 transition-transform" />
+        </button>
+      )}
+
+      {/* Sidebar Activity Log */}
+      {hasActivityLog && isOpen && (
+        <ActivityLog
+          modelType={modelInfo.model_type}
+          modelId={modelInfo.model_id}
+          onClose={() => setIsOpen(false)}
+        />
+      )}
+    </div>
   );
 }
+

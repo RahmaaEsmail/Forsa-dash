@@ -59,11 +59,11 @@
   --sidebar-ring : oklch(0.708 0 0);
 
   /* font size */
-  --small-size : 12px;
-  --normal-size : 16px;
-  --medium-size:18px;
-  --large-size :24px;
-  --xl-size: 32px;
+  --small-size : 11px;
+  --normal-size : 13px;
+  --medium-size: 15px;
+  --large-size : 20px;
+  --xl-size: 26px;
 
   /* font family */
   --main-family : "Cairo", sans-serif;
@@ -135,6 +135,16 @@
   --text-large : var(--large-size);
   --text-x-large : var(--xl-size);
 
+  /* Default Tailwind Text Size Overrides for Compact Layouts */
+  --text-xs: 0.7rem;
+  --text-sm: 0.8rem;
+  --text-base: 0.875rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.25rem;
+  --text-3xl: 1.5rem;
+  --text-4xl: 1.875rem;
+
   /* Font Family */
   --font-cairo : var(--main-family);
   --font-sans : var(--main-family);
@@ -188,15 +198,15 @@
   }
 
   .thBase {
-    @apply p-6 text-center! text-base font-bold! text-secondary! whitespace-nowrap;
+    @apply py-3 px-4 text-center! text-sm font-bold! text-secondary! whitespace-nowrap;
   }
 
   .tdBase {
-    @apply p-6 text-base! text-center! font-normal text-placeholder! whitespace-nowrap;
+    @apply py-3 px-4 text-sm! text-center! font-normal text-placeholder! whitespace-nowrap;
   }
   
   .rowBase {
-    @apply border-b p-5 border-border/60 last:border-b-0 hover:bg-black/[0.02];
+    @apply border-b p-3 border-border/60 last:border-b-0 hover:bg-black/[0.02];
   }
 }
 
@@ -231,5 +241,17 @@ select:is(:-webkit-autofill, :autofill) {
 ::-webkit-scrollbar-thumb {
   background: var(--main-color); 
   border-radius : 10px;
+}
+
+@media print {
+  @page {
+    size: auto;
+    margin: 0mm;
+  }
+  body {
+    margin: 0px !important;
+    padding: 1.5cm !important;
+    background: #fff !important;
+  }
 }
 

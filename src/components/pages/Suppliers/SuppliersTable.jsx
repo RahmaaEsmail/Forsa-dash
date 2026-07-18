@@ -13,7 +13,7 @@ import useChangeUnitStatus from '../../../hooks/units/useChangeUnitStatus'
 import useDeleteSupplier from '../../../hooks/suppliers/useDeleteSupplier'
 import ContactLink from '../../shared/ContactLink'
 
-export default function SuppliersTable({ searc,  sortOrder, page,per_page,  data, loading }) {
+export default function SuppliersTable({ searc,  sortOrder, page,per_page,  data, loading, selectedRowKeys, onSelectedRowKeysChange }) {
   // navigate 
   const navigate = useNavigate();
   
@@ -60,19 +60,8 @@ export default function SuppliersTable({ searc,  sortOrder, page,per_page,  data
     render: (v) => <ContactLink type="email" value={v} />,
   },
 
-  {
-    title: "Mobile",
-    dataIndex: "mobile",
-    key: "mobile",
-    render: (v) => <ContactLink type="mobile" value={v} />,
-  },
-
-  {
-    title: "Phone",
-    dataIndex: "phone",
-    key: "phone",
-    render: (v) => <ContactLink type="phone" value={v} />,
-  },
+  { title: "Mobile", dataIndex: "mobile", key: "mobile" },
+  { title: "Phone", dataIndex: "phone", key: "phone" },
 
   { title: "Source", dataIndex: "source_of_supply", key: "source_of_supply" },
 
@@ -82,17 +71,28 @@ export default function SuppliersTable({ searc,  sortOrder, page,per_page,  data
 
   { title: "Min Order", dataIndex: "minimum_order_value", key: "minimum_order_value" },
 
-  { title: "Rating", dataIndex: "rating", key: "rating" },
+  {
+    title: "Rating",
+    dataIndex: "rating",
+    key: "rating",
+    render: (v) => v || "—"
+  },
 
   {
     title: "Active",
     dataIndex: "is_active",
     key: "is_active",
-    render: (v) => (
-      <Badge className={v ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}>
-        {v ? "Active" : "Inactive"}
+    render: (v, row) => (
+      <Badge
+        className={
+          v === true
+            ? "bg-[#CCF0EB] hover:bg-[#CCF0EB]/90 text-success"
+            : "bg-[#F5F7FA] text-[#858B9E]"
+        }
+      >
+        {v === true ? "Active" : "Inactive"}
       </Badge>
-    ),
+    )
   },
 
   {
@@ -117,19 +117,21 @@ export default function SuppliersTable({ searc,  sortOrder, page,per_page,  data
   },
 
    {
-      title: "Action",
+      title: "Actions",
+      dataIndex: "actions",
+      key: "actions",
       render: (_, row) => {
         return (
-          <div className='flex gap-2 justify-center items-center'>
-            <Button  
-              onClick={() => navigate(`/suppliers/${row?.id}/details`)}
-              title="View Details" size='icon' variant='ghost' className="hover:text-blue-600 hover:bg-blue-50">
+          <div className="flex gap-2 items-center justify-center">
+            <Button title="Details" size='icon' onClick={() => navigate(`/supplier-details/${row?.id}`)} variant='ghost'>
               <Eye className="w-4 h-4" />
             </Button>
-
-            <Button  
+            <Button
+              title="Edit"
               onClick={() => navigate(`/create-supplier?id=${row?.id}`)}
-              title="Edit" size='icon' variant='ghost' className="hover:text-amber-600 hover:bg-amber-50">
+              size='icon'
+              variant='ghost'
+            >
               <Edit className="w-4 h-4" />
             </Button>
 
@@ -153,6 +155,8 @@ export default function SuppliersTable({ searc,  sortOrder, page,per_page,  data
         columns={columns}
         dataSource={data || []}
         loading={loading}
+        selectedRowKeys={selectedRowKeys}
+        onSelectedRowKeysChange={onSelectedRowKeysChange}
       />
 
       <DeleteModal isSuccess={is_delete_supplier_success} isLoading={isDeleting} onDelete={handleDeleteUnit} open={deleteModal} setOpen={setDeleteModal} title={`This is a  supplier #${rowData?.name}?`} desc={"Are you sure you want to delete this item? This action cannot be undone."} />

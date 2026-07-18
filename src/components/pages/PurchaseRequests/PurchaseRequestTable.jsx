@@ -21,7 +21,7 @@ import Pagination from "../../shared/Pagination";
 import CreateRFQModal from "./CreateRFQModal";
 import EntityLink from "../../shared/EntityLink";
 
-export default function PurchaseRequestTable({ page, setPage, purchase_data }) {
+export default function PurchaseRequestTable({ page, setPage, purchase_data, selectedRowKeys, onSelectedRowKeysChange }) {
   const purchase_loading = !purchase_data;
   const {
     mutate: delete_purchase,
@@ -230,12 +230,9 @@ export default function PurchaseRequestTable({ page, setPage, purchase_data }) {
             {["approved", "completed"].includes(row?.status) && (
               <Button
                 onClick={() => navigate(`/purchase-requests/${row.id}/rfqs`)}
-                title="RFQ"
-                variant="ghost"
-                size="icon"
-                className="text-primary"
+                className="text-[#00B69B] hover:text-[#00B69B] hover:bg-green-50 px-2"
               >
-                <FilePlus className="w-5 h-5" />
+                RFQs
               </Button>
             )}
           </div>
@@ -255,6 +252,8 @@ export default function PurchaseRequestTable({ page, setPage, purchase_data }) {
       <CustomTable
         columns={columns}
         dataSource={purchase_data?.data || []} // Ensure purchase_data is properly structured
+        selectedRowKeys={selectedRowKeys}
+        onSelectedRowKeysChange={onSelectedRowKeysChange}
       />
       <DeleteModal
         open={openDeleteModal}
