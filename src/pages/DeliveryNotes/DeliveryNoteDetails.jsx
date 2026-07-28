@@ -209,6 +209,7 @@ import {
 } from "lucide-react";
 import { downloadAsPDF } from "../../utils/downloadPDF";
 import useChangeDeliveryNoteStatus from "../../hooks/delivery-notes/useChangeDeliveryNotesStatus";
+import usePermission from "../../hooks/usePermission";
 
 const statusVariants = {
   draft: "bg-slate-100 text-slate-700 border-slate-200",
@@ -221,6 +222,7 @@ export default function DeliveryNoteDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const printRef = useRef(null);
+  const { hasPermission } = usePermission();
 
   const { data: settingsData } = useListSettings();
   const getSetting = (key) =>
@@ -367,7 +369,7 @@ export default function DeliveryNoteDetails() {
               <Printer className="w-4 h-4 text-slate-500" /> Print PDF
             </Button>
 
-            {dn?.status === 'draft' && (
+            {dn?.status === 'draft' && hasPermission("edit_delivery_orders") && (
               <>
                 <Button 
                   onClick={() => navigate(`/edit-delivery-note/${id}`)}
@@ -387,7 +389,7 @@ export default function DeliveryNoteDetails() {
               </>
             )}
 
-            {dn?.status === 'pending' && (
+            {dn?.status === 'pending' && hasPermission("edit_delivery_orders") && (
               <Button 
                 onClick={() => handleStatusChange('deliver')}
                 disabled={changeStatus.isPending}
@@ -398,7 +400,7 @@ export default function DeliveryNoteDetails() {
               </Button>
             )}
 
-            {dn?.status !== 'delivered' && dn?.status !== 'cancelled' && (
+            {dn?.status !== 'delivered' && dn?.status !== 'cancelled' && hasPermission("edit_delivery_orders") && (
               <Button 
                 variant="outline"
                 onClick={() => handleStatusChange('cancel')}

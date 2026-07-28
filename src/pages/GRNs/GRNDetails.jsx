@@ -32,6 +32,7 @@ import {
 } from "../../components/ui/dialog";
 import { Textarea } from "../../components/ui/textarea";
 import { downloadAsPDF } from "../../utils/downloadPDF";
+import usePermission from "../../hooks/usePermission";
 
 const formatDate = (value) => {
   if (!value) return "—";
@@ -53,6 +54,7 @@ export default function GRNDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: grnResponse, isLoading } = useGRNDetails(id);
+  const { hasPermission } = usePermission();
   const { data: settingsData } = useListSettings();
   const approveGRN = useApproveGRN();
   const rejectGRN = useRejectGRN();
@@ -236,7 +238,7 @@ export default function GRNDetails() {
               <Printer className="w-4 h-4" /> Download PDF
             </Button>
 
-            {grn?.status === "draft" && (
+            {grn?.status === "draft" && hasPermission("edit_grns") && (
               <>
                 <Button
                   onClick={() => navigate(`/grns/${id}/edit`)}

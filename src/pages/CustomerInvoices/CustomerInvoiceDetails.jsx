@@ -509,9 +509,11 @@ import useCancelCustomerInvoice from "../../hooks/customer-invoices/useCancelCus
 import CancelInvoiceModal from "../../components/pages/CustomerInvoices/CancelInvoiceModal";
 import useListSettings from "../../hooks/Settings/useListSettings";
 import MarkPaidModal from "../../components/pages/CustomerInvoices/MarkPaidModal";
+import usePermission from "../../hooks/usePermission";
 
 export default function CustomerInvoiceDetails() {
   const { id } = useParams();
+  const { hasPermission } = usePermission();
   const navigate = useNavigate();
   const printRef = useRef(null);
 
@@ -772,42 +774,50 @@ export default function CustomerInvoiceDetails() {
 
           {isDraft && (
             <>
-              <Button
-                onClick={handleApprove}
-                disabled={approveMutation.isPending}
-                className="h-11 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 shadow-md shadow-emerald-600/10 transition-all"
-              >
-                <CheckCircle className="w-4 h-4" />
-                {approveMutation.isPending ? "Approving..." : "Approve"}
-              </Button>
+              {hasPermission("edit_customer_invoices") && (
+                <Button
+                  onClick={handleApprove}
+                  disabled={approveMutation.isPending}
+                  className="h-11 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 shadow-md shadow-emerald-600/10 transition-all"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  {approveMutation.isPending ? "Approving..." : "Approve"}
+                </Button>
+              )}
 
-              <Button
-                onClick={() => navigate(`/customer-invoices/${id}/edit`)}
-                className="h-11 px-6 rounded-xl bg-blue-50 text-blue-600 font-bold gap-2 hover:bg-blue-100 border border-blue-100 transition-all"
-              >
-                <Edit className="w-4 h-4" />
-                Edit
-              </Button>
+              {hasPermission("edit_customer_invoices") && (
+                <Button
+                  onClick={() => navigate(`/customer-invoices/${id}/edit`)}
+                  className="h-11 px-6 rounded-xl bg-blue-50 text-blue-600 font-bold gap-2 hover:bg-blue-100 border border-blue-100 transition-all"
+                >
+                  <Edit className="w-4 h-4" />
+                  Edit
+                </Button>
+              )}
 
-              <Button
-                onClick={() => setCancelModalOpen(true)}
-                className="h-11 px-6 rounded-xl bg-orange-50 text-orange-600 font-bold gap-2 hover:bg-orange-100 border border-orange-100 transition-all"
-              >
-                <XCircle className="w-4 h-4" />
-                Cancel
-              </Button>
+              {hasPermission("edit_customer_invoices") && (
+                <Button
+                  onClick={() => setCancelModalOpen(true)}
+                  className="h-11 px-6 rounded-xl bg-orange-50 text-orange-600 font-bold gap-2 hover:bg-orange-100 border border-orange-100 transition-all"
+                >
+                  <XCircle className="w-4 h-4" />
+                  Cancel
+                </Button>
+              )}
 
-              <Button
-                onClick={() => setDeleteModalOpen(true)}
-                className="h-11 px-6 rounded-xl bg-red-50 text-red-500 font-bold gap-2 hover:bg-red-100 border border-red-100 transition-all"
-              >
-                <Trash2 className="w-4 h-4" />
-                Delete
-              </Button>
+              {hasPermission("edit_customer_invoices") && (
+                <Button
+                  onClick={() => setDeleteModalOpen(true)}
+                  className="h-11 px-6 rounded-xl bg-red-50 text-red-500 font-bold gap-2 hover:bg-red-100 border border-red-100 transition-all"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete
+                </Button>
+              )}
             </>
           )}
 
-          {isApproved && (
+          {isApproved && hasPermission("edit_customer_invoices") && (
             <>
               <Button
                 onClick={() => setMarkPaidModalOpen(true)}

@@ -10,8 +10,12 @@ import usePermission from "../hooks/usePermission";
 function RouteWrapper({ route }) {
   const { hasPermission } = usePermission();
 
-  if (route.permission && !hasPermission(route.permission)) {
-    return <Navigate to="/" replace />;
+  if (route.permission) {
+    const permissions = Array.isArray(route.permission) ? route.permission : [route.permission];
+    const hasAny = permissions.some(p => hasPermission(p));
+    if (!hasAny) {
+      return <Navigate to="/" replace />;
+    }
   }
 
   return (

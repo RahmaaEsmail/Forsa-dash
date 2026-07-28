@@ -124,14 +124,16 @@ export default function CategoriesTable({ searc,  sortOrder, page,per_page,  dat
               <Trash />
             </Button> */}
 
-            <Button
-              onClick={() => {
-                setRowData(row)
-                setChangeStatusModal(true)
-              }}
-              title="Change Status" size='icon' variant='ghost'>
-              <Eye />
-            </Button>
+            {hasPermission("manage_categories") && (
+              <Button
+                onClick={() => {
+                  setRowData(row)
+                  setChangeStatusModal(true)
+                }}
+                title="Change Status" size='icon' variant='ghost'>
+                <Eye className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         )
       }

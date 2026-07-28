@@ -172,7 +172,7 @@ export default function CustomerInvoicesTable({ data, loading }) {
               </Button>
             )}
 
-            {isDraft && (
+            {isDraft && hasPermission("edit_customer_invoices") && (
               <>
                 <Button 
                   variant="ghost" 
@@ -200,7 +200,7 @@ export default function CustomerInvoicesTable({ data, loading }) {
               </>
             )}
 
-            {isApproved && (
+            {isApproved && hasPermission("edit_customer_invoices") && (
               <>
                 <Button 
                   variant="ghost" 

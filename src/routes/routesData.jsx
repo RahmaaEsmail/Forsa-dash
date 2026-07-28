@@ -278,7 +278,7 @@ export const routesData = [
     active_icon: "/images/icon-park-solid_shopping-bag.svg",
     inactive_icon: "/images/icon-park-solid_shopping-bag-gray.svg",
     icon: PlusCircle, // Plus circle for "Add Product"
-    permission: "create_items",
+    permission: ["create_items", "edit_items"],
   },
   {
     id: "product details",
@@ -428,7 +428,7 @@ export const routesData = [
     component: AddSupplierPage,
     hidden: true,
     icon: Users, // Plus circle for "Add Product"
-    permission: "create_suppliers",
+    permission: ["create_suppliers", "edit_suppliers"],
   },
   {
     id: "supplier details",
@@ -455,7 +455,7 @@ export const routesData = [
     component: AddCustomerPage,
     hidden: true,
     icon: Users,
-    permission: "create_customers",
+    permission: ["create_customers", "edit_customers"],
   },
   {
     id: "customer details",
