@@ -1,14 +1,11 @@
 import React from 'react';
 import CustomTable from '../../shared/CustomTable';
 import { Badge } from '../../ui/badge';
-import { Eye, Edit, Trash2, CheckCircle2, Truck, XCircle } from 'lucide-react';
+import { Eye, Edit } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '../../shared/Pagination';
 import Loading from '../../shared/Loading';
-import useChangeDeliveryNoteStatus from '../../../hooks/delivery-notes/useChangeDeliveryNotesStatus';
-import useDeleteDeliveryNote from '../../../hooks/delivery-notes/useDeleteDeliveryNotes';
-import { toast } from 'sonner';
 import EntityLink from '../../shared/EntityLink';
 
 const statusVariants = {
@@ -18,27 +15,18 @@ const statusVariants = {
   cancelled: "bg-red-100 text-red-700 border-none",
 };
 
+import usePermission from '../../../hooks/usePermission';
+
 export default function DeliveryNoteTable({ data, isLoading, page, setPage }) {
   const navigate = useNavigate();
-  const changeStatus = useChangeDeliveryNoteStatus();
-  const deleteNote = useDeleteDeliveryNote();
-
-  const handleStatusChange = (id, status) => {
-    changeStatus.mutate({ id, status });
-  };
-
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this delivery note?")) {
-      deleteNote.mutate({ id });
-    }
-  };
+  const { hasPermission } = usePermission();
 
   const columns = [
     {
       title: "DO #",
       dataIndex: "do_number",
       key: "do_number",
-      render: (val, row) => <span className="font-bold text-slate-900">{val || `#${row.id}`}</span>
+      render: (val, row) => <span className="font-bold text-slate-900">{row.quotation?.quotation_number || val || `#${row.id}`}</span>
     },
     {
       title: "Date",
@@ -76,36 +64,17 @@ export default function DeliveryNoteTable({ data, isLoading, page, setPage }) {
       key: "actions",
       render: (_, row) => (
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={() => navigate(`/delivery-note-details/${row.id}`)} title="View">
-            <Eye className="w-4 h-4 text-slate-500" />
-          </Button>
-          
-          {row.status === 'draft' && (
-            <>
-              <Button variant="ghost" size="icon" onClick={() => navigate(`/edit-delivery-note/${row.id}`)} title="Edit">
-                <Edit className="w-4 h-4 text-slate-500" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={() => handleStatusChange(row.id, 'submit')} title="Submit for Dispatch" className="text-blue-500">
-                <Truck className="w-4 h-4" />
-              </Button>
-            </>
-          )}
-
-          {row.status === 'pending' && (
-            <Button variant="ghost" size="icon" onClick={() => handleStatusChange(row.id, 'deliver')} title="Mark as Delivered" className="text-emerald-500">
-              <CheckCircle2 className="w-4 h-4" />
+          {hasPermission("view_delivery_orders") && (
+            <Button variant="ghost" size="icon" onClick={() => window.open(`/delivery-note-details/${row.id}`, '_blank')} title="View">
+              <Eye className="w-4 h-4 text-slate-500" />
             </Button>
           )}
-
-          {row.status !== 'delivered' && row.status !== 'cancelled' && (
-             <Button variant="ghost" size="icon" onClick={() => handleStatusChange(row.id, 'cancel')} title="Cancel" className="text-orange-500">
-                <XCircle className="w-4 h-4" />
-             </Button>
+          
+          {row.status === 'draft' && hasPermission("edit_delivery_orders") && (
+            <Button variant="ghost" size="icon" onClick={() => window.open(`/edit-delivery-note/${row.id}`, '_blank')} title="Edit">
+              <Edit className="w-4 h-4 text-slate-500" />
+            </Button>
           )}
-
-          <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(row.id)} title="Delete">
-            <Trash2 className="w-4 h-4" />
-          </Button>
         </div>
       )
     }

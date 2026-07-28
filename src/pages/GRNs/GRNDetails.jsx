@@ -377,6 +377,33 @@ export default function GRNDetails() {
                   </a>
                 </div>
               )}
+
+              {grn?.attachments && grn.attachments.length > 0 && (
+                <div className="pt-6 border-t border-slate-50">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">
+                    Attachments ({grn.attachments.length})
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {grn.attachments.map((file, i) => (
+                      <div key={file.id || i} className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-100 rounded-2xl hover:border-primary/20 transition-all">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-8.5 h-8.5 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-primary shadow-sm flex-shrink-0">
+                            <FileText className="w-4.5 h-4.5" />
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-xs font-bold text-slate-700 truncate max-w-[200px] md:max-w-[240px]">
+                              {file.name || file.file_name || file.path?.split("/").pop() || `Attachment ${i + 1}`}
+                            </span>
+                            <a href={file.url || file.file_url || file.path} target="_blank" rel="noreferrer" className="text-[10px] text-primary hover:underline font-semibold mt-0.5">
+                              View / Download
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 

@@ -9,9 +9,12 @@ import useDeleteCategory from '../../../hooks/categories/useDeleteCategory'
 import useChangeCategoryStatus from '../../../hooks/categories/useChangeCatgoryStatus'
 import { useNavigate } from 'react-router-dom'
 
+import usePermission from '../../../hooks/usePermission';
+
 export default function CategoriesTable({ searc,  sortOrder, page,per_page,  data, loading }) {
   // navigate 
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   
   // modals
   const [deleteModal, setDeleteModal] = useState(false);
@@ -104,20 +107,22 @@ export default function CategoriesTable({ searc,  sortOrder, page,per_page,  dat
       render: (_, row) => {
         return (
           <div className='flex gap-2 items-center'>
-            <Button 
-            onClick={() => navigate(`/create-categories?id=${row?.id}&name=${`${row?.name?.en}-${row?.name?.ar}`}`)}
-            title="Edit" size='icon' variant='ghost'>
-              <Edit />
-            </Button>
+            {hasPermission("manage_categories") && (
+              <Button 
+              onClick={() => window.open(`/create-categories?id=${row?.id}&name=${`${row?.name?.en}-${row?.name?.ar}`}`, '_blank')}
+              title="Edit" size='icon' variant='ghost'>
+                <Edit />
+              </Button>
+            )}
 
-            <Button
+            {/* <Button
               onClick={() => {
                 setRowData(row)
                 setDeleteModal(true)
               }}
               title="Delete" size='icon' variant='ghost'>
               <Trash />
-            </Button>
+            </Button> */}
 
             <Button
               onClick={() => {

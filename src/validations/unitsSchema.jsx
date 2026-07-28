@@ -14,8 +14,9 @@ export const unitsSchema = z.object({
   is_active: z.boolean().optional(),
 
   symbol: z
-    .string({ required_error: "Symbol is required" })
+    .string()
     .trim()
-    .min(1, "Symbol is required")
-    .max(10, "Symbol must be at most 10 characters"),
+    .max(10, "Symbol must be at most 10 characters")
+    .optional()
+    .or(z.literal("")),
 });

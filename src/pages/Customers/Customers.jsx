@@ -11,8 +11,11 @@ import Pagination from '../../components/shared/Pagination';
 import CustomerFilterations from '../../components/pages/Customers/CustomerFilterations';
 import ExportExcelModal from '../../components/shared/ExportExcelModal';
 
+import usePermission from '../../hooks/usePermission';
+
 export default function Customers() {
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   const { filters, setFilters } = useCustomerStore();
   const { page, per_page, search } = filters;
   const [selectedRowKeys, setSelectedRowKeys] = React.useState([]);
@@ -57,12 +60,14 @@ export default function Customers() {
             <Download className="w-4 h-4" />
             {selectedRowKeys.length > 0 ? `Export Selected (${selectedRowKeys.length})` : 'Export Excel'}
           </Button>
-          <Button
-            onClick={() => navigate("/create-customer")}
-            className={"px-3!"}>
-            <Plus />
-            <span>Add new Customer</span>
-          </Button>
+          {hasPermission("create_customers") && (
+            <Button
+              onClick={() => navigate("/create-customer")}
+              className={"px-3!"}>
+              <Plus />
+              <span>Add new Customer</span>
+            </Button>
+          )}
         </div>
       </PageHeader>
 

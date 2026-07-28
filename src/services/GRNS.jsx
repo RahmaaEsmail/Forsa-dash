@@ -42,4 +42,16 @@ export const handleDeleteGRNS = async({id}) => {
   return response.data;
 }
 
+export const handleUploadGRNAttachment = async({id, body}) => {
+  const response = await apiInstance.post(`${userEndpoints.grns}/${id}/attachments`, body, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return response.data;
+}
+
+export const handleDeleteGRNAttachment = async({id, documentId}) => {
+  const response = await apiInstance.delete(`${userEndpoints.grns}/${id}/attachments/${documentId}`);
+  return response.data;
+}
+
 

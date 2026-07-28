@@ -11,9 +11,12 @@ import { useNavigate } from 'react-router-dom'
 import useDeleteUnit from '../../../hooks/units/useDeleteUnit'
 import useChangeUnitStatus from '../../../hooks/units/useChangeUnitStatus'
 
+import usePermission from '../../../hooks/usePermission';
+
 export default function UnitsTable({ searc,  sortOrder, page,per_page,  data, loading }) {
   // navigate 
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   
   // modals
   const [deleteModal, setDeleteModal] = useState(false);
@@ -85,20 +88,22 @@ export default function UnitsTable({ searc,  sortOrder, page,per_page,  data, lo
       render: (_, row) => {
         return (
           <div className='flex gap-2 justify-center items-center'>
-            <Button  
-            onClick={() => navigate(`/create-unit?id=${row?.id}&name=${`${row?.name?.ar}-${row?.name?.en}`}`)}
-            title="Edit" size='icon' variant='ghost'>
-              <Edit />
-            </Button>
+            {hasPermission("manage_categories") && (
+              <Button  
+              onClick={() => window.open(`/create-unit?id=${row?.id}&name=${`${row?.name?.ar}-${row?.name?.en}`}`, '_blank')}
+              title="Edit" size='icon' variant='ghost'>
+                <Edit />
+              </Button>
+            )}
 
-            <Button
+            {/* <Button
               onClick={() => {
                 setRowData(row)
                 setDeleteModal(true)
               }}
               title="Delete" size='icon' variant='ghost'>
               <Trash />
-            </Button>
+            </Button> */}
 
             <Button
               onClick={() => {

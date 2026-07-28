@@ -25,6 +25,8 @@ const PRODUCT_COL_MAP = {
   'category.name': 'Category',
 };
 
+import usePermission from "../../hooks/usePermission";
+
 export default function Products() {
   const [filters, setFilters] = useState({
     category: "",
@@ -38,6 +40,7 @@ export default function Products() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
 
   const { data, isLoading } = useGetProducts({
     page,
@@ -68,10 +71,12 @@ export default function Products() {
             <Download className="w-4 h-4" />
             {selectedRowKeys.length > 0 ? `Export Selected (${selectedRowKeys.length})` : 'Export Excel'}
           </Button>
-          <Button onClick={() => navigate(`/add_product`)} className={"px-3!"}>
-            <Plus />
-            <span>Add new product</span>
-          </Button>
+          {hasPermission("create_items") && (
+            <Button onClick={() => navigate(`/add_product`)} className={"px-3!"}>
+              <Plus />
+              <span>Add new product</span>
+            </Button>
+          )}
         </div>
       </PageHeader>
 

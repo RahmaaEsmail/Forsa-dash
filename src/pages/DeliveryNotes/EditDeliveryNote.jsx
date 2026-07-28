@@ -3,7 +3,7 @@ import PageHeader from '../../components/shared/PageHeader'
 import { Button } from '../../components/ui/button'
 import DeliveryNoteForm from '../../components/pages/DeliveryNotes/DeliveryNoteForm'
 import { FormProvider, useForm } from 'react-hook-form'
-import useEditDeliveryNote from '../../hooks/delivery-notes/useEditDeliveryNote'
+import useEditDeliveryNote, { useUploadDeliveryNoteAttachment, useDeleteDeliveryNoteAttachment } from '../../hooks/delivery-notes/useEditDeliveryNote'
 import useDeliveryNoteDetails from '../../hooks/delivery-notes/useDeliveryNoteDetails'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { format } from 'date-fns'
@@ -15,6 +15,8 @@ export default function EditDeliveryNote() {
   const navigate = useNavigate();
   const location = useLocation();
   const editDeliveryNote = useEditDeliveryNote();
+  const uploadAttachment = useUploadDeliveryNoteAttachment();
+  const deleteAttachment = useDeleteDeliveryNoteAttachment();
   
   const { data: deliveryNoteResponse, isLoading } = useDeliveryNoteDetails(id);
 
@@ -28,7 +30,8 @@ export default function EditDeliveryNote() {
       contact_info: "",
       notes: "",
       delivery_type_id: "",
-      items: []
+      items: [],
+      attachments: []
     },
   })
 
@@ -76,8 +79,8 @@ export default function EditDeliveryNote() {
   return (
     <FormProvider {...methods}>
       <div className="container mx-auto px-4 py-8 max-w-7xl animate-in fade-in duration-500">
-        <PageHeader 
-            title={isReadOnly ? `Delivery Note #${deliveryNote?.do_number || id}` : `Edit Delivery Note #${deliveryNote?.do_number || id}`} 
+         <PageHeader 
+            title={isReadOnly ? `Delivery Note #${deliveryNote?.quotation?.quotation_number || deliveryNote?.do_number || id}` : `Edit Delivery Note #${deliveryNote?.quotation?.quotation_number || deliveryNote?.do_number || id}`} 
             subTitle={isReadOnly ? "View delivery record details" : "Update delivery information"}
         >
           <div className='flex gap-3 items-center'>
@@ -105,7 +108,15 @@ export default function EditDeliveryNote() {
         </PageHeader>
 
         <form onSubmit={methods.handleSubmit(onSubmit)} className="mt-8">
-            <DeliveryNoteForm isEdit={!isReadOnly} isReadOnly={isReadOnly} />
+            <DeliveryNoteForm 
+               isEdit={!isReadOnly} 
+               isReadOnly={isReadOnly}
+               existingAttachments={deliveryNote?.attachments || []}
+               onDeleteExisting={(docId) => deleteAttachment.mutateAsync({ id, documentId: docId })}
+               onUploadNew={(formData) => uploadAttachment.mutateAsync({ id, body: formData })}
+               isUploading={uploadAttachment.isPending}
+               isDeleting={deleteAttachment.isPending}
+            />
         </form>
       </div>
     </FormProvider>

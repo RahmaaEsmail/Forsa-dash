@@ -19,8 +19,11 @@ const QUOTATION_COL_MAP = {
   status:           'Status',
 };
 
+import usePermission from '../../hooks/usePermission';
+
 export default function Quotations() {
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   const [page, setPage] = useState(1);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -58,13 +61,15 @@ export default function Quotations() {
             {selectedRowKeys.length > 0 ? `Export Selected (${selectedRowKeys.length})` : 'Export Excel'}
           </Button>
 
-          <Button 
-            onClick={() => navigate(`/create_quote`)}
-            className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
-          >
-            <Plus className="w-4 h-4" />
-            Create Quotation
-          </Button>
+          {hasPermission("create_quotations") && (
+            <Button 
+              onClick={() => navigate(`/create_quote`)}
+              className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
+            >
+              <Plus className="w-4 h-4" />
+              Create Quotation
+            </Button>
+          )}
         </div>
       </PageHeader>
 

@@ -41,11 +41,11 @@ export default function QuotationFilter({ filters, onFilterChange, onReset }) {
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>
             <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="submitted">Submitted</SelectItem>
             <SelectItem value="client_approval">Client Approval</SelectItem>
             <SelectItem value="sales_manager_approval">Sales Manager Approval</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
+            <SelectItem value="proforma_invoice">Proforma Invoice</SelectItem>
+            <SelectItem value="paid_payment">Paid Payment</SelectItem>
+            <SelectItem value="delivered">Delivered</SelectItem>
             <SelectItem value="cancelled">Cancelled</SelectItem>
           </SelectContent>
         </Select>

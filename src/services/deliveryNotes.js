@@ -7,12 +7,30 @@ export const handleGetAllDeliveryNotes = async(params) => {
 }
 
 export const handleCreateDeliveryNotes = async({body}) => {
-  const response = await apiInstance.post(userEndpoints.delivery_notes , body);
+  const isFormData = body instanceof FormData;
+  const response = await apiInstance.post(userEndpoints.delivery_notes , body, {
+    headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {}
+  });
   return response.data;
 }
 
 export const handleUpdateDeliveryNotes = async({id , body}) => {
-  const response = await apiInstance.post(`${userEndpoints.delivery_notes}/${id}` , body);
+  const isFormData = body instanceof FormData;
+  const response = await apiInstance.post(`${userEndpoints.delivery_notes}/${id}` , body, {
+    headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {}
+  });
+  return response.data;
+}
+
+export const handleUploadDeliveryNoteAttachment = async({id, body}) => {
+  const response = await apiInstance.post(`${userEndpoints.delivery_notes}/${id}/attachments` , body, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return response.data;
+}
+
+export const handleDeleteDeliveryNoteAttachment = async({id, documentId}) => {
+  const response = await apiInstance.delete(`${userEndpoints.delivery_notes}/${id}/attachments/${documentId}`);
   return response.data;
 }
 

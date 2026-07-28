@@ -20,6 +20,15 @@ const getModelFromPath = (pathname) => {
     if (parts[0] === 'delivery-note-details') {
       return { model_type: 'delivery_order', model_id: parts[1] };
     }
+    if (parts[0] === 'edit-delivery-note') {
+      return { model_type: 'delivery_order', model_id: parts[1] };
+    }
+    if (parts[0] === 'create-delivery-note') {
+      return { model_type: 'quotation', model_id: parts[1] };
+    }
+    if (parts[0] === 'create-grn') {
+      return { model_type: 'rfq', model_id: parts[1] };
+    }
   }
 
   if (parts.length === 3) {
@@ -33,6 +42,9 @@ const getModelFromPath = (pathname) => {
       return { model_type: 'quotation', model_id: parts[1] };
     }
     if (parts[0] === 'grns' && parts[2] === 'details') {
+      return { model_type: 'grn', model_id: parts[1] };
+    }
+    if (parts[0] === 'grns' && parts[2] === 'edit') {
       return { model_type: 'grn', model_id: parts[1] };
     }
     if (parts[0] === 'customer-invoices' && parts[2] === 'details') {

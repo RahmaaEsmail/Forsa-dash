@@ -19,6 +19,7 @@ import useDeleteProduct from "../../../../hooks/products/useDeleteProduct";
 import useUpdateActiveStatus from "../../../../hooks/products/useUpdateActiveStatus";
 import { ActiveInActiveStatusModal } from "../../../shared/ActiveInActiveStatusModal";
 import { useNavigate } from "react-router-dom";
+import usePermission from "../../../../hooks/usePermission";
 
 const thBase =
   "p-6 text-center! text-base font-bold! text-secondary! whitespace-nowrap";
@@ -32,6 +33,7 @@ export default function ProductTable({ data = product_data, selectedRowKeys = []
   const columnsCount = onSelectedRowKeysChange ? 17 : 16; // ✅ تحديث عدد الأعمدة
 
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
 
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openUpdateStatusModal, setOpenUpdateStatusModal] = useState(false);
@@ -239,41 +241,47 @@ export default function ProductTable({ data = product_data, selectedRowKeys = []
 
                 <TableCell className={`${tdBase} text-center`}>
                   <div className="flex gap-1 items-center justify-center">
-                    <Button
-                      onClick={() => navigate(`/add_product?id=${prod?.id}`)}
-                      title="Edit Product"
-                      variant="ghost"
-                      size="icon"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    {hasPermission("edit_items") && (
+                      <Button
+                        onClick={() => window.open(`/add_product?id=${prod?.id}`, '_blank')}
+                        title="Edit Product"
+                        variant="ghost"
+                        size="icon"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
 
-                    <Button
+                    {/* <Button
                       onClick={() => setOpenDeleteModal(prod)}
                       title="Delete Product"
                       variant="ghost"
                       size="icon"
                     >
                       <Trash className="h-4 w-4" />
-                    </Button>
+                    </Button> */}
 
-                    <Button
-                      onClick={() => setOpenUpdateStatusModal(prod)}
-                      title="Toggle Status"
-                      variant="ghost"
-                      size="icon"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
+                    {hasPermission("edit_items") && (
+                      <Button
+                        onClick={() => setOpenUpdateStatusModal(prod)}
+                        title="Toggle Status"
+                        variant="ghost"
+                        size="icon"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    )}
 
-                    <Button
-                      onClick={() => navigate(`/product-details/${prod?.id}`)}
-                      title="Product Details"
-                      variant="ghost"
-                      size="icon"
-                    >
-                      <Fullscreen className="h-4 w-4" />
-                    </Button>
+                    {hasPermission("view_items") && (
+                      <Button
+                        onClick={() => window.open(`/product-details/${prod?.id}`, '_blank')}
+                        title="Product Details"
+                        variant="ghost"
+                        size="icon"
+                      >
+                        <Fullscreen className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

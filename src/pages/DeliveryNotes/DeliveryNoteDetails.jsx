@@ -202,7 +202,13 @@ import {
   Package,
   ArrowLeft,
   Printer,
+  Download,
+  Truck,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
+import { downloadAsPDF } from "../../utils/downloadPDF";
+import useChangeDeliveryNoteStatus from "../../hooks/delivery-notes/useChangeDeliveryNotesStatus";
 
 const statusVariants = {
   draft: "bg-slate-100 text-slate-700 border-slate-200",
@@ -234,6 +240,11 @@ export default function DeliveryNoteDetails() {
     "King Fahd Road, Olaya District, Riyadh 12211";
 
   const { data: dnResponse, isLoading } = useDeliveryNoteDetails(id);
+  const changeStatus = useChangeDeliveryNoteStatus();
+
+  const handleStatusChange = (status) => {
+    changeStatus.mutate({ id, status });
+  };
 
   if (isLoading) return <Loading />;
 
@@ -241,6 +252,16 @@ export default function DeliveryNoteDetails() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleDownloadPDF = async () => {
+    const element = printRef.current;
+    if (!element) return;
+    const doNumber = dn?.quotation?.quotation_number || dn?.do_number || id;
+    await downloadAsPDF(element, {
+      filename: `DeliveryNote-${doNumber}.pdf`,
+      margin: [10, 10, 10, 10],
+    });
   };
 
   const formatNumber = (val) => {
@@ -322,8 +343,8 @@ export default function DeliveryNoteDetails() {
       />
 
       {/* Screen Interactive Workspace Controls Header */}
-      {/* <div className="no-print">
-        <PageHeader title={`Delivery Note #${dn?.do_number || id}`} subTitle="View detailed delivery record and status.">
+      <div className="no-print">
+        <PageHeader title={`Delivery Note #${dn?.quotation?.quotation_number || dn?.do_number || id}`} subTitle="View detailed delivery record and status.">
           <div className='flex gap-3 items-center'>
             <Button variant="outline" className="h-11 px-6 rounded-xl border-slate-200 text-slate-600 font-bold hover:bg-slate-50 gap-2" onClick={() => navigate('/delivery-notes')}>
               <ArrowLeft className="w-4 h-4" />
@@ -332,24 +353,65 @@ export default function DeliveryNoteDetails() {
 
             <Button 
               variant="outline" 
+              onClick={handleDownloadPDF}
+              className="h-11 px-6 rounded-xl border-slate-200 text-slate-700 gap-2 font-bold hover:bg-slate-50 transition-all shadow-sm"
+            >
+              <Download className="w-4 h-4 text-slate-500" /> Download PDF
+            </Button>
+
+            <Button 
+              variant="outline" 
               onClick={handlePrint}
               className="h-11 px-6 rounded-xl border-slate-200 text-slate-700 gap-2 font-bold hover:bg-slate-50 transition-all shadow-sm"
             >
-              <Printer className="w-4 h-4 text-slate-500" /> Download/Print PDF
+              <Printer className="w-4 h-4 text-slate-500" /> Print PDF
             </Button>
 
             {dn?.status === 'draft' && (
+              <>
+                <Button 
+                  onClick={() => navigate(`/edit-delivery-note/${id}`)}
+                  className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
+                >
+                  <Edit className="w-4 h-4" />
+                  Edit DO
+                </Button>
+                <Button 
+                  onClick={() => handleStatusChange('submit')}
+                  disabled={changeStatus.isPending}
+                  className="h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2 shadow-lg shadow-blue-500/20 cursor-pointer"
+                >
+                  <Truck className="w-4 h-4" />
+                  Submit for Dispatch
+                </Button>
+              </>
+            )}
+
+            {dn?.status === 'pending' && (
               <Button 
-                onClick={() => navigate(`/edit-delivery-note/${id}`)}
-                className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
+                onClick={() => handleStatusChange('deliver')}
+                disabled={changeStatus.isPending}
+                className="h-11 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer"
               >
-                <Edit className="w-4 h-4" />
-                Edit DO
+                <CheckCircle2 className="w-4 h-4" />
+                Mark as Delivered
+              </Button>
+            )}
+
+            {dn?.status !== 'delivered' && dn?.status !== 'cancelled' && (
+              <Button 
+                variant="outline"
+                onClick={() => handleStatusChange('cancel')}
+                disabled={changeStatus.isPending}
+                className="h-11 px-6 rounded-xl border-red-200 hover:bg-red-50 text-red-600 font-bold gap-2 transition-all shadow-sm cursor-pointer"
+              >
+                <XCircle className="w-4 h-4" />
+                Cancel DO
               </Button>
             )}
           </div>
         </PageHeader>
-      </div> */}
+      </div>
 
       {/* Screen Interactive Body Grid */}
       {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 no-print">
@@ -532,7 +594,7 @@ export default function DeliveryNoteDetails() {
                     Delivery Note No:
                   </span>
                   <span className="text-slate-900 font-bold">
-                    {dn?.do_number}
+                    {dn?.quotation?.quotation_number || dn?.do_number}
                   </span>
                 </div>
                 <div>
@@ -657,6 +719,35 @@ export default function DeliveryNoteDetails() {
           </div>
         </div>
       </div>
+
+      {/* Attachments Section (Screen Only) */}
+      {dn?.attachments && dn.attachments.length > 0 && (
+        <div className="max-w-[850px] mx-auto bg-white p-8 border border-slate-200 rounded-2xl mt-6 no-print shadow-sm">
+          <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-primary" />
+            Attachments ({dn.attachments.length})
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {dn.attachments.map((file, i) => (
+              <div key={file.id || i} className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-100 rounded-xl hover:border-primary/20 transition-all">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8.5 h-8.5 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-primary shadow-sm flex-shrink-0">
+                    <FileText className="w-4.5 h-4.5" />
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-xs font-bold text-slate-700 truncate max-w-[220px]">
+                      {file.name || file.file_name || file.path?.split("/").pop() || `Attachment ${i + 1}`}
+                    </span>
+                    <a href={file.url || file.file_url || file.path} target="_blank" rel="noreferrer" className="text-[10px] text-primary hover:underline font-semibold mt-0.5">
+                      View / Download
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

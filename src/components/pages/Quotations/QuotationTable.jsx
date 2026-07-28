@@ -15,9 +15,9 @@ const statusVariants = {
   draft: "bg-blue-100 text-blue-700 hover:bg-blue-100 border-none",
   submitted: "bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-none",
   client_approval:
-    "bg-purple-100 text-purple-700 hover:bg-purple-100 border-none",
-  sales_manager_approval:
     "bg-indigo-100 text-indigo-700 hover:bg-indigo-100 border-none",
+  sales_manager_approval:
+    "bg-purple-100 text-purple-700 hover:bg-purple-100 border-none",
   proforma_invoice:
     "bg-orange-100 text-orange-700 hover:bg-orange-100 border-none",
   paid_payment:
@@ -28,6 +28,8 @@ const statusVariants = {
   cancelled: "bg-slate-100 text-slate-700 hover:bg-slate-100 border-none",
 };
 
+import usePermission from "../../../hooks/usePermission";
+
 export default function QuotationTable({
   selectedRowKeys,
   onSelectedRowKeysChange,
@@ -37,6 +39,7 @@ export default function QuotationTable({
   setPage,
 }) {
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const deleteQuotation = useDeleteQuotation();
@@ -59,7 +62,10 @@ export default function QuotationTable({
       title: "Quotation #",
       dataIndex: "quotation_number",
       key: "quotation_number",
-      render: (val) => <span className="font-bold text-slate-900">{val}</span>,
+      render: (val, row) => {
+        const displayVal = row?.status === 'proforma_invoice' ? val?.replace(/^QUO-?/, 'PI-') : val;
+        return <span className="font-bold text-slate-900">{displayVal}</span>;
+      },
     },
     {
       title: "Date",
@@ -100,45 +106,59 @@ export default function QuotationTable({
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => (
-        <Badge
-          className={`capitalize px-3 py-1 rounded-full ${statusVariants[status] || "bg-slate-100 text-slate-700"}`}
-        >
-          {status?.replace(/_/g, " ")}
-        </Badge>
-      ),
+      render: (status) => {
+        let displayStatus = status;
+        if (status === "client_approval") {
+          displayStatus = "Manager Approval";
+        } else if (status === "sales_manager_approval") {
+          displayStatus = "Client Approval";
+        } else {
+          displayStatus = status?.replace(/_/g, " ");
+        }
+        return (
+          <Badge
+            className={`capitalize px-3 py-1 rounded-full ${statusVariants[status] || "bg-slate-100 text-slate-700"}`}
+          >
+            {displayStatus}
+          </Badge>
+        );
+      },
     },
     {
       title: "Actions",
       key: "actions",
       render: (_, row) => (
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(`/quotations/${row.id}/details`)}
-          >
-            <Eye className="w-4 h-4 text-slate-500" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(`/quotations/${row.id}/edit`)}
-          >
-            <Edit className="w-4 h-4 text-slate-500" />
-          </Button>
-          <Button
+          {hasPermission("view_quotations") && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => window.open(`/quotations/${row.id}/details`, '_blank')}
+            >
+              <Eye className="w-4 h-4 text-slate-500" />
+            </Button>
+          )}
+          {hasPermission("edit_quotations") && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => window.open(`/quotations/${row.id}/edit`, '_blank')}
+            >
+              <Edit className="w-4 h-4 text-slate-500" />
+            </Button>
+          )}
+          {/* <Button
             variant="ghost"
             size="icon"
             onClick={() => handleDelete(row.id)}
             className="text-red-500 hover:text-red-600 hover:bg-red-50"
           >
             <Trash2 className="w-4 h-4" />
-          </Button>
+          </Button> */}
           {row.status === "paid_payment" || row.status === "approved" ? (
             <Button
               variant="ghost"
-              onClick={() => navigate(`/create-delivery-note/${row.id}`)}
+              onClick={() => window.open(`/create-delivery-note/${row.id}`, '_blank')}
               className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 px-2"
             >
               Delivery Note
@@ -147,7 +167,7 @@ export default function QuotationTable({
           <Button
             variant="ghost"
             size=""
-            onClick={() => navigate(`/create-invoice/${row.id}`)}
+            onClick={() => window.open(`/create-invoice/${row.id}`, '_blank')}
           >
             Create Invoice
           </Button>

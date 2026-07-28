@@ -12,8 +12,11 @@ import Pagination from '../../components/shared/Pagination'
 import SupplierFilterations from '../../components/pages/Suppliers/SupplierFilteration'
 import ExportExcelModal from '../../components/shared/ExportExcelModal'
 
+import usePermission from '../../hooks/usePermission';
+
 export default function Supplier() {
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   const {filters , setFilters} = useSupplierStore();
   const {page} = filters;
   const [selectedRowKeys, setSelectedRowKeys] = React.useState([]);
@@ -67,12 +70,14 @@ export default function Supplier() {
             <Download className="w-4 h-4" />
             {selectedRowKeys.length > 0 ? `Export Selected (${selectedRowKeys.length})` : 'Export Excel'}
           </Button>
-          <Button
-            onClick={() => navigate("/create-supplier")}
-            className={"px-3!"}>
-            <Plus />
-            <span>Add new Supplier</span>
-          </Button>
+          {hasPermission("create_suppliers") && (
+            <Button
+              onClick={() => navigate("/create-supplier")}
+              className={"px-3!"}>
+              <Plus />
+              <span>Add new Supplier</span>
+            </Button>
+          )}
         </div>
       </PageHeader>
 

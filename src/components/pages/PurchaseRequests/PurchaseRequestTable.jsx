@@ -21,6 +21,8 @@ import Pagination from "../../shared/Pagination";
 import CreateRFQModal from "./CreateRFQModal";
 import EntityLink from "../../shared/EntityLink";
 
+import usePermission from "../../../hooks/usePermission";
+
 export default function PurchaseRequestTable({ page, setPage, purchase_data, selectedRowKeys, onSelectedRowKeysChange }) {
   const purchase_loading = !purchase_data;
   const {
@@ -30,6 +32,7 @@ export default function PurchaseRequestTable({ page, setPage, purchase_data, sel
   } = useDeletePurchaseRequest();
 
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
 
   // stats
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -193,25 +196,29 @@ export default function PurchaseRequestTable({ page, setPage, purchase_data, sel
       render: (_, row) => {
         return (
           <div className="flex gap-2">
-            <Button
-              onClick={() => navigate(`/edit_purchase_request/${row?.id}`)}
-              title="Edit"
-              variant="ghost"
-              size="icon"
-            >
-              <Edit />
-            </Button>
+            {hasPermission("edit_purchase_requests") && (
+              <Button
+                onClick={() => window.open(`/edit_purchase_request/${row?.id}`, '_blank')}
+                title="Edit"
+                variant="ghost"
+                size="icon"
+              >
+                <Edit />
+              </Button>
+            )}
 
-            <Button
-              onClick={() => navigate(`/purchase_request_details/${row?.id}`)}
-              title="View"
-              variant="ghost"
-              size="icon"
-            >
-              <Fullscreen />
-            </Button>
+            {hasPermission("view_purchase_requests") && (
+              <Button
+                onClick={() => window.open(`/purchase_request_details/${row?.id}`, '_blank')}
+                title="View"
+                variant="ghost"
+                size="icon"
+              >
+                <Fullscreen />
+              </Button>
+            )}
 
-            {row?.status == "draft" && (
+            {/* {row?.status == "draft" && (
               <Button
                 onClick={() => {
                   setOpenDeleteModal(true);
@@ -223,13 +230,13 @@ export default function PurchaseRequestTable({ page, setPage, purchase_data, sel
               >
                 <Trash2 />
               </Button>
-            )}
+            )} */}
 
             {/* Removed Change Status from table per user request */}
 
             {["approved", "completed"].includes(row?.status) && (
               <Button
-                onClick={() => navigate(`/purchase-requests/${row.id}/rfqs`)}
+                onClick={() => window.open(`/purchase-requests/${row.id}/rfqs`, '_blank')}
                 className="text-[#00B69B] hover:text-[#00B69B] hover:bg-green-50 px-2"
               >
                 RFQs

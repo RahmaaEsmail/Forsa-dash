@@ -14,6 +14,10 @@ export default function useChangeDeliveryNoteStatus() {
           queryKey: ["delivery-notes"],
           exact: false
         })
+        queryClient.invalidateQueries({
+          queryKey: ["delivery-note"],
+          exact: false
+        })
       }
     },
     onError: (res) => {

@@ -79,14 +79,14 @@ export default function DeliveryTypeTable({ data, isLoading }) {
           >
             <Edit2 className="w-4 h-4" />
           </Button>
-          <Button 
+          {/* <Button 
             variant="ghost" 
             size="icon" 
             onClick={() => handleDelete(record.id)}
             className="h-8 w-8 text-red-600 hover:bg-red-50"
           >
             <Trash2 className="w-4 h-4" />
-          </Button>
+          </Button> */}
         </div>
       )
     }

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useForm, FormProvider } from 'react-hook-form'
 import PageHeader from '../../components/shared/PageHeader'
 import { Button } from '../../components/ui/button'
-import { useGRNDetails, useUpdateGRN } from '../../hooks/grns/useGRNs'
+import { useGRNDetails, useUpdateGRN, useUploadGRNAttachment, useDeleteGRNAttachment } from '../../hooks/grns/useGRNs'
 import GRNForm from '../../components/pages/GRNs/GRNForm'
 import { format } from 'date-fns'
 import Loading from '../../components/shared/Loading'
@@ -13,13 +13,16 @@ export default function EditGRN() {
   const navigate = useNavigate();
   const { data: grnResponse, isLoading } = useGRNDetails(id);
   const updateGRN = useUpdateGRN();
+  const uploadAttachment = useUploadGRNAttachment();
+  const deleteAttachment = useDeleteGRNAttachment();
 
   const methods = useForm({
     defaultValues: {
       rfq_id: "",
       received_date: new Date(),
       supplier_reference: null,
-      items: []
+      items: [],
+      attachments: []
     }
   });
 
@@ -81,7 +84,14 @@ export default function EditGRN() {
           </div>
         </PageHeader>
 
-        <GRNForm isEdit={true} />
+        <GRNForm 
+          isEdit={true}
+          existingAttachments={grnResponse?.data?.attachments || []}
+          onDeleteExisting={(docId) => deleteAttachment.mutateAsync({ id, documentId: docId })}
+          onUploadNew={(formData) => uploadAttachment.mutateAsync({ id, body: formData })}
+          isUploading={uploadAttachment.isPending}
+          isDeleting={deleteAttachment.isPending}
+        />
       </div>
     </FormProvider>
   )

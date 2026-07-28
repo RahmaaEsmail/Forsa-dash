@@ -6,7 +6,9 @@ import {
   handleUpdateGRNS, 
   handleDeleteGRNS,
   handleApproveGRN,
-  handleRejectGRN
+  handleRejectGRN,
+  handleUploadGRNAttachment,
+  handleDeleteGRNAttachment
 } from "../../services/GRNS";
 import { toast } from "sonner";
 
@@ -100,5 +102,35 @@ export const useRejectGRN = () => {
     onError: (error) => {
       toast.error(error.response?.data?.message || error.response?.data?.error?.message || "Failed to reject GRN");
     },
+  });
+};
+
+export const useUploadGRNAttachment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, body }) => handleUploadGRNAttachment({ id, body }),
+    onSuccess: (data, variables) => {
+      toast.success(data?.message || "Attachment uploaded successfully");
+      queryClient.invalidateQueries({ queryKey: GRN_QUERY_KEYS.details(variables.id) });
+      queryClient.invalidateQueries({ queryKey: ["grns"] });
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || error.response?.data?.error?.message || "Failed to upload attachment");
+    }
+  });
+};
+
+export const useDeleteGRNAttachment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, documentId }) => handleDeleteGRNAttachment({ id, documentId }),
+    onSuccess: (data, variables) => {
+      toast.success(data?.message || "Attachment deleted successfully");
+      queryClient.invalidateQueries({ queryKey: GRN_QUERY_KEYS.details(variables.id) });
+      queryClient.invalidateQueries({ queryKey: ["grns"] });
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || error.response?.data?.error?.message || "Failed to delete attachment");
+    }
   });
 };

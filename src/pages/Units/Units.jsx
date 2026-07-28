@@ -13,8 +13,11 @@ import UnitsTable from '../../components/pages/Units/UnitsTable'
 import getAllUnitsOptions from '../../hooks/units/getAllUnitsOptions'
 import AddUnitModal from '../../components/pages/Units/AddUnitModal'
 
+import usePermission from '../../hooks/usePermission';
+
 export default function UnitsPage() {
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
 
   const { filters, setFilters } = useUnitStore();
   const { search, page, sort_order } = filters;
@@ -42,12 +45,14 @@ export default function UnitsPage() {
         "Manage all Units, control visibility, and keep units data up to date."
       }
     >
-      <Button 
-      onClick={() =>navigate("/create-unit")}
-      className={"px-3!"}>
-        <Plus />
-        <span>Add new Unit</span>
-      </Button>
+      {hasPermission("manage_categories") && (
+        <Button 
+        onClick={() =>navigate("/create-unit")}
+        className={"px-3!"}>
+          <Plus />
+          <span>Add new Unit</span>
+        </Button>
+      )}
     </PageHeader>
 
       <UnitsFilterations /> 

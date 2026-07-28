@@ -23,22 +23,29 @@ export default function CreateDeliveryNote() {
       contact_info: "",
       notes: "",
       delivery_type_id: "",
-      items: []
+      items: [],
+      attachments: []
     },
   })
 
   function onSubmit(values) {
-    const payload = {
-      quotation_id: Number(values.quotation_id),
-      delivery_date: format(values.delivery_date, "yyyy-MM-dd"),
-      notes: values.notes,
-      items: values.items.map(item => ({
-        quotation_item_id: Number(item.quotation_item_id),
-        quantity: Number(item.quantity)
-      }))
-    };
+    const formData = new FormData();
+    formData.append("quotation_id", Number(values.quotation_id));
+    formData.append("delivery_date", format(values.delivery_date, "yyyy-MM-dd"));
+    if (values.notes) {
+      formData.append("notes", values.notes);
+    }
+    values.items.forEach((item, index) => {
+      formData.append(`items[${index}][quotation_item_id]`, Number(item.quotation_item_id));
+      formData.append(`items[${index}][quantity]`, Number(item.quantity));
+    });
+    if (values.attachments && values.attachments.length > 0) {
+      values.attachments.forEach(file => {
+        formData.append("attachments[]", file);
+      });
+    }
 
-    createDeliveryNote.mutate({ body: payload }, {
+    createDeliveryNote.mutate({ body: formData }, {
       onSuccess: () => {
         navigate('/delivery-notes');
       }

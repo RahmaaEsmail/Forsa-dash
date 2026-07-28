@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Send, X, Loader2, MessageSquare, CornerDownRight, Users, AtSign, List } from 'lucide-react';
+import { Send, X, Loader2, MessageSquare, CornerDownRight, Users, AtSign, List, Paperclip } from 'lucide-react';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import ActivityLogChats from '../../components/Layout/ActivityLog/ActivityLogChats';
@@ -33,6 +33,15 @@ export default function ActivityLog({
 
   const inputRef = useRef(null);
   const scrollRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
 
   // RFQ Details query to determine if it is a purchase order
   const { data: rfqDetails } = useRFQDetails(modelType === 'rfq' ? modelId : null);
@@ -156,17 +165,34 @@ export default function ActivityLog({
   };
 
   const handleSendComment = () => {
-    if (!commentText.trim()) return;
+    if (!commentText.trim() && !selectedFile) return;
 
     const mentionedIds = extractMentionedUserIds(commentText);
 
-    const body = {
-      model_type: activeModelType,
-      model_id: parseInt(modelId, 10),
-      comment: commentText,
-      mentioned_user_ids: mentionedIds,
-      parent_id: replyingTo ? replyingTo.id : null
-    };
+    let body;
+    if (selectedFile) {
+      body = new FormData();
+      body.append('model_type', activeModelType);
+      body.append('model_id', parseInt(modelId, 10));
+      body.append('comment', commentText);
+      if (replyingTo) {
+        body.append('parent_id', replyingTo.id);
+      }
+      if (mentionedIds.length > 0) {
+        mentionedIds.forEach((id) => {
+          body.append('mentioned_user_ids[]', id);
+        });
+      }
+      body.append('attachment', selectedFile);
+    } else {
+      body = {
+        model_type: activeModelType,
+        model_id: parseInt(modelId, 10),
+        comment: commentText,
+        mentioned_user_ids: mentionedIds,
+        parent_id: replyingTo ? replyingTo.id : null
+      };
+    }
 
     console.log("model_id", modelId);
 
@@ -176,6 +202,10 @@ export default function ActivityLog({
         onSuccess: () => {
           setCommentText('');
           setReplyingTo(null);
+          setSelectedFile(null);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
         }
       }
     );
@@ -321,7 +351,7 @@ export default function ActivityLog({
         )}
 
         <div className="flex gap-2 items-end">
-          <div className="w-full flex flex-col bg-slate-50 border border-slate-200 rounded-2xl p-2.5 shadow-inner">
+          <div className="w-full flex flex-col bg-slate-50 border border-slate-200 rounded-2xl p-2 shadow-inner">
             <textarea
               ref={inputRef}
               rows={1}
@@ -332,11 +362,58 @@ export default function ActivityLog({
               className="w-full bg-transparent border-none outline-none resize-none text-slate-700 text-sm py-1 px-1 focus:ring-0 placeholder:text-slate-400"
               style={{ maxHeight: '100px', scrollbarWidth: 'thin' }}
             />
+
+            {/* File attachment preview */}
+            {selectedFile && (
+              <div className="flex items-center justify-between bg-white border border-slate-100 rounded-lg p-1.5 mt-2 mx-1 shadow-sm animate-in fade-in duration-200">
+                <div className="flex items-center gap-1.5 overflow-hidden text-xs font-semibold text-slate-700">
+                  <Paperclip size={12} className="text-slate-400 shrink-0" />
+                  <span className="truncate max-w-[150px]">{selectedFile.name}</span>
+                  <span className="text-[10px] text-slate-400 font-normal shrink-0">
+                    ({(selectedFile.size / 1024).toFixed(1)} KB)
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFile(null);
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = '';
+                    }
+                  }}
+                  className="text-slate-400 hover:text-red-500 rounded-full p-0.5 transition-colors cursor-pointer"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            )}
+
+            <div className="flex justify-between items-center mt-1.5 pt-1.5 border-t border-slate-200/50 px-1">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-slate-400 hover:text-primary transition-colors p-1.5 rounded-lg hover:bg-slate-200/50 flex items-center justify-center cursor-pointer"
+                title="Attach file"
+              >
+                <Paperclip size={15} />
+              </button>
+              {selectedFile && (
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pr-1">
+                  File Attached
+                </span>
+              )}
+            </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+            />
           </div>
           <Button
             onClick={handleSendComment}
-            disabled={addMutation.isPending || !commentText.trim()}
-            className="rounded-2xl h-10 w-10 p-0 shrink-0 bg-primary hover:bg-primary/95 text-white shadow-md flex items-center justify-center transition-all disabled:opacity-50"
+            disabled={addMutation.isPending || (!commentText.trim() && !selectedFile)}
+            className="rounded-2xl h-10 w-10 p-0 shrink-0 bg-primary hover:bg-primary/95 text-white shadow-md flex items-center justify-center transition-all disabled:opacity-50 cursor-pointer"
           >
             {addMutation.isPending ? (
               <Loader2 className="animate-spin" size={16} />

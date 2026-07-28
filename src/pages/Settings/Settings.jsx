@@ -243,6 +243,8 @@ import {
 } from 'lucide-react';
 import PageHeader from '@/components/shared/PageHeader';
 
+import usePermission from '@/hooks/usePermission';
+
 const GROUP_CONFIG = {
   tax: { label: 'Taxation', icon: Percent },
   company: { label: 'Company Profile', icon: Building2 },
@@ -255,6 +257,7 @@ const GROUP_CONFIG = {
 export default function Settings() {
   const { data: settingsData, isLoading } = useListSettings();
   const updateSettings = useUpdateSettings();
+  const { hasPermission } = usePermission();
   const [formValues, setFormValues] = useState({});
 
   useEffect(() => {
@@ -342,18 +345,20 @@ export default function Settings() {
     <div className="container mx-auto space-y-6 pb-10">
       <div className="flex items-center justify-between">
         <PageHeader title="System Settings" subTitle="Configure your platform preferences and metadata." />
-        <Button 
-          onClick={handleSave} 
-          disabled={updateSettings.isPending}
-          className="px-8 py-6 text-lg font-bold shadow-lg transition-all hover:scale-105"
-        >
-          {updateSettings.isPending ? (
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-          ) : (
-            <Save className="mr-2 h-5 w-5" />
-          )}
-          Save Changes
-        </Button>
+        {hasPermission("edit_settings") && (
+          <Button 
+            onClick={handleSave} 
+            disabled={updateSettings.isPending}
+            className="px-8 py-6 text-lg font-bold shadow-lg transition-all hover:scale-105"
+          >
+            {updateSettings.isPending ? (
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            ) : (
+              <Save className="mr-2 h-5 w-5" />
+            )}
+            Save Changes
+          </Button>
+        )}
       </div>
 
       <Tabs defaultValue={groups[0]} className="w-full">

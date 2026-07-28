@@ -15,8 +15,11 @@ import CancelInvoiceModal from './CancelInvoiceModal'
 import MarkPaidModal from './MarkPaidModal'
 import EntityLink from '../../shared/EntityLink'
 
+import usePermission from '../../../hooks/usePermission';
+
 export default function CustomerInvoicesTable({ data, loading }) {
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   const queryClient = useQueryClient();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
@@ -144,26 +147,30 @@ export default function CustomerInvoicesTable({ data, loading }) {
         const isApproved = row.status === 'approved';
         return (
           <div className="flex gap-1.5 justify-center items-center">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-xl w-8 h-8"
-              onClick={() => navigate(`/customer-invoices/${row.id}/details`)}
-              title="View Details"
-            >
-              <Eye className="w-4 h-4" />
-            </Button>
+            {hasPermission("view_customer_invoices") && (
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-xl w-8 h-8"
+                onClick={() => window.open(`/customer-invoices/${row.id}/details`, '_blank')}
+                title="View Details"
+              >
+                <Eye className="w-4 h-4" />
+              </Button>
+            )}
             
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-xl w-8 h-8"
-              onClick={() => navigate(`/customer-invoices/${row.id}/edit`)}
-              disabled={!isDraft}
-              title={isDraft ? "Edit Invoice" : "Only draft invoices can be edited"}
-            >
-              <Edit className="w-4 h-4" />
-            </Button>
+            {hasPermission("edit_customer_invoices") && (
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-xl w-8 h-8"
+                onClick={() => window.open(`/customer-invoices/${row.id}/edit`, '_blank')}
+                disabled={!isDraft}
+                title={isDraft ? "Edit Invoice" : "Only draft invoices can be edited"}
+              >
+                <Edit className="w-4 h-4" />
+              </Button>
+            )}
 
             {isDraft && (
               <>
@@ -223,7 +230,7 @@ export default function CustomerInvoicesTable({ data, loading }) {
               </>
             )}
 
-            <Button 
+            {/* <Button 
               variant="ghost" 
               size="icon" 
               className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl w-8 h-8"
@@ -232,7 +239,7 @@ export default function CustomerInvoicesTable({ data, loading }) {
               title={isDraft ? "Delete Invoice" : "Only draft invoices can be deleted"}
             >
               <Trash2 className="w-4 h-4" />
-            </Button>
+            </Button> */}
           </div>
         );
       }

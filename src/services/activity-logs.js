@@ -17,7 +17,9 @@ export const handleGetActivityMentions = async ({ signal }) => {
 };
 
 export const handleAddComment = async ({ body, signal }) => {
+  const isFormData = body instanceof FormData;
   const response = await apiInstance.post(userEndpoints.add_comment, body, {
+    headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {},
     signal,
   });
   return response.data;

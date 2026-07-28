@@ -1219,11 +1219,11 @@ export default function CustomerInvoiceDetails() {
 
           {/* Terms & Conditions Section */}
           <div className="grid grid-cols-2 gap-6 border-t border-slate-100 pt-6 text-[11px] text-slate-500 mb-12">
-            <div className="text-[18px] text-slate-900 font-bold leading-relaxed">
-              <h5 className="font-bold text-slate-900 text-[15px] mb-2 uppercase">
+            <div className="bg-slate-50/60 p-4 rounded-xl border border-slate-100 space-y-2 text-slate-600">
+              <h5 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
                 Terms & Conditions
               </h5>
-              <ul className="list-disc pl-4 space-y-1">
+              <ul className="list-disc pl-4 space-y-1 text-[10px] leading-relaxed text-slate-500 font-medium">
                 <li>
                   Payment is due within the agreed payment timeline terms.
                 </li>

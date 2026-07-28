@@ -1,13 +1,14 @@
-import { Menu, MoveDown, Search, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Menu, MoveDown, Search, ChevronLeft, ChevronRight, LogOut } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Input } from '../../components/ui/input'
 import { Button } from '../../components/ui/button'
 import { useSidebar } from '../../context/SidebarContext'
 import useUnreadCount from '../../hooks/Notifications/useUnreadCount'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { config } from '../../api/config'
 
 export default function Header() {
+  const navigate = useNavigate();
   const { toggle, isMinimized, toggleMinimize } = useSidebar() || {};
   const { data: unreadCountData } = useUnreadCount();
   
@@ -18,6 +19,13 @@ export default function Header() {
     console.log("user data", JSON.parse(localStorage.getItem((config.localStorageUserData))))
     setUserData(JSON.parse(localStorage.getItem((config.localStorageUserData))))
   } ,[])
+
+  const handleLogout = () => {
+    localStorage.removeItem(config.localStorageTokenName);
+    localStorage.removeItem(config.localStorageRefreshTokenName);
+    localStorage.removeItem(config.localStorageUserData);
+    navigate("/login");
+  };
 
   return (
     <div className='bg-white rounded-main p-4 md:p-5 mt-6 md:mt-10 flex flex-wrap gap-3 justify-between items-center'>
@@ -65,8 +73,8 @@ export default function Header() {
         />
       </div> */}
 
-      {/* Right: Bell + Export */}
-      <div className="flex gap-3 items-center shrink-0">
+      {/* Right: Bell + Export + Logout */}
+      <div className="flex gap-4 items-center shrink-0">
         <NavLink to="/notifications" className='relative'>
           <img src="/images/bell.svg" alt="Notifications" className='h-7 w-6' />
           {unreadCount > 0 && (
@@ -76,10 +84,15 @@ export default function Header() {
           )}
         </NavLink>
 
-        {/* <Button variant='default' className="text-small! py-2 font-bold flex gap-1 items-center" size='sm'>
-          <span className='hidden sm:inline'>Export Data</span>
-          <MoveDown size={12} />
-        </Button> */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleLogout}
+          className="border-slate-200 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-full h-10 w-10 shrink-0"
+          title="Logout"
+        >
+          <LogOut className="w-5 h-5" />
+        </Button>
       </div>
     </div>
   )

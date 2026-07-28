@@ -40,8 +40,8 @@ function getSanitizedStyles() {
     }
   });
 
-  // Convert oklch(...) occurrences in the CSS string
-  return cssText.replace(/oklch\([^)]+\)/g, (match) => {
+  // Convert oklch(...) and oklab(...) occurrences in the CSS string
+  return cssText.replace(/(oklch|oklab)\([^)]+\)/g, (match) => {
     return colorToRgb(match);
   });
 }
@@ -117,7 +117,7 @@ export async function downloadAsPDF(element, options = {}) {
               ];
               properties.forEach((prop) => {
                 const val = style[prop];
-                if (val && val.includes("oklch")) {
+                if (val && (val.includes("oklch") || val.includes("oklab"))) {
                   const rgbVal = colorToRgb(val);
                   el.style[prop] = rgbVal;
                 }

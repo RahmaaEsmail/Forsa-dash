@@ -18,8 +18,17 @@ import { useListQuotations } from "../../../hooks/quotations/useListQuotations"
 import { useListCustomers } from "../../../hooks/customers/useListCustomers"
 import { useListDeliveryTypes } from "../../../hooks/delivery-notes/useListDeliveryTypes"
 import CustomSelect from "../../shared/CustomSelect"
+import AttachmentsSection from "../../shared/AttachmentsSection"
 
-export default function DeliveryNoteForm({ isReadOnly = false, isEdit = false }) {
+export default function DeliveryNoteForm({ 
+  isReadOnly = false, 
+  isEdit = false,
+  existingAttachments = [],
+  onDeleteExisting,
+  onUploadNew,
+  isUploading = false,
+  isDeleting = false
+}) {
   const { register, control, setValue, watch, formState: { errors } } = useFormContext()
   const { fields, append, remove } = useFieldArray({
     control,
@@ -174,6 +183,16 @@ export default function DeliveryNoteForm({ isReadOnly = false, isEdit = false })
           />
         </div>
       </Card>
+
+      <AttachmentsSection 
+        isReadOnly={isReadOnly}
+        isEdit={isEdit}
+        existingAttachments={existingAttachments}
+        onDeleteExisting={onDeleteExisting}
+        onUploadNew={onUploadNew}
+        isUploading={isUploading}
+        isDeleting={isDeleting}
+      />
     </div>
   )
 }

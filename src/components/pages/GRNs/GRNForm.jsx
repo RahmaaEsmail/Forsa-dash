@@ -6,8 +6,17 @@ import SearchableAsyncSelect from '../../shared/SearchableAsyncSelect'
 import { handleGetRFQs, handleGetRFQDetails } from '../../../services/rfqs'
 import GRNItemsTable from './GRNItemsTable'
 import { Card, CardContent } from '../../ui/card'
+import AttachmentsSection from '../../shared/AttachmentsSection'
 
-export default function GRNForm({ isEdit = false }) {
+export default function GRNForm({ 
+  isEdit = false, 
+  isReadOnly = false,
+  existingAttachments = [],
+  onDeleteExisting,
+  onUploadNew,
+  isUploading = false,
+  isDeleting = false
+}) {
   const { control, setValue, watch } = useFormContext();
   const [rfqDetails, setRfqDetails] = React.useState(null);
   const rfq_id = watch("rfq_id");
@@ -46,6 +55,7 @@ export default function GRNForm({ isEdit = false }) {
             name="received_date"
             label="Received Date"
             required
+            disabled={isReadOnly}
           />
           {/* Using a standard file input for supplier reference if needed, 
               but CustomInput might work if type="file" is passed */}
@@ -54,7 +64,8 @@ export default function GRNForm({ isEdit = false }) {
             <input 
               type="file"
               onChange={(e) => setValue("supplier_reference", e.target.files[0])}
-              className="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              disabled={isReadOnly}
+              className="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50"
             />
           </div>
         </CardContent>
@@ -62,8 +73,18 @@ export default function GRNForm({ isEdit = false }) {
 
       <div className="space-y-3">
          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Received Items</h3>
-         <GRNItemsTable />
+         <GRNItemsTable isReadOnly={isReadOnly} />
       </div>
+
+      <AttachmentsSection 
+        isReadOnly={isReadOnly}
+        isEdit={isEdit}
+        existingAttachments={existingAttachments}
+        onDeleteExisting={onDeleteExisting}
+        onUploadNew={onUploadNew}
+        isUploading={isUploading}
+        isDeleting={isDeleting}
+      />
     </div>
   )
 }

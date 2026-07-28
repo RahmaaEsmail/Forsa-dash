@@ -169,15 +169,7 @@ useEffect(() => {
             errors={errors.code}
           /> */}
 
-          <CustomInput
-            label={"Symbol"}
-            isRequired={true}
-            register={register}
-            type="text"
-            placeholder={"Enter Symbol Of Unit"}
-            name={"symbol"}
-            errors={errors.symbol}
-          />
+
 
 
           <div className="flex items-center space-x-2">

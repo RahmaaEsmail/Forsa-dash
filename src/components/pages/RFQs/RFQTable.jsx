@@ -11,8 +11,11 @@ import { Badge } from '../../ui/badge'
 import { toast } from 'sonner'
 import EntityLink from '../../shared/EntityLink'
 
+import usePermission from '../../../hooks/usePermission';
+
 export default function RFQTable({ prId, view = "rfq", filters = {}, onDataLoaded, selectedRowKeys, onSelectedRowKeysChange }) {
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -126,27 +129,31 @@ export default function RFQTable({ prId, view = "rfq", filters = {}, onDataLoade
         console.log("row",row);
         return   (
         <div className="flex gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => navigate(`/rfqs/${row.id}/details`)}
-            title="View Details"
-          >
-            <Eye className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => navigate(`/rfqs/${row.id}/edit`)}
-            title="Edit RFQ"
-          >
-            <Edit className="w-4 h-4" />
-          </Button>
+          {hasPermission("view_rfqs") && (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => window.open(`/rfqs/${row.id}/details`, '_blank')}
+              title="View Details"
+            >
+              <Eye className="w-4 h-4" />
+            </Button>
+          )}
+          {hasPermission("edit_rfqs") && (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => window.open(`/rfqs/${row.id}/edit`, '_blank')}
+              title="Edit RFQ"
+            >
+              <Edit className="w-4 h-4" />
+            </Button>
+          )}
           {row.status === 'purchase_ordered' && (
             <Button 
               variant="ghost" 
               size="icon"
-              onClick={() => navigate(`/create-grn/${row.id}`)}
+              onClick={() => window.open(`/create-grn/${row.id}`, '_blank')}
               title="Create GRN"
             >
               <PackagePlus className="w-4 h-4 text-emerald-600" />

@@ -10,9 +10,12 @@ import useDeleteCustomer from '../../../hooks/customers/useDeleteCustomer';
 import useChangeCustomerStatus from '../../../hooks/customers/useChangeCustomerStatus';
 import ContactLink from '../../shared/ContactLink';
 
+import usePermission from '../../../hooks/usePermission';
+
 export default function CustomersTable({ data, loading, selectedRowKeys, onSelectedRowKeysChange }) {
   // navigate 
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   
   // modals
   const [deleteModal, setDeleteModal] = useState(false);
@@ -91,24 +94,28 @@ export default function CustomersTable({ data, loading, selectedRowKeys, onSelec
       render: (_, row) => {
         return (
           <div className='flex gap-2 justify-center items-center'>
-            <Button  
-              onClick={() => navigate(`/customer-details/${row?.id}`)}
-              title="Details" size='icon' variant='ghost'>
-              <Eye className="w-4 h-4" />
-            </Button>
-            <Button  
-              onClick={() => navigate(`/create-customer?id=${row?.id}`)}
-              title="Edit" size='icon' variant='ghost'>
-              <Edit className="w-4 h-4" />
-            </Button>
-            <Button
+            {hasPermission("view_customers") && (
+              <Button  
+                onClick={() => window.open(`/customer-details/${row?.id}`, '_blank')}
+                title="Details" size='icon' variant='ghost'>
+                <Eye className="w-4 h-4" />
+              </Button>
+            )}
+            {hasPermission("edit_customers") && (
+              <Button  
+                onClick={() => window.open(`/create-customer?id=${row?.id}`, '_blank')}
+                title="Edit" size='icon' variant='ghost'>
+                <Edit className="w-4 h-4" />
+              </Button>
+            )}
+            {/* <Button
               onClick={() => {
                 setRowData(row);
                 setDeleteModal(true);
               }}
               title="Delete" size='icon' variant='ghost' className="hover:text-red-600 hover:bg-red-50">
               <Trash className="w-4 h-4" />
-            </Button>
+            </Button> */}
           </div>
         )
       }

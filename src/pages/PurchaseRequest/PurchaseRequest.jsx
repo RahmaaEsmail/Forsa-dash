@@ -22,8 +22,11 @@ const PR_COL_MAP = {
   cancellation_reason: "Cancellation Reason",
 };
 
+import usePermission from "../../hooks/usePermission";
+
 export default function PurchaseRequest() {
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   const [page, setPage] = React.useState(1);
   const [filter, setFilter] = React.useState({
     search: "",
@@ -59,12 +62,14 @@ export default function PurchaseRequest() {
               ? `Export Selected (${selectedRowKeys.length})`
               : "Export Excel"}
           </Button>
-          <Button
-            onClick={() => navigate(`/create_purchase_request`)}
-            className={"font-bold"}
-          >
-            Create
-          </Button>
+          {hasPermission("create_purchase_requests") && (
+            <Button
+              onClick={() => navigate(`/create_purchase_request`)}
+              className={"font-bold"}
+            >
+              Create
+            </Button>
+          )}
         </div>
       </PageHeader>
 

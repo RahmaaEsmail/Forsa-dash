@@ -10,8 +10,11 @@ import CategoriesTable from '../../components/pages/Categories/CategoriesTable'
 import CategoryFilterations from '../../components/pages/Categories/CategoryFilter'
 import { useCategoriesStore } from '../../store/zustand/categoriesStore'
 
+import usePermission from '../../hooks/usePermission';
+
 export default function Category() {
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
 
   const { filters, setFilters } = useCategoriesStore();
   const { search, page, sort_order } = filters;
@@ -39,10 +42,12 @@ export default function Category() {
         "Manage all building material catgories, control visibility, and keep category data up to date."
       }
     >
-      <Button onClick={() => navigate(`/create-categories`)} className={"px-3!"}>
-        <Plus />
-        <span>Add new category</span>
-      </Button>
+      {hasPermission("manage_categories") && (
+        <Button onClick={() => navigate(`/create-categories`)} className={"px-3!"}>
+          <Plus />
+          <span>Add new category</span>
+        </Button>
+      )}
     </PageHeader>
 
       <CategoryFilterations />

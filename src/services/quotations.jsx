@@ -33,6 +33,7 @@ export const handleUpdateQuotationStatus = async ({ id, status, body = {} }) => 
       endpoint += 'manager-approve';
       break;
     case 'proforma':
+    case 'proforma_invoice':
       endpoint += 'proforma';
       break;
     case 'payment-received':

@@ -17,7 +17,8 @@ export default function CreateGRN() {
       rfq_id: id || "",
       received_date: new Date(),
       supplier_reference: null,
-      items: []
+      items: [],
+      attachments: []
     }
   });
 
@@ -33,6 +34,12 @@ export default function CreateGRN() {
       formData.append(`items[${index}][rfq_item_id]`, item.rfq_item_id);
       formData.append(`items[${index}][quantity_received]`, item.quantity_received);
     });
+
+    if (values.attachments && values.attachments.length > 0) {
+      values.attachments.forEach(file => {
+        formData.append("attachments[]", file);
+      });
+    }
 
     createGRN.mutate({ body: formData }, {
       onSuccess: () => {

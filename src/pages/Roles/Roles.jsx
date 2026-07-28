@@ -25,7 +25,8 @@ import { Badge } from "@/components/ui/badge";
 import useDebounce from "@/hooks/useDebounce";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-import { PERMISSIONS } from "@/constants/permissions";
+import useListPermissions from "@/hooks/Roles/useListPermissions";
+import usePermission from "@/hooks/usePermission";
 
 export default function Roles() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -45,12 +46,15 @@ export default function Roles() {
   }), [debouncedSearch, isActive, currentPage]);
 
   const { data: rolesData, isLoading: isListLoading } = useListRoles(params);
+  const { data: permissionsResponse, isLoading: isPermissionsLoading } = useListPermissions();
+  const permissionsList = useMemo(() => permissionsResponse?.data || [], [permissionsResponse]);
+  const { hasPermission } = usePermission();
   
   const createMutation = useCreateRole();
   const updateMutation = useUpdateRole();
   const deleteMutation = useDeleteRole();
 
-  const { register, handleSubmit, control, reset, setValue, formState: { errors } } = useForm({
+  const { register, handleSubmit, control, reset, setValue, watch, formState: { errors } } = useForm({
     defaultValues: {
       name: "",
       display_name: { en: "", ar: "" },
@@ -60,17 +64,34 @@ export default function Roles() {
     }
   });
 
-  const permissionOptions = PERMISSIONS.map(p => ({
-    label: p.title_en,
-    value: p.id,
-    textValue: `${p.title_en} ${p.title_ar}`
-  }));
+  const selectedPermissionIds = watch("permission_ids") || [];
+
+  const handleCheckboxChange = (permissionId, checked) => {
+    if (checked) {
+      setValue("permission_ids", [...selectedPermissionIds, Number(permissionId)]);
+    } else {
+      setValue("permission_ids", selectedPermissionIds.filter(id => Number(id) !== Number(permissionId)));
+    }
+  };
+
+  const groupedPermissions = useMemo(() => {
+    const groups = {};
+    permissionsList.forEach(p => {
+      const g = p.group || 'general';
+      if (!groups[g]) groups[g] = [];
+      groups[g].push(p);
+    });
+    return groups;
+  }, [permissionsList]);
 
   const getPermissionTitles = (ids) => {
     if (!ids || !Array.isArray(ids)) return [];
     return ids.map(id => {
-      const perm = PERMISSIONS.find(p => p.id === Number(id));
-      return perm ? perm.title_en : `ID: ${id}`;
+      const perm = permissionsList.find(p => p.id === Number(id));
+      if (!perm) return `ID: ${id}`;
+      return typeof perm.display_name === 'object' && perm.display_name !== null
+        ? (perm.display_name.en || perm.display_name.ar || "")
+        : (perm.display_name || "");
     });
   };
 
@@ -178,27 +199,31 @@ export default function Roles() {
       key: "actions",
       render: (_, record) => (
         <div className="flex justify-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-primary hover:bg-primary/10"
-            onClick={() => handleEdit(record)}
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-danger hover:bg-danger/10"
-            onClick={() => {
-              if (window.confirm("Are you sure you want to delete this role?")) {
-                deleteMutation.mutate({ id: record.id });
-              }
-            }}
-            disabled={deleteMutation.isPending}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {hasPermission("manage_roles") && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-primary hover:bg-primary/10"
+              onClick={() => handleEdit(record)}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+          )}
+          {hasPermission("manage_roles") && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-danger hover:bg-danger/10"
+              onClick={() => {
+                if (window.confirm("Are you sure you want to delete this role?")) {
+                  deleteMutation.mutate({ id: record.id });
+                }
+              }}
+              disabled={deleteMutation.isPending}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       ),
     },
@@ -220,12 +245,14 @@ export default function Roles() {
               reset();
             }
           }}>
-            <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90 h-11 px-6 shadow-lg">
-                <Plus className="mr-2 h-4 w-4" />
-                Add New Role
-              </Button>
-            </DialogTrigger>
+            {hasPermission("manage_roles") && (
+              <DialogTrigger asChild>
+                <Button className="bg-primary hover:bg-primary/90 h-11 px-6 shadow-lg">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add New Role
+                </Button>
+              </DialogTrigger>
+            )}
             <DialogContent className="max-w-3xl overflow-y-auto max-h-[90vh]">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-3 text-2xl font-black">
@@ -291,18 +318,42 @@ export default function Roles() {
                      </div>
                   </div>
 
-                  <div className="md:col-span-2 pt-4 border-t">
-                    <CustomSelect
-                      control={control}
-                      name="permission_ids"
-                      label="Assigned Permissions (Pages)"
-                      placeholder="Search and select pages..."
-                      options={permissionOptions}
-                      isLoading={false}
-                      multiple={true}
-                      isRequired={true}
-                    />
-                    <p className="text-[10px] text-muted-foreground mt-2">Select the pages and modules this role has permission to access.</p>
+                  <div className="md:col-span-2 pt-4 border-t space-y-4">
+                    <Label className="text-base font-bold text-secondary">Assigned Permissions by Module</Label>
+                    <div className="border rounded-xl overflow-hidden divide-y">
+                      {isPermissionsLoading ? (
+                        <div className="p-6 text-center text-sm text-muted-foreground flex justify-center items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin text-primary" /> Loading permissions...
+                        </div>
+                      ) : Object.entries(groupedPermissions).length === 0 ? (
+                        <div className="p-6 text-center text-sm text-muted-foreground">No permissions available.</div>
+                      ) : (
+                        Object.entries(groupedPermissions).map(([groupName, perms]) => (
+                          <div key={groupName} className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4 items-center hover:bg-slate-50/50">
+                            <span className="font-bold text-xs text-secondary uppercase tracking-wider">{groupName.replace(/_/g, ' ')}</span>
+                            <div className="md:col-span-3 flex flex-wrap gap-4">
+                              {perms.map(p => {
+                                const isChecked = selectedPermissionIds.includes(p.id);
+                                const displayName = typeof p.display_name === 'object' && p.display_name !== null
+                                  ? (p.display_name.en || p.display_name.ar || "")
+                                  : (p.display_name || "");
+                                return (
+                                  <label key={p.id} className="flex items-center gap-2 text-xs font-semibold text-placeholder cursor-pointer select-none">
+                                    <input
+                                      type="checkbox"
+                                      checked={isChecked}
+                                      onChange={(e) => handleCheckboxChange(p.id, e.target.checked)}
+                                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                                    />
+                                    <span>{displayName}</span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
                   </div>
                 </div>
 

@@ -706,6 +706,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   Printer,
+  Download,
   ChevronRight,
   Send,
   CheckCircle2,
@@ -726,6 +727,7 @@ import useListSettings from "../../hooks/Settings/useListSettings";
 import { Card, CardContent } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { DeleteModal } from "../../components/shared/DeleteModal";
+import { downloadAsPDF } from "../../utils/downloadPDF";
 import { format } from "date-fns";
 
 // Components
@@ -733,10 +735,13 @@ import QuotationStatusTabs from "../../components/pages/Quotations/QuotationStat
 import PaymentReceivedModal from "../../components/pages/Quotations/PaymentReceivedModal";
 import CancelQuotationModal from "../../components/pages/Quotations/CancelQuotationModal";
 
+import usePermission from "../../hooks/usePermission";
+
 export default function QuotationDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const printRef = useRef(null);
+  const { hasPermission } = usePermission();
 
   const { data: quotationResponse, isLoading } = useQuotationDetails(id);
   const updateStatus = useUpdateQuotationStatus();
@@ -744,6 +749,7 @@ export default function QuotationDetails() {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [shouldDownloadPDF, setShouldDownloadPDF] = useState(false);
 
   const { data: settingsData } = useListSettings();
   const getSetting = (key) => {
@@ -799,15 +805,39 @@ export default function QuotationDetails() {
     });
   };
 
+  const isProforma = quotation?.status === "proforma_invoice";
+  const baseNumber = quotation?.quotation_number || "";
+  const number = isProforma ? baseNumber.replace(/^QUO-?/, "PI-") : baseNumber;
+  const documentTitle = isProforma ? "Proforma Invoice" : "Quotation";
+
   const handlePrint = () => {
     const originalTitle = document.title;
-    const documentName = quotation?.quotation_number || id;
+    const documentName = number || id;
     document.title = documentName;
     window.print();
     setTimeout(() => {
       document.title = originalTitle;
     }, 100);
   };
+
+  const handleDownloadPDF = async () => {
+    const element = printRef.current;
+    if (!element) return;
+    const formattedName = number.startsWith("PI-") ? number.replace(/^PI-/, "PI_") : number;
+    await downloadAsPDF(element, {
+      filename: `${formattedName}.pdf`,
+      margin: [10, 10, 10, 10],
+    });
+  };
+
+  useEffect(() => {
+    if (shouldDownloadPDF && quotation?.status === "proforma_invoice") {
+      setShouldDownloadPDF(false);
+      setTimeout(() => {
+        handleDownloadPDF();
+      }, 500);
+    }
+  }, [quotation?.status, shouldDownloadPDF]);
 
   if (isLoading) return <Loading />;
 
@@ -854,22 +884,26 @@ export default function QuotationDetails() {
             Quotations
           </span>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-slate-900">Quotation Details</span>
+          <span className="text-slate-900">{documentTitle} Details</span>
         </div>
 
         <div className="flex flex-col gap-6">
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                Quotation{" "}
+                {documentTitle}{" "}
                 <span className="text-slate-400 font-normal text-lg">
-                  #{quotation?.quotation_number}
+                  #{number}
                 </span>
                 <Badge
                   variant="outline"
                   className="bg-primary/10 text-primary border-none rounded-md px-2 uppercase text-[10px]"
                 >
-                  {quotation?.status?.replace("_", " ")}
+                  {quotation?.status === "client_approval"
+                    ? "Manager Approval"
+                    : quotation?.status === "sales_manager_approval"
+                      ? "Client Approval"
+                      : quotation?.status?.replace("_", " ")}
                 </Badge>
               </h1>
               <p className="text-sm text-slate-500 mt-1">
@@ -879,22 +913,97 @@ export default function QuotationDetails() {
                   : "N/A"}
               </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-3 items-center flex-wrap">
+              {/* Action Buttons */}
+              {quotation?.status !== "cancelled" &&
+                quotation?.status !== "delivered" &&
+                hasPermission("edit_quotations") && (
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsCancelModalOpen(true)}
+                    disabled={updateStatus.isPending}
+                    className="rounded-xl border-red-200 text-primary font-bold hover:bg-red-50 h-11 px-6 gap-2"
+                  >
+                    <XCircle className="w-4 h-4" /> Cancel
+                  </Button>
+                )}
+
+              {quotation?.status === "draft" && hasPermission("edit_quotations") && (
+                <Button
+                  onClick={() => handleStatusAction("client-approve")}
+                  disabled={updateStatus.isPending}
+                  className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
+                >
+                  <Send className="w-4 h-4" />
+                  {updateStatus.isPending ? "Sending..." : "Send to Client"}
+                </Button>
+              )}
+
+              {quotation?.status === "client_approval" && hasPermission("edit_quotations") && (
+                <Button
+                  onClick={() => handleStatusAction("manager-approve")}
+                  disabled={updateStatus.isPending}
+                  className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  {updateStatus.isPending
+                    ? "Approving..."
+                    : "Approve as Manager"}
+                </Button>
+              )}
+
+              {quotation?.status === "sales_manager_approval" && hasPermission("edit_quotations") && (
+                <Button
+                  onClick={() => handleStatusAction("proforma_invoice", {}, () => setShouldDownloadPDF(true))}
+                  disabled={updateStatus.isPending}
+                  className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
+                >
+                  <FileText className="w-4 h-4" />
+                  {updateStatus.isPending
+                    ? "Generating..."
+                    : "Generate Proforma"}
+                </Button>
+              )}
+
+              {quotation?.status === "proforma_invoice" && hasPermission("edit_quotations") && (
+                <Button
+                  onClick={() => setIsPaymentModalOpen(true)}
+                  disabled={updateStatus.isPending}
+                  className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  {updateStatus.isPending ? "Processing..." : "Record Payment"}
+                </Button>
+              )}
+
+              {quotation?.status === "paid_payment" && hasPermission("edit_quotations") && (
+                <Button
+                  onClick={() => handleStatusAction("deliver")}
+                  disabled={updateStatus.isPending}
+                  className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
+                >
+                  <Package className="w-4 h-4" />
+                  {updateStatus.isPending ? "Marking..." : "Mark as Delivered"}
+                </Button>
+              )}
+
               <Button
                 variant="outline"
-                onClick={handlePrint}
-                className="rounded-xl border-slate-200 text-slate-600 gap-2 font-bold hover:bg-slate-50 h-11 px-6"
+                onClick={handleDownloadPDF}
+                className="rounded-xl border-slate-200 text-slate-700 gap-2 font-bold hover:bg-slate-50 h-11 px-6 transition-all shadow-sm"
               >
-                <Printer className="w-4 h-4" /> Download/Print PDF
+                <Download className="w-4 h-4 text-slate-500" /> Download PDF
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => setIsDeleteModalOpen(true)}
-                disabled={deleteQuotation.isPending}
-                className="rounded-xl border-red-200 text-primary gap-2 font-bold hover:bg-red-50 h-11 px-6"
-              >
-                <Trash2 className="w-4 h-4" /> Delete
-              </Button>
+              {hasPermission("delete_quotations") && (
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  disabled={deleteQuotation.isPending}
+                  className="rounded-xl border-red-200 text-primary gap-2 font-bold hover:bg-red-50 h-11 px-6"
+                >
+                  <Trash2 className="w-4 h-4" /> Delete
+                </Button>
+              )}
               <Button
                 variant="outline"
                 className="rounded-xl border-slate-200 text-slate-600 gap-2 font-bold hover:bg-slate-50 h-11 px-6"
@@ -908,93 +1017,6 @@ export default function QuotationDetails() {
           <Card className="border border-slate-100 shadow-sm bg-white rounded-2xl overflow-hidden px-8 py-4">
             <QuotationStatusTabs currentStatus={quotation?.status} />
           </Card>
-
-          {/* Action Bar */}
-          <div className="flex flex-wrap justify-end items-center gap-3 py-2">
-            {quotation?.status !== "cancelled" &&
-              quotation?.status !== "delivered" && (
-                <Button
-                  variant="outline"
-                  onClick={() => setIsCancelModalOpen(true)}
-                  disabled={updateStatus.isPending}
-                  className="h-11 px-6 rounded-xl border-red-200 text-primary font-bold hover:bg-red-50 gap-2"
-                >
-                  <XCircle className="w-4 h-4" /> Cancel Quotation
-                </Button>
-              )}
-
-            {quotation?.status === "draft" && (
-              <Button
-                onClick={() => handleStatusAction("client-approve")}
-                disabled={updateStatus.isPending}
-                className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
-              >
-                <Send className="w-4 h-4" />
-                {updateStatus.isPending ? "Sending..." : "Send to Client"}
-              </Button>
-            )}
-
-            {quotation?.status === "client_approval" && (
-              <Button
-                onClick={() => handleStatusAction("manager-approve")}
-                disabled={updateStatus.isPending}
-                className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                {updateStatus.isPending ? "Approving..." : "Approve as Manager"}
-              </Button>
-            )}
-
-            {quotation?.status === "sales_manager_approval" && (
-              <Button
-                onClick={() => handleStatusAction("proforma")}
-                disabled={updateStatus.isPending}
-                className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
-              >
-                <FileText className="w-4 h-4" />
-                {updateStatus.isPending ? "Generating..." : "Generate Proforma"}
-              </Button>
-            )}
-
-            {quotation?.status === "proforma_invoice" && (
-              <Button
-                onClick={() => setIsPaymentModalOpen(true)}
-                disabled={updateStatus.isPending}
-                className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
-              >
-                <CreditCard className="w-4 h-4" />
-                {updateStatus.isPending ? "Processing..." : "Record Payment"}
-              </Button>
-            )}
-
-            {(quotation?.status === "paid_payment" ||
-              quotation?.status === "approved") && (
-              <Button
-                onClick={() => navigate(`/create-delivery-note/${id}`)}
-                className="h-11 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2 shadow-lg shadow-blue-600/20"
-              >
-                <Truck className="w-4 h-4" />
-                Create Delivery Note
-              </Button>
-            )}
-
-            {quotation?.status === "paid_payment" && (
-              <Button
-                onClick={() => handleStatusAction("deliver")}
-                disabled={updateStatus.isPending}
-                className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
-              >
-                <Package className="w-4 h-4" />
-                {updateStatus.isPending ? "Marking..." : "Mark as Delivered"}
-              </Button>
-            )}
-
-            {quotation?.status === "delivered" && (
-              <div className="flex items-center gap-2 text-emerald-600 font-bold bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100">
-                <CheckCircle2 className="w-5 h-5" /> Completed & Delivered
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
@@ -1032,7 +1054,7 @@ export default function QuotationDetails() {
           </div>
 
           <h3 className="text-2xl font-bold text-primary mb-6 tracking-tight">
-            Quotation
+            {documentTitle}
           </h3>
 
           {/* Cards Meta Section */}
@@ -1057,16 +1079,14 @@ export default function QuotationDetails() {
             {/* Quote Details */}
             <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-5 text-xs text-slate-600">
               <h4 className="text-primary font-bold text-sm mb-3">
-                Quote Details
+                {isProforma ? "Invoice Details" : "Quote Details"}
               </h4>
               <div className="grid grid-cols-2 gap-y-3">
                 <div>
                   <span className="text-slate-400 block mb-0.5">
-                    Quotation No:
+                    {isProforma ? "Proforma Invoice No:" : "Quotation No:"}
                   </span>
-                  <span className="text-slate-900 font-bold">
-                    {quotation?.quotation_number}
-                  </span>
+                  <span className="text-slate-900 font-bold">{number}</span>
                 </div>
                 <div>
                   <span className="text-slate-400 block mb-0.5">Date:</span>
@@ -1183,11 +1203,11 @@ export default function QuotationDetails() {
 
           {/* Terms & Bank Details */}
           <div className="grid grid-cols-2 gap-6 border-t border-slate-100 pt-6 text-[11px] text-slate-500 mb-12">
-            <div className="text-[18px] text-slate-900 font-bold leading-relaxed">
-              <h5 className="font-bold text-slate-900 text-[15px] mb-2 uppercase">
+            <div className="bg-slate-50/60 p-4 rounded-xl border border-slate-100 space-y-2 text-slate-600">
+              <h5 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
                 Terms & Conditions
               </h5>
-              <ul className="list-disc pl-4 space-y-1">
+              <ul className="list-disc pl-4 space-y-1 text-[10px] leading-relaxed text-slate-500 font-medium">
                 <li>
                   Prices are valid for 15 Days from the date of quotation.
                 </li>
@@ -1239,7 +1259,6 @@ export default function QuotationDetails() {
         </div>
       </div>
 
-      {/* Modals Management Container */}
       <PaymentReceivedModal
         open={isPaymentModalOpen}
         onOpenChange={setIsPaymentModalOpen}

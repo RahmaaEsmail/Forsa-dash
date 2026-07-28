@@ -1603,11 +1603,11 @@ export default function RFQDetails() {
             )}
             {/* Always show Terms & Conditions for PO; otherwise only if content exists */}
             {(rfq.terms_and_conditions || rfq.is_purchase_order) && (
-              <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
-                <h4 className="font-bold text-slate-900 uppercase text-[15px] mb-2">
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-1.5 text-slate-600">
+                <h4 className="font-bold text-slate-900 uppercase text-xs tracking-wider">
                   Terms & Conditions
                 </h4>
-                <p className="text-[18px] text-slate-900 font-bold leading-relaxed whitespace-pre-wrap">
+                <p className="text-[10px] leading-relaxed text-slate-500 font-medium whitespace-pre-wrap">
                   {rfq.terms_and_conditions ||
                     "Standard terms and conditions apply. Delivery as per agreed schedule. Payment as per payment terms above."}
                 </p>

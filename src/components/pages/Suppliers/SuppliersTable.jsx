@@ -12,10 +12,12 @@ import useDeleteUnit from '../../../hooks/units/useDeleteUnit'
 import useChangeUnitStatus from '../../../hooks/units/useChangeUnitStatus'
 import useDeleteSupplier from '../../../hooks/suppliers/useDeleteSupplier'
 import ContactLink from '../../shared/ContactLink'
+import usePermission from '../../../hooks/usePermission';
 
 export default function SuppliersTable({ searc,  sortOrder, page,per_page,  data, loading, selectedRowKeys, onSelectedRowKeysChange }) {
   // navigate 
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   
   // modals
   const [deleteModal, setDeleteModal] = useState(false);
@@ -123,26 +125,30 @@ export default function SuppliersTable({ searc,  sortOrder, page,per_page,  data
       render: (_, row) => {
         return (
           <div className="flex gap-2 items-center justify-center">
-            <Button title="Details" size='icon' onClick={() => navigate(`/supplier-details/${row?.id}`)} variant='ghost'>
-              <Eye className="w-4 h-4" />
-            </Button>
-            <Button
-              title="Edit"
-              onClick={() => navigate(`/create-supplier?id=${row?.id}`)}
-              size='icon'
-              variant='ghost'
-            >
-              <Edit className="w-4 h-4" />
-            </Button>
+            {hasPermission("view_suppliers") && (
+              <Button title="Details" size='icon' onClick={() => window.open(`/supplier-details/${row?.id}`, '_blank')} variant='ghost'>
+                <Eye className="w-4 h-4" />
+              </Button>
+            )}
+            {hasPermission("edit_suppliers") && (
+              <Button
+                title="Edit"
+                onClick={() => window.open(`/create-supplier?id=${row?.id}`, '_blank')}
+                size='icon'
+                variant='ghost'
+              >
+                <Edit className="w-4 h-4" />
+              </Button>
+            )}
 
-            <Button
+            {/* <Button
               onClick={() => {
                 setRowData(row)
                 setDeleteModal(true)
               }}
               title="Delete" size='icon' variant='ghost' className="hover:text-red-600 hover:bg-red-50">
               <Trash className="w-4 h-4" />
-            </Button>
+            </Button> */}
           </div>
         )
       }

@@ -22,7 +22,8 @@ import CustomSelect from "@/components/shared/CustomSelect";
 import { Users as UsersIcon, Plus, Edit, Trash2, UserCheck, Loader2, Key, Search, Mail, Shield, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import useDebounce from "@/hooks/useDebounce";
-import { PERMISSIONS } from "@/constants/permissions";
+import usePermission from "@/hooks/usePermission";
+import useListPermissions from "@/hooks/Roles/useListPermissions";
 
 export default function Users() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -43,7 +44,10 @@ export default function Users() {
 
   const { data: usersData, isLoading: isListLoading } = useListUsers(params);
   const { data: rolesData, isLoading: isRolesLoading } = useListRoles({ per_page: 100 });
+  const { data: permissionsResponse, isLoading: isPermissionsLoading } = useListPermissions();
+  const permissionsList = useMemo(() => permissionsResponse?.data || [], [permissionsResponse]);
   
+  const { hasPermission } = usePermission();
   const createMutation = useCreateUser();
   const updateMutation = useUpdateUser();
   const deleteMutation = useDeleteUser();
@@ -82,11 +86,18 @@ export default function Users() {
     value: r.id
   })) || [];
 
-  const permissionOptions = PERMISSIONS.map(p => ({
-    label: p.title_en,
-    value: p.id,
-    textValue: `${p.title_en} ${p.title_ar}`
-  }));
+  const permissionOptions = useMemo(() => {
+    return permissionsList.map(p => {
+      const displayName = typeof p.display_name === 'object' && p.display_name !== null
+        ? (p.display_name.en || p.display_name.ar || "")
+        : (p.display_name || "");
+      return {
+        label: displayName,
+        value: p.id,
+        textValue: displayName
+      };
+    });
+  }, [permissionsList]);
 
   const onSubmit = (data) => {
   const transformedData = {
@@ -197,27 +208,31 @@ export default function Users() {
           >
             <Eye className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-primary hover:bg-primary/10"
-            onClick={() => handleEdit(record)}
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-danger hover:bg-danger/10"
-            onClick={() => {
-              if (window.confirm("Are you sure you want to delete this user?")) {
-                deleteMutation.mutate({ id: record.id });
-              }
-            }}
-            disabled={deleteMutation.isPending}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {hasPermission("manage_users") && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-primary hover:bg-primary/10"
+              onClick={() => handleEdit(record)}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+          )}
+          {hasPermission("manage_users") && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-danger hover:bg-danger/10"
+              onClick={() => {
+                if (window.confirm("Are you sure you want to delete this user?")) {
+                  deleteMutation.mutate({ id: record.id });
+                }
+              }}
+              disabled={deleteMutation.isPending}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       ),
     },
@@ -238,12 +253,14 @@ export default function Users() {
             reset();
           }
         }}>
-          <DialogTrigger asChild>
-            <Button className="bg-primary hover:bg-primary/90 h-11 px-6 shadow-lg">
-              <Plus className="mr-2 h-4 w-4" />
-              Add New User
-            </Button>
-          </DialogTrigger>
+          {hasPermission("manage_users") && (
+            <DialogTrigger asChild>
+              <Button className="bg-primary hover:bg-primary/90 h-11 px-6 shadow-lg">
+                <Plus className="mr-2 h-4 w-4" />
+                Add New User
+              </Button>
+            </DialogTrigger>
+          )}
           <DialogContent className="max-w-3xl overflow-y-auto max-h-[90vh]">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-3 text-2xl font-black">

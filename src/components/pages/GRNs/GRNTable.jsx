@@ -15,8 +15,11 @@ const statusVariants = {
   rejected: "bg-red-100 text-red-700 border-none",
 };
 
+import usePermission from '../../../hooks/usePermission';
+
 export default function GRNTable({ data, isLoading, page, setPage }) {
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   const deleteGRN = useDeleteGRN();
 
   const handleDelete = (id) => {
@@ -66,19 +69,21 @@ export default function GRNTable({ data, isLoading, page, setPage }) {
       key: "actions",
       render: (_, row) => (
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={() => navigate(`/grns/${row.id}/details`)} title="View">
-            <Eye className="w-4 h-4 text-slate-500" />
-          </Button>
+          {hasPermission("view_grns") && (
+            <Button variant="ghost" size="icon" onClick={() => window.open(`/grns/${row.id}/details`, '_blank')} title="View">
+              <Eye className="w-4 h-4 text-slate-500" />
+            </Button>
+          )}
           
-          {row.status === 'draft' && (
-            <Button variant="ghost" size="icon" onClick={() => navigate(`/grns/${row.id}/edit`)} title="Edit">
+          {row.status === 'draft' && hasPermission("edit_grns") && (
+            <Button variant="ghost" size="icon" onClick={() => window.open(`/grns/${row.id}/edit`, '_blank')} title="Edit">
               <Edit className="w-4 h-4 text-slate-500" />
             </Button>
           )}
 
-          <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(row.id)} title="Delete">
+          {/* <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(row.id)} title="Delete">
             <Trash2 className="w-4 h-4" />
-          </Button>
+          </Button> */}
         </div>
       )
     }
