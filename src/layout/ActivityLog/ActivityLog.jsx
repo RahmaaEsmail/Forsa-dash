@@ -60,7 +60,7 @@ export default function ActivityLog({
   const { data: usersResponse } = useListUsers({ per_page: 100 });
   const { data: profileResponse } = useQuery(userProfileOptions());
 
-  const addMutation = useAddActivityLogComment();
+  const addMutation = useAddActivityLogComment(activeModelType, modelId);
   const updateMutation = useUpdateActivityLogComment(activeModelType, modelId);
   const deleteMutation = useDeleteActivityLogComment(activeModelType, modelId);
 
@@ -211,14 +211,18 @@ export default function ActivityLog({
     );
   };
 
-  const handleEditComment = (id, newText) => {
+  const handleEditComment = (id, newText, existingAttachment) => {
     const mentionedIds = extractMentionedUserIds(newText);
+    const body = {
+      comment: newText,
+      mentioned_user_ids: mentionedIds
+    };
+    if (existingAttachment) {
+      body.attachment = existingAttachment;
+    }
     updateMutation.mutate({
       id,
-      body: {
-        comment: newText,
-        mentioned_user_ids: mentionedIds
-      }
+      body
     });
   };
 

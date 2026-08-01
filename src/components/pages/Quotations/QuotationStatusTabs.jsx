@@ -6,10 +6,10 @@ const statuses = [
   { id: "draft", label: "Draft", key: "draft" },
   {
     id: "sales_manager_approval",
-    label: "Client Approval",
+    label: "Manager Approval",
     key: "sales_manager_approval",
   },
-  { id: "client_approval", label: "Manager Approval", key: "client_approval" },
+  { id: "client_approval", label: "Client Approval", key: "client_approval" },
   { id: "proforma_invoice", label: "Proforma", key: "proforma_invoice" },
   { id: "paid_payment", label: "Paid", key: "paid_payment" },
   { id: "delivered", label: "Delivered", key: "delivered" },

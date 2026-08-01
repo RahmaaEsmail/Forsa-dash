@@ -19,6 +19,7 @@ import {
   FileText,
   Package,
   Truck,
+  Download,
 } from "lucide-react";
 import Loading from "../../components/shared/Loading";
 import { useUpdateQuotationStatus } from "../../hooks/quotations/useUpdateQuotationStatus";
@@ -195,9 +196,9 @@ export default function EditQuotation() {
                 className="bg-primary/10 text-primary border-none rounded-md px-2 uppercase text-[10px]"
               >
                 {quotation?.status === "client_approval"
-                  ? "Manager Approval"
+                  ? "Client Approval"
                   : quotation?.status === "sales_manager_approval"
-                    ? "Client Approval"
+                    ? "Manager Approval"
                     : quotation?.status?.replace("_", " ")}
               </Badge>
             </div>
@@ -227,7 +228,7 @@ export default function EditQuotation() {
           {quotation?.status === "draft" && (
             <Button
               type="button"
-              onClick={() => handleStatusAction("client-approve")}
+              onClick={() => handleStatusAction("manager-approve")}
               disabled={updateStatus.isPending}
               className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
             >
@@ -236,19 +237,19 @@ export default function EditQuotation() {
             </Button>
           )}
 
-          {quotation?.status === "client_approval" && (
+          {quotation?.status === "sales_manager_approval" && (
             <Button
               type="button"
-              onClick={() => handleStatusAction("manager-approve")}
+              onClick={() => handleStatusAction("client-approve")}
               disabled={updateStatus.isPending}
               className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
             >
-              <CheckCircle2 className="w-4 h-4" />
-              {updateStatus.isPending ? "Approving..." : "Approve as Manager"}
+              <Send className="w-4 h-4" />
+              {updateStatus.isPending ? "Sending..." : "Send to Client"}
             </Button>
           )}
 
-          {quotation?.status === "sales_manager_approval" && (
+          {quotation?.status === "client_approval" && (
             <Button
               type="button"
               onClick={() => handleStatusAction("proforma")}
@@ -261,15 +262,30 @@ export default function EditQuotation() {
           )}
 
           {quotation?.status === "proforma_invoice" && (
-            <Button
-              type="button"
-              onClick={() => setIsPaymentModalOpen(true)}
-              disabled={updateStatus.isPending}
-              className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
-            >
-              <CreditCard className="w-4 h-4" />
-              {updateStatus.isPending ? "Processing..." : "Record Payment"}
-            </Button>
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  window.open(
+                    `/quotations/${id}/details?download=true`,
+                    "_blank",
+                  )
+                }
+                className="h-11 px-6 rounded-xl border-slate-200 text-slate-700 gap-2 font-bold hover:bg-slate-50 transition-all shadow-sm"
+              >
+                <Download className="w-4 h-4 text-slate-500" /> Proforma Details
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setIsPaymentModalOpen(true)}
+                disabled={updateStatus.isPending}
+                className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
+              >
+                <CreditCard className="w-4 h-4" />
+                {updateStatus.isPending ? "Processing..." : "Record Payment"}
+              </Button>
+            </>
           )}
 
           {(quotation?.status === "paid_payment" ||

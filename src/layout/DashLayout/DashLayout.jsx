@@ -17,6 +17,9 @@ const getModelFromPath = (pathname) => {
     if (parts[0] === 'purchase_request_details') {
       return { model_type: 'purchase_request', model_id: parts[1] };
     }
+    if (parts[0] === 'edit_purchase_request') {
+      return { model_type: 'purchase_request', model_id: parts[1] };
+    }
     if (parts[0] === 'delivery-note-details') {
       return { model_type: 'delivery_order', model_id: parts[1] };
     }
@@ -41,6 +44,9 @@ const getModelFromPath = (pathname) => {
     if (parts[0] === 'quotations' && parts[2] === 'details') {
       return { model_type: 'quotation', model_id: parts[1] };
     }
+    if (parts[0] === 'quotations' && parts[2] === 'edit') {
+      return { model_type: 'quotation', model_id: parts[1] };
+    }
     if (parts[0] === 'grns' && parts[2] === 'details') {
       return { model_type: 'grn', model_id: parts[1] };
     }
@@ -48,6 +54,9 @@ const getModelFromPath = (pathname) => {
       return { model_type: 'grn', model_id: parts[1] };
     }
     if (parts[0] === 'customer-invoices' && parts[2] === 'details') {
+      return { model_type: 'customer_invoice', model_id: parts[1] };
+    }
+    if (parts[0] === 'customer-invoices' && parts[2] === 'edit') {
       return { model_type: 'customer_invoice', model_id: parts[1] };
     }
   }

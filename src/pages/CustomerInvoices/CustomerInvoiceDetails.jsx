@@ -542,6 +542,34 @@ export default function CustomerInvoiceDetails() {
     "300123456700003";
   const companyAddress =
     getSetting("address") || getSetting("company_address") || "Cairo, Egypt";
+  const companyName =
+    getSetting("company_name") ||
+    getSetting("name") ||
+    "BRKZ International Information Technology Company | شركة بي ار كيه زد العالمية لتقنية المعلومات";
+  const companyCrn =
+    getSetting("company_crn") ||
+    getSetting("crn") ||
+    getSetting("company_registration_number") ||
+    getSetting("commercial_register") ||
+    "311411370400003";
+
+  const getSettingFileUrl = (value) => {
+    if (!value || typeof value !== 'string') return '';
+    if (value.startsWith('http://') || value.startsWith('https://')) return value;
+    return `https://api.forsa.cloud/${value.replace(/^\//, '')}`;
+  };
+
+  const bankOneName = getSetting("bank_one_name") || "Saudi National Bank | البنك الأهلي السعودي (SNB)";
+  const bankOneHolder = getSetting("bank_one_account_holder") || "Company B.R.K.Z. Alalamiyyah for Information Technology";
+  const bankOneIban = getSetting("bank_one_iban") || "SA6610000020000000249108";
+  const bankOneImage = getSetting("bank_one_image") ? getSettingFileUrl(getSetting("bank_one_image")) : "/images/snb-logo.png";
+
+  const bankTwoName = getSetting("bank_two_name") || "Alrajhi Bank | مصرف الراجحي";
+  const bankTwoHolder = getSetting("bank_two_account_holder") || "BRKZ IT CO";
+  const bankTwoIban = getSetting("bank_two_iban") || "SA8380000611608010256585";
+  const bankTwoImage = getSetting("bank_two_image") ? getSettingFileUrl(getSetting("bank_two_image")) : "/images/alrajhi-logo.png";
+
+  const termsAndConditionsText = getSetting("rfq_terms_and_conditions") || getSetting("terms_and_conditions");
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
@@ -710,7 +738,30 @@ export default function CustomerInvoiceDetails() {
           }
           #printable-invoice-area-wrapper * { visibility: visible !important; }
           
-          @page { size: A4; margin: 0; }
+          @page { size: A4; margin: 0; padding: 0; }
+
+          #printable-invoice-area {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 48px !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            margin-bottom: 170px !important;
+            padding-bottom: 170px !important;
+          }
+
+          .print-footer {
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 10px 0 !important;
+            background-color: #C94544 !important;
+            z-index: 9999 !important;
+          }
         }
       `,
         }}
@@ -1029,8 +1080,8 @@ export default function CustomerInvoiceDetails() {
               </div>
             </div>
             <div className="text-right text-xs text-slate-500 space-y-1">
-              <h2 className="font-extrabold text-base text-slate-900 tracking-wide">
-                FORSA TRADING & CONTRACTING
+              <h2 className="font-extrabold text-[11px] text-slate-900 tracking-wide">
+                {companyName}
               </h2>
               <p>
                 {companyAddress} | VAT: {companyVat}
@@ -1228,40 +1279,22 @@ export default function CustomerInvoiceDetails() {
           </div>
 
           {/* Terms & Conditions Section */}
-          <div className="grid grid-cols-2 gap-6 border-t border-slate-100 pt-6 text-[11px] text-slate-500 mb-12">
+          <div className="border-t border-slate-100 pt-6 text-[11px] text-slate-500 mb-6">
             <div className="bg-slate-50/60 p-4 rounded-xl border border-slate-100 space-y-2 text-slate-600">
               <h5 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
                 Terms & Conditions
               </h5>
-              <ul className="list-disc pl-4 space-y-1 text-[10px] leading-relaxed text-slate-500 font-medium">
-                <li>
-                  Payment is due within the agreed payment timeline terms.
-                </li>
-                <li>
-                  Please quote invoice number as reference on remittance advice
-                  transfers.
-                </li>
-                <li>All disputes subject to Riyadh jurisdiction rules.</li>
-              </ul>
-            </div>
-            <div>
-              <h5 className="font-bold text-slate-800 text-xs mb-2">
-                Bank Remittance Accounts
-              </h5>
-              <div className="bg-slate-50/60 p-3 rounded-xl border border-slate-100 space-y-1 text-slate-600">
-                <p>
-                  <span className="text-slate-400">Bank Name:</span> Al Rajhi
-                  Bank
-                </p>
-                <p>
-                  <span className="text-slate-400">Account Name:</span> FORSA
-                  Trading Est.
-                </p>
-                <p>
-                  <span className="text-slate-400">IBAN:</span> SA56 8000 0000
-                  1234 5678 9012
-                </p>
-              </div>
+              {termsAndConditionsText ? (
+                <div className="text-[10px] leading-relaxed text-slate-500 font-medium whitespace-pre-line">
+                  {termsAndConditionsText}
+                </div>
+              ) : (
+                <ul className="list-disc pl-4 space-y-1 text-[10px] leading-relaxed text-slate-500 font-medium">
+                  <li>Payment is due within the agreed payment timeline terms.</li>
+                  <li>Please quote invoice number as reference on remittance advice transfers.</li>
+                  <li>All disputes subject to Riyadh jurisdiction rules.</li>
+                </ul>
+              )}
             </div>
           </div>
 
@@ -1279,6 +1312,65 @@ export default function CustomerInvoiceDetails() {
             <div className="space-y-12">
               <div className="h-px bg-slate-200 mx-4"></div>
               <p>Authorized Signature</p>
+            </div>
+          </div>
+
+          {/* Full-width Teal Footer Banner */}
+          <div className="print-footer bg-[#C94544] text-white text-center py-2.5 mt-8 mx-[-48px] mb-[-48px] text-[10px] space-y-2 font-bold leading-normal">
+            {/* Bank Transfer Details */}
+            <div className="px-8 text-left">
+              <p className="text-[10px] font-black uppercase text-center tracking-wide text-white/95 mb-2">
+                For bank transfer process please use one of the following bank accounts
+              </p>
+              <div className="grid grid-cols-2 gap-4 text-[9px] font-medium leading-relaxed opacity-95">
+                {/* Bank 1 */}
+                {(bankOneName || bankOneIban) && (
+                  <div className="bg-white/10 p-2.5 rounded-lg border border-white/15 flex items-center gap-3">
+                    {bankOneImage && (
+                      <img
+                        src={bankOneImage}
+                        alt="Bank 1 Logo"
+                        className="w-10 h-10 object-contain bg-white p-1 rounded shrink-0"
+                      />
+                    )}
+                    <div className="space-y-0.5 min-w-0">
+                      <p className="font-extrabold text-white text-[10px] truncate">{bankOneName}</p>
+                      <p className="truncate"><span className="text-white/60">Name:</span> {bankOneHolder}</p>
+                      <p className="font-bold truncate"><span className="text-white/60 font-normal">IBAN:</span> {bankOneIban}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Bank 2 */}
+                {(bankTwoName || bankTwoIban) && (
+                  <div className="bg-white/10 p-2.5 rounded-lg border border-white/15 flex items-center gap-3">
+                    {bankTwoImage && (
+                      <img
+                        src={bankTwoImage}
+                        alt="Bank 2 Logo"
+                        className="w-10 h-10 object-contain bg-white p-1 rounded shrink-0"
+                      />
+                    )}
+                    <div className="space-y-0.5 min-w-0">
+                      <p className="font-extrabold text-white text-[10px] truncate">{bankTwoName}</p>
+                      <p className="truncate"><span className="text-white/60">Name:</span> {bankTwoHolder}</p>
+                      <p className="font-bold truncate"><span className="text-white/60 font-normal">IBAN:</span> {bankTwoIban}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Divider line */}
+            <div className="border-t border-white/15 mx-6"></div>
+
+            <div className="space-y-1">
+              <p>
+                {companyName}
+              </p>
+              <p className="opacity-90 font-normal text-[9px]">
+                VAT No. {companyVat} &nbsp;&nbsp;&nbsp;&nbsp; CRN. {companyCrn}
+              </p>
             </div>
           </div>
         </div>
