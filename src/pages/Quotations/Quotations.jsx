@@ -108,14 +108,14 @@ export default function Quotations() {
         className="w-full"
       >
         {/* <TabsList className="bg-slate-100/50 p-1 rounded-xl w-fit flex gap-1 mb-6 border border-slate-200">
-          <TabsTrigger 
-            value="quotation" 
+          <TabsTrigger
+            value="quotation"
             className="rounded-lg px-8 py-2.5 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all font-bold text-sm"
           >
             Quotations
           </TabsTrigger>
-          <TabsTrigger 
-            value="proforma" 
+          <TabsTrigger
+            value="proforma"
             className="rounded-lg px-8 py-2.5 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all font-bold text-sm"
           >
             Proforma Invoices

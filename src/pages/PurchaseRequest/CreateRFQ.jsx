@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 import { format } from 'date-fns'
 import CancelRFQModal from '../../components/pages/RFQs/CancelRFQModal'
 import ActivityLog from '../../layout/ActivityLog/ActivityLog'
-import { Printer, MessageSquare, AlertCircle, X } from 'lucide-react'
+import { Printer, MessageSquare, AlertCircle, X, ChevronRight } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -33,6 +33,7 @@ export default function CreateRFQ() {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [rfqStatus, setRfqStatus] = useState("draft");
   const [rfqDetailsPrId, setRfqDetailsPrId] = useState(null);
+  const [prNumber, setPrNumber] = useState(null);
   const [showChat, setShowChat] = useState(false);
   const [errorDialog, setErrorDialog] = useState({ open: false, title: '', message: '' });
 
@@ -73,6 +74,9 @@ export default function CreateRFQ() {
           setRfqStatus(data.status || "draft");
           if (data.purchase_request_id || data.purchase_request?.id) {
             setRfqDetailsPrId(data.purchase_request_id || data.purchase_request?.id);
+          }
+          if (data.purchase_request?.pr_number) {
+            setPrNumber(data.purchase_request.pr_number);
           }
           methods.reset({
             supplier_id: data.supplier?.id?.toString(),
@@ -288,12 +292,40 @@ export default function CreateRFQ() {
     });
   };
 
+  const resolvedPrId = isEdit ? rfqDetailsPrId : prId;
+  const resolvedPrNumber = isEdit ? prNumber : prData?.data?.pr_number;
+
   if (isPRLoading || isLoadingRFQ) return <Loading />;
 
   return (
     <FormProvider {...methods}>
       <div className="flex h-full min-h-screen">
         <div className="flex-1 flex flex-col gap-6 pb-6 px-6 overflow-y-auto">
+          {/* Breadcrumbs */}
+          <div className="flex items-center gap-2 text-xs text-slate-400 mt-6 font-medium">
+            <span
+              className="hover:text-primary cursor-pointer"
+              onClick={() => navigate("/rfqs")}
+            >
+              RFQs
+            </span>
+            {resolvedPrId && resolvedPrNumber && (
+              <>
+                <ChevronRight className="w-3 h-3" />
+                <span
+                  className="hover:text-primary cursor-pointer"
+                  onClick={() => navigate(`/purchase_request_details/${resolvedPrId}`)}
+                >
+                  PR #{resolvedPrNumber}
+                </span>
+              </>
+            )}
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-slate-900">
+              {isEdit ? `Edit RFQ #${methods.watch("rfq_number")}` : "Create RFQ"}
+            </span>
+          </div>
+
           <PageHeader
             title="Request for Quotation"
             subTitle={isEdit ? `Edit RFQ #${methods.watch("rfq_number")}` : `PR #${prData?.data?.pr_number || prId}`}
@@ -404,7 +436,7 @@ export default function CreateRFQ() {
           {isEdit && <RFQStatusTabs currentStatus={rfqStatus} />}
 
           <div className="space-y-6">
-            <RFQGeneralInfo isEdit={isEdit} prData={prData} />
+            <RFQGeneralInfo isEdit={isEdit} prData={prData} prId={resolvedPrId} prNumber={resolvedPrNumber} />
             <RFQItemsTable isEdit={isEdit} prData={prData} />
             {/* <RFQSummary /> */}
           </div>

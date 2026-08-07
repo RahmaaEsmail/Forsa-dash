@@ -716,6 +716,7 @@ import {
   XCircle,
   Trash2,
   Truck,
+  Undo,
 } from "lucide-react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useQuotationDetails } from "../../hooks/quotations/useQuotationDetails";
@@ -729,6 +730,8 @@ import { Badge } from "../../components/ui/badge";
 import { DeleteModal } from "../../components/shared/DeleteModal";
 import { downloadAsPDF } from "../../utils/downloadPDF";
 import { format } from "date-fns";
+import { pdf } from "@react-pdf/renderer";
+import { QuotationPDF, DownloadQuotationButton } from "./QuotationPDF";
 
 // Components
 import QuotationStatusTabs from "../../components/pages/Quotations/QuotationStatusTabs";
@@ -783,24 +786,47 @@ export default function QuotationDetails() {
     "311411370400003";
 
   const getSettingFileUrl = (value) => {
-    if (!value || typeof value !== 'string') return '';
-    if (value.startsWith('http://') || value.startsWith('https://')) return value;
-    return `https://api.forsa.cloud/${value.replace(/^\//, '')}`;
+    if (!value || typeof value !== "string") return "";
+    if (value.startsWith("http://") || value.startsWith("https://"))
+      return value;
+    return `https://api.forsa.cloud/${value.replace(/^\//, "")}`;
   };
 
-  const bankOneName = getSetting("bank_one_name") || "Saudi National Bank | البنك الأهلي السعودي (SNB)";
-  const bankOneHolder = getSetting("bank_one_account_holder") || "Company B.R.K.Z. Alalamiyyah for Information Technology";
+  const bankOneName =
+    getSetting("bank_one_name") ||
+    "Saudi National Bank | البنك الأهلي السعودي (SNB)";
+  const bankOneHolder =
+    getSetting("bank_one_account_holder") ||
+    "Company B.R.K.Z. Alalamiyyah for Information Technology";
   const bankOneIban = getSetting("bank_one_iban") || "SA6610000020000000249108";
-  const bankOneImage = getSetting("bank_one_image") ? getSettingFileUrl(getSetting("bank_one_image")) : "/images/snb-logo.png";
+  const bankOneImage = getSetting("bank_one_image")
+    ? getSettingFileUrl(getSetting("bank_one_image"))
+    : "/images/snb-logo.png";
 
-  const bankTwoName = getSetting("bank_two_name") || "Alrajhi Bank | مصرف الراجحي";
+  const bankTwoName =
+    getSetting("bank_two_name") || "Alrajhi Bank | مصرف الراجحي";
   const bankTwoHolder = getSetting("bank_two_account_holder") || "BRKZ IT CO";
   const bankTwoIban = getSetting("bank_two_iban") || "SA8380000611608010256585";
-  const bankTwoImage = getSetting("bank_two_image") ? getSettingFileUrl(getSetting("bank_two_image")) : "/images/alrajhi-logo.png";
+  const bankTwoImage = getSetting("bank_two_image")
+    ? getSettingFileUrl(getSetting("bank_two_image"))
+    : "/images/alrajhi-logo.png";
 
-  const termsAndConditionsText = getSetting("rfq_terms_and_conditions") || getSetting("terms_and_conditions");
+  const termsAndConditionsText =
+    getSetting("rfq_terms_and_conditions") ||
+    getSetting("terms_and_conditions");
 
   const quotation = quotationResponse?.data;
+  const rfqId = quotation?.purchase_request?.id;
+  const rfqNumber =
+    quotation?.purchase_request?.display_number ||
+    quotation?.purchase_request?.rfq_number;
+  const prId =
+    quotation?.purchase_request?.id ||
+    quotation?.purchase_request?.purchase_request_id ||
+    quotation?.purchase_request?.purchase_request?.id;
+  const prNumber =
+    quotation?.purchase_request?.pr_number ||
+    quotation?.purchase_request?.purchase_request?.pr_number;
 
   const methods = useForm({
     defaultValues: { items: [] },
@@ -834,9 +860,13 @@ export default function QuotationDetails() {
     });
   };
 
-  const isProforma = quotation?.status === "proforma_invoice";
+  const isProforma = ["proforma_invoice", "paid_payment", "delivered"].includes(
+    quotation?.status,
+  );
   const baseNumber = quotation?.quotation_number || "";
-  const number = isProforma ? baseNumber.replace(/^(QUO|QUC)-?/, "PI-") : baseNumber;
+  const number = isProforma
+    ? baseNumber.replace(/^(QUO|QUC)-?/, "PI-")
+    : baseNumber;
   const documentTitle = isProforma ? "Proforma Invoice" : "Quotation";
 
   const handlePrint = () => {
@@ -849,14 +879,33 @@ export default function QuotationDetails() {
     }, 100);
   };
 
-  const handleDownloadPDF = async () => {
-    const element = printRef.current;
-    if (!element) return;
-    const formattedName = number.startsWith("PI-") ? number.replace(/^PI-/, "PI_") : number;
-    await downloadAsPDF(element, {
-      filename: `${formattedName}.pdf`,
-      margin: [10, 10, 10, 10],
-    });
+  const handleDownloadPDF = async (customIsProforma = null) => {
+    const isProf = customIsProforma !== null 
+      ? customIsProforma 
+      : isProforma;
+
+    const doc = (
+      <QuotationPDF
+        quotation={quotation}
+        isProforma={isProf}
+        settings={settingsData}
+      />
+    );
+    const blob = await pdf(doc).toBlob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    const computedNumber = isProf
+      ? baseNumber.replace(/^(QUO|QUC)-?/, "PI-")
+      : baseNumber;
+    const formattedName = computedNumber.startsWith("PI-")
+      ? computedNumber.replace(/^PI-/, "PI_")
+      : computedNumber;
+    link.download = `${formattedName}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   useEffect(() => {
@@ -944,6 +993,28 @@ export default function QuotationDetails() {
           >
             Quotations
           </span>
+          {prNumber && prId && (
+            <>
+              <ChevronRight className="w-3 h-3" />
+              <span
+                className="hover:text-primary cursor-pointer"
+                onClick={() => navigate(`/purchase_request_details/${prId}`)}
+              >
+                PR #{prNumber}
+              </span>
+            </>
+          )}
+          {rfqNumber && rfqId && (
+            <>
+              <ChevronRight className="w-3 h-3" />
+              <span
+                className="hover:text-primary cursor-pointer"
+                onClick={() => navigate(`/rfqs/${rfqId}/details`)}
+              >
+                RFQ #{rfqNumber}
+              </span>
+            </>
+          )}
           <ChevronRight className="w-3 h-3" />
           <span className="text-slate-900">{documentTitle} Details</span>
         </div>
@@ -973,9 +1044,35 @@ export default function QuotationDetails() {
                   ? format(new Date(quotation.quotation_date), "PPP")
                   : "N/A"}
               </p>
+              {quotation?.purchase_request && prNumber && prId && (
+                <div className="flex gap-2 items-center mt-3 bg-slate-50 border border-slate-100 rounded-lg p-2 w-fit">
+                  <span className="text-xs font-medium text-slate-500">PR Connection:</span>
+                  <span
+                    onClick={() => navigate(`/purchase_request_details/${prId}`)}
+                    className="cursor-pointer text-xs font-bold text-primary hover:underline hover:text-primary/85 flex items-center gap-1.5"
+                  >
+                    #{prNumber}
+                    <Badge variant="outline" className="bg-white text-[9px] py-0 px-1 uppercase border-slate-200">
+                      {quotation?.purchase_request?.status}
+                    </Badge>
+                  </span>
+                </div>
+              )}
             </div>
             <div className="flex gap-3 items-center flex-wrap">
               {/* Action Buttons */}
+              {quotation?.status !== "draft" &&
+                hasPermission("edit_quotations") && (
+                  <Button
+                    variant="outline"
+                    onClick={() => handleStatusAction("step-back")}
+                    disabled={updateStatus.isPending}
+                    className="rounded-xl border-amber-200 text-amber-700 font-bold hover:bg-amber-50 h-11 px-6 gap-2"
+                  >
+                    <Undo className="w-4 h-4" /> Step Back
+                  </Button>
+                )}
+
               {quotation?.status !== "cancelled" &&
                 quotation?.status !== "delivered" &&
                 hasPermission("edit_quotations") && (
@@ -989,72 +1086,106 @@ export default function QuotationDetails() {
                   </Button>
                 )}
 
-              {quotation?.status === "draft" && hasPermission("edit_quotations") && (
+              {quotation?.status === "draft" &&
+                hasPermission("edit_quotations") && (
+                  <Button
+                    onClick={() => handleStatusAction("manager-approve")}
+                    disabled={updateStatus.isPending}
+                    className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
+                  >
+                    <Send className="w-4 h-4" />
+                    {updateStatus.isPending ? "Sending..." : "Send to Manager"}
+                  </Button>
+                )}
+
+              {quotation?.status === "sales_manager_approval" &&
+                hasPermission("edit_quotations") && (
+                  <Button
+                    onClick={() => handleStatusAction("client-approve")}
+                    disabled={updateStatus.isPending}
+                    className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
+                  >
+                    <Send className="w-4 h-4" />
+                    {updateStatus.isPending ? "Sending..." : "Send to Client"}
+                  </Button>
+                )}
+
+              {quotation?.status === "client_approval" &&
+                hasPermission("edit_quotations") && (
+                  <Button
+                    onClick={() =>
+                      handleStatusAction("proforma_invoice", {}, () =>
+                        setShouldDownloadPDF(true),
+                      )
+                    }
+                    disabled={updateStatus.isPending}
+                    className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
+                  >
+                    <FileText className="w-4 h-4" />
+                    {updateStatus.isPending
+                      ? "Generating..."
+                      : "Generate Proforma"}
+                  </Button>
+                )}
+
+              {quotation?.status === "proforma_invoice" &&
+                hasPermission("edit_quotations") && (
+                  <Button
+                    onClick={() => setIsPaymentModalOpen(true)}
+                    disabled={updateStatus.isPending}
+                    className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    {updateStatus.isPending
+                      ? "Processing..."
+                      : "Record Payment"}
+                  </Button>
+                )}
+
+              {quotation?.status === "paid_payment" &&
+                hasPermission("edit_quotations") && (
+                  <Button
+                    onClick={() => handleStatusAction("deliver")}
+                    disabled={updateStatus.isPending}
+                    className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
+                  >
+                    <Package className="w-4 h-4" />
+                    {updateStatus.isPending
+                      ? "Marking..."
+                      : "Mark as Delivered"}
+                  </Button>
+                )}
+
+              {["proforma_invoice", "paid_payment", "delivered"].includes(
+                quotation?.status,
+              ) ? (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleDownloadPDF(true)}
+                    className="rounded-xl border-slate-200 text-slate-700 gap-2 font-bold hover:bg-slate-50 h-11 px-6 transition-all shadow-sm"
+                  >
+                    <Download className="w-4 h-4 text-slate-500" /> Download
+                    Proforma
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleDownloadPDF(false)}
+                    className="rounded-xl border-slate-200 text-slate-700 gap-2 font-bold hover:bg-slate-50 h-11 px-6 transition-all shadow-sm"
+                  >
+                    <Download className="w-4 h-4 text-slate-500" /> Download
+                    Quotation
+                  </Button>
+                </>
+              ) : (
                 <Button
-                  onClick={() => handleStatusAction("manager-approve")}
-                  disabled={updateStatus.isPending}
-                  className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
+                  variant="outline"
+                  onClick={() => handleDownloadPDF(null)}
+                  className="rounded-xl border-slate-200 text-slate-700 gap-2 font-bold hover:bg-slate-50 h-11 px-6 transition-all shadow-sm"
                 >
-                  <Send className="w-4 h-4" />
-                  {updateStatus.isPending ? "Sending..." : "Send to Manager"}
+                  <Download className="w-4 h-4 text-slate-500" /> Download PDF
                 </Button>
               )}
-
-              {quotation?.status === "sales_manager_approval" && hasPermission("edit_quotations") && (
-                <Button
-                  onClick={() => handleStatusAction("client-approve")}
-                  disabled={updateStatus.isPending}
-                  className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
-                >
-                  <Send className="w-4 h-4" />
-                  {updateStatus.isPending
-                    ? "Sending..."
-                    : "Send to Client"}
-                </Button>
-              )}
-
-              {quotation?.status === "client_approval" && hasPermission("edit_quotations") && (
-                <Button
-                  onClick={() => handleStatusAction("proforma_invoice", {}, () => setShouldDownloadPDF(true))}
-                  disabled={updateStatus.isPending}
-                  className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
-                >
-                  <FileText className="w-4 h-4" />
-                  {updateStatus.isPending
-                    ? "Generating..."
-                    : "Generate Proforma"}
-                </Button>
-              )}
-
-              {quotation?.status === "proforma_invoice" && hasPermission("edit_quotations") && (
-                <Button
-                  onClick={() => setIsPaymentModalOpen(true)}
-                  disabled={updateStatus.isPending}
-                  className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
-                >
-                  <CreditCard className="w-4 h-4" />
-                  {updateStatus.isPending ? "Processing..." : "Record Payment"}
-                </Button>
-              )}
-
-              {quotation?.status === "paid_payment" && hasPermission("edit_quotations") && (
-                <Button
-                  onClick={() => handleStatusAction("deliver")}
-                  disabled={updateStatus.isPending}
-                  className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20 h-11 px-6"
-                >
-                  <Package className="w-4 h-4" />
-                  {updateStatus.isPending ? "Marking..." : "Mark as Delivered"}
-                </Button>
-              )}
-
-              <Button
-                variant="outline"
-                onClick={handleDownloadPDF}
-                className="rounded-xl border-slate-200 text-slate-700 gap-2 font-bold hover:bg-slate-50 h-11 px-6 transition-all shadow-sm"
-              >
-                <Download className="w-4 h-4 text-slate-500" /> Download PDF
-              </Button>
               {hasPermission("delete_quotations") && (
                 <Button
                   variant="outline"
@@ -1274,9 +1405,16 @@ export default function QuotationDetails() {
                 </div>
               ) : (
                 <ul className="list-disc pl-4 space-y-1 text-[10px] leading-relaxed text-slate-500 font-medium">
-                  <li>Prices are valid for 15 Days from the date of quotation.</li>
-                  <li>Delivery within 3-5 working days from PO confirmation.</li>
-                  <li>Goods once sold cannot be returned unless manufacturing defect.</li>
+                  <li>
+                    Prices are valid for 15 Days from the date of quotation.
+                  </li>
+                  <li>
+                    Delivery within 3-5 working days from PO confirmation.
+                  </li>
+                  <li>
+                    Goods once sold cannot be returned unless manufacturing
+                    defect.
+                  </li>
                   <li>All disputes subject to Riyadh jurisdiction.</li>
                 </ul>
               )}
@@ -1305,7 +1443,8 @@ export default function QuotationDetails() {
             {/* Bank Transfer Details */}
             <div className="px-8 text-left">
               <p className="text-[10px] font-black uppercase text-center tracking-wide text-white/95 mb-2">
-                For bank transfer process please use one of the following bank accounts
+                For bank transfer process please use one of the following bank
+                accounts
               </p>
               <div className="grid grid-cols-2 gap-4 text-[9px] font-medium leading-relaxed opacity-95">
                 {/* Bank 1 */}
@@ -1319,9 +1458,17 @@ export default function QuotationDetails() {
                       />
                     )}
                     <div className="space-y-0.5 min-w-0">
-                      <p className="font-extrabold text-white text-[10px] truncate">{bankOneName}</p>
-                      <p className="truncate"><span className="text-white/60">Name:</span> {bankOneHolder}</p>
-                      <p className="font-bold truncate"><span className="text-white/60 font-normal">IBAN:</span> {bankOneIban}</p>
+                      <p className="font-extrabold text-white text-[10px] truncate">
+                        {bankOneName}
+                      </p>
+                      <p className="truncate">
+                        <span className="text-white/60">Name:</span>{" "}
+                        {bankOneHolder}
+                      </p>
+                      <p className="font-bold truncate">
+                        <span className="text-white/60 font-normal">IBAN:</span>{" "}
+                        {bankOneIban}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -1337,9 +1484,17 @@ export default function QuotationDetails() {
                       />
                     )}
                     <div className="space-y-0.5 min-w-0">
-                      <p className="font-extrabold text-white text-[10px] truncate">{bankTwoName}</p>
-                      <p className="truncate"><span className="text-white/60">Name:</span> {bankTwoHolder}</p>
-                      <p className="font-bold truncate"><span className="text-white/60 font-normal">IBAN:</span> {bankTwoIban}</p>
+                      <p className="font-extrabold text-white text-[10px] truncate">
+                        {bankTwoName}
+                      </p>
+                      <p className="truncate">
+                        <span className="text-white/60">Name:</span>{" "}
+                        {bankTwoHolder}
+                      </p>
+                      <p className="font-bold truncate">
+                        <span className="text-white/60 font-normal">IBAN:</span>{" "}
+                        {bankTwoIban}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -1350,9 +1505,7 @@ export default function QuotationDetails() {
             <div className="border-t border-white/15 mx-6"></div>
 
             <div className="space-y-1">
-              <p>
-                {companyName}
-              </p>
+              <p>{companyName}</p>
               <p className="opacity-90 font-normal text-[9px]">
                 VAT No. {companyVat} &nbsp;&nbsp;&nbsp;&nbsp; CRN. {companyCrn}
               </p>
