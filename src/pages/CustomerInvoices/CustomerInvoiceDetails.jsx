@@ -738,7 +738,7 @@ export default function CustomerInvoiceDetails() {
           }
           #printable-invoice-area-wrapper * { visibility: visible !important; }
           
-          @page { size: A4; margin: 0; padding: 0; }
+          @page { size: A4; margin: 0 0 170px 0; padding: 0; }
 
           #printable-invoice-area {
             border: none !important;
@@ -747,8 +747,8 @@ export default function CustomerInvoiceDetails() {
             margin: 0 !important;
             max-width: 100% !important;
             width: 100% !important;
-            margin-bottom: 170px !important;
-            padding-bottom: 170px !important;
+            margin-bottom: 0 !important;
+            padding-bottom: 20px !important;
           }
 
           .print-footer {
