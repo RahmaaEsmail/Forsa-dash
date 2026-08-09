@@ -6,24 +6,32 @@ import { useSidebar } from '../../context/SidebarContext'
 import useUnreadCount from '../../hooks/Notifications/useUnreadCount'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { config } from '../../api/config'
+import Cookies from 'js-cookie'
+import { apiInstance } from '../../api/apiInstance'
+import { userEndpoints } from '../../api/userEndpoints'
 
 export default function Header() {
   const navigate = useNavigate();
   const { toggle, isMinimized, toggleMinimize } = useSidebar() || {};
   const { data: unreadCountData } = useUnreadCount();
   
-  console.log("data" , unreadCountData)
   const unreadCount = unreadCountData?.data?.unread_count || 0;
   const [userData, setUserData] = useState(null);
   useEffect(() => { 
-    console.log("user data", JSON.parse(localStorage.getItem((config.localStorageUserData))))
     setUserData(JSON.parse(localStorage.getItem((config.localStorageUserData))))
   } ,[])
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      // Revoke tokens on the backend so they can't be reused
+      await apiInstance.post(userEndpoints.logout, {});
+    } catch (_) {
+      // Even if the server call fails, clear local state and redirect
+    }
     localStorage.removeItem(config.localStorageTokenName);
-    localStorage.removeItem(config.localStorageRefreshTokenName);
     localStorage.removeItem(config.localStorageUserData);
+    // Refresh token is stored as a cookie — must use Cookies.remove, NOT localStorage.removeItem
+    Cookies.remove(config.localStorageRefreshTokenName);
     navigate("/login");
   };
 
