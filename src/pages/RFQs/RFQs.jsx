@@ -62,19 +62,19 @@ export default function RFQs() {
 
       {/* <RFQStatusTabs /> */}
 
-      <RFQFilter onFilter={handleFilter} onReset={handleReset} />
+      <RFQFilter onFilter={handleFilter} onReset={handleReset} filters={filters} />
 
       <div className="px-5">
         <Tabs value={activeView} onValueChange={handleViewChange} className="w-full">
           <TabsList className="bg-slate-100/50 p-1 rounded-xl w-fit flex gap-1 mb-8 border border-slate-200">
-            <TabsTrigger 
-              value="rfq" 
+            <TabsTrigger
+              value="rfq"
               className="rounded-lg px-8 py-2.5 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all font-bold text-sm"
             >
               RFQ
             </TabsTrigger>
-            <TabsTrigger 
-              value="po" 
+            <TabsTrigger
+              value="po"
               className="rounded-lg px-8 py-2.5 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all font-bold text-sm"
             >
               Purchase Order
@@ -83,24 +83,24 @@ export default function RFQs() {
 
           <TabsContent value="rfq" className="mt-0">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-              <RFQTable 
-                view="rfq" 
-                filters={filters} 
-                onDataLoaded={setRfqData} 
-                selectedRowKeys={selectedRowKeys} 
-                onSelectedRowKeysChange={setSelectedRowKeys} 
+              <RFQTable
+                view="rfq"
+                filters={filters}
+                onDataLoaded={setRfqData}
+                selectedRowKeys={selectedRowKeys}
+                onSelectedRowKeysChange={setSelectedRowKeys}
               />
             </div>
           </TabsContent>
-          
+
           <TabsContent value="po" className="mt-0">
-             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-              <RFQTable 
-                view="po" 
-                filters={filters} 
-                onDataLoaded={setPoData} 
-                selectedRowKeys={selectedRowKeys} 
-                onSelectedRowKeysChange={setSelectedRowKeys} 
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+              <RFQTable
+                view="po"
+                filters={filters}
+                onDataLoaded={setPoData}
+                selectedRowKeys={selectedRowKeys}
+                onSelectedRowKeysChange={setSelectedRowKeys}
               />
             </div>
           </TabsContent>
