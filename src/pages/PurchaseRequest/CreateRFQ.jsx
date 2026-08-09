@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 import { format } from 'date-fns'
 import CancelRFQModal from '../../components/pages/RFQs/CancelRFQModal'
 import ActivityLog from '../../layout/ActivityLog/ActivityLog'
-import { Printer, MessageSquare, AlertCircle, X, ChevronRight } from 'lucide-react'
+import { Printer, MessageSquare, AlertCircle, X, ChevronRight, Package } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -421,6 +421,15 @@ export default function CreateRFQ() {
                   disabled={isUpdatingStatus}
                 >
                   {isUpdatingStatus ? "Issuing..." : "Issue Purchase Order"}
+                </Button>
+              )}
+
+              {isEdit && rfqStatus === 'purchase_ordered' && (
+                <Button
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white h-10 px-6 font-bold gap-2"
+                  onClick={() => navigate(`/create-grn/${rfqId}`)}
+                >
+                  <Package className="w-4 h-4" /> Create GRN
                 </Button>
               )}
 

@@ -1287,14 +1287,6 @@ export default function RFQDetails() {
             >
               <Printer className="w-4 h-4" /> Download/Print PDF
             </Button>
-            {rfq.status === "purchase_ordered" && (
-              <Button
-                className="rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2"
-                onClick={() => navigate(`/create-grn/${rfq.id}`)}
-              >
-                <Package className="w-4 h-4" /> Create GRN
-              </Button>
-            )}
             {rfq.can_be_fully_edited && (
               <Button
                 variant="outline"
