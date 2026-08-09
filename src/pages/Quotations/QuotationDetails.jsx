@@ -1061,7 +1061,7 @@ export default function QuotationDetails() {
             </div>
             <div className="flex gap-3 items-center flex-wrap">
               {/* Action Buttons */}
-              {quotation?.status !== "draft" &&
+              {quotation?.can_step_back &&
                 hasPermission("edit_quotations") && (
                   <Button
                     variant="outline"
