@@ -12,6 +12,10 @@ export async function handleGetAllSettings({signal}) {
 }
 
 export const handleUpdateSettings = async({signal , body}) => {
-  const response = await apiInstance.post(userEndpoints.list_settings  , body , {signal});
+  const isFormData = body instanceof FormData;
+  const response = await apiInstance.post(userEndpoints.list_settings  , body , {
+    headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {},
+    signal,
+  });
   return response.data;
 }

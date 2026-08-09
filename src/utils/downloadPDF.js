@@ -1,4 +1,5 @@
 import html2pdf from "html2pdf.js";
+import html2canvas from "html2canvas";
 
 /**
  * Converts any CSS color string (including oklch) to rgb/rgba by painting it
@@ -52,7 +53,7 @@ function getSanitizedStyles() {
  * @param {HTMLElement} element  The element to render
  * @param {object}      options
  * @param {string}      options.filename    e.g. "RFQ-1234.pdf"
- * @param {number[]}    options.margin      [top, right, bottom, left] in mm
+ * @param {number[]}    options.margin      [top, right, bottom, left] in mm (standard format is top, left, bottom, right)
  * @param {string}      options.orientation "portrait" | "landscape"
  * @param {number}      options.scale       html2canvas scale factor (default 2)
  */
@@ -72,9 +73,59 @@ export async function downloadAsPDF(element, options = {}) {
   // Get sanitized styles BEFORE cloning
   const cleanCSS = getSanitizedStyles();
 
-  await html2pdf()
+  // Find if there is a printable footer to repeat
+  const footerEl = element.querySelector(".print-footer");
+  let footerImgData = null;
+  let pdfFooterHeight = 0;
+  let pdfFooterWidth = 0;
+
+  const isLandscape = orientation === "landscape";
+  const pageWidth = isLandscape ? 297 : 210;
+  const pageHeight = isLandscape ? 210 : 297;
+
+  if (footerEl) {
+    try {
+      // Capture footer as an image
+      const footerCanvas = await html2canvas(footerEl, {
+        scale: scale,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null,
+        logging: false,
+      });
+      if (footerCanvas.width > 0) {
+        footerImgData = footerCanvas.toDataURL("image/png");
+        pdfFooterWidth = pageWidth;
+        pdfFooterHeight = pdfFooterWidth * (footerCanvas.height / footerCanvas.width);
+      }
+    } catch (error) {
+      console.error("Failed to capture footer canvas:", error);
+    }
+  }
+
+  // Normalize and adjust margin to accommodate footer on all pages if we have one
+  let adjustedMargin = [8, 8, 8, 8];
+  if (Array.isArray(margin)) {
+    if (margin.length === 2) {
+      adjustedMargin = [margin[0], margin[1], margin[0], margin[1]];
+    } else if (margin.length === 4) {
+      adjustedMargin = [...margin];
+    }
+  } else if (typeof margin === "number") {
+    adjustedMargin = [margin, margin, margin, margin];
+  }
+
+  if (footerImgData) {
+    // Space for footer: pdfFooterHeight plus 5mm safety gap
+    const minBottomMargin = pdfFooterHeight + 5;
+    if (adjustedMargin[2] < minBottomMargin) {
+      adjustedMargin[2] = minBottomMargin;
+    }
+  }
+
+  const worker = html2pdf()
     .set({
-      margin,
+      margin: adjustedMargin,
       filename,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
@@ -126,11 +177,43 @@ export async function downloadAsPDF(element, options = {}) {
               // Ignore errors on hidden or unstyled nodes
             }
           });
+
+          // 4. Hide the inline footer from page content so it isn't rendered twice
+          if (footerImgData) {
+            const clonedFooter = clonedDoc.querySelector(".print-footer");
+            if (clonedFooter) {
+              clonedFooter.style.display = "none";
+            }
+          }
         },
       },
       jsPDF: { unit: "mm", format: "a4", orientation },
       pagebreak: { mode: ["avoid-all", "css", "legacy"] },
     })
-    .from(element)
-    .save();
+    .from(element);
+
+  if (footerImgData) {
+    await worker
+      .toPdf()
+      .get("pdf")
+      .then((pdf) => {
+        const totalPages = pdf.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+          pdf.addImage(
+            footerImgData,
+            "PNG",
+            0,
+            pageHeight - pdfFooterHeight,
+            pdfFooterWidth,
+            pdfFooterHeight,
+            undefined,
+            "FAST"
+          );
+        }
+      })
+      .save();
+  } else {
+    await worker.save();
+  }
 }

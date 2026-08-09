@@ -931,6 +931,7 @@ import {
   Database,
   Info,
   MessageSquare,
+  ChevronRight,
 } from "lucide-react";
 
 import { useRFQDetails } from "../../hooks/rfqs/useRFQs";
@@ -1115,6 +1116,8 @@ export default function RFQDetails() {
   const { data: rfqResponse, isLoading, isError } = useRFQDetails(rfqId);
 
   const rfq = getRfq(rfqResponse);
+  const prId = rfq?.purchase_request_id || rfq?.purchase_request?.id;
+  const prNumber = rfq?.purchase_request?.pr_number;
   const currency = rfq?.currency;
 
   const activityModelType = rfq
@@ -1207,6 +1210,31 @@ export default function RFQDetails() {
       />
 
       <div className="mx-auto max-w-7xl space-y-6 no-print">
+        {/* Breadcrumbs */}
+        <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
+          <span
+            className="hover:text-primary cursor-pointer"
+            onClick={() => navigate("/rfqs")}
+          >
+            RFQs
+          </span>
+          {prNumber && prId && (
+            <>
+              <ChevronRight className="w-3 h-3" />
+              <span
+                className="hover:text-primary cursor-pointer"
+                onClick={() => navigate(`/purchase_request_details/${prId}`)}
+              >
+                PR #{prNumber}
+              </span>
+            </>
+          )}
+          <ChevronRight className="w-3 h-3" />
+          <span className="text-slate-900">
+            {rfq?.is_purchase_order ? "PO Details" : "RFQ Details"}
+          </span>
+        </div>
+
         {/* Main Header Action Controls */}
         <div className="flex flex-col gap-4 rounded-3xl border bg-background p-5 shadow-sm md:flex-row md:items-center md:justify-between">
           <div className="flex items-start gap-4">
@@ -1235,6 +1263,20 @@ export default function RFQDetails() {
                 Created at {formatDate(rfq.created_at)} by{" "}
                 {safeText(rfq.procurement_user?.name)}
               </p>
+              {rfq?.purchase_request && prNumber && prId && (
+                <div className="flex gap-2 items-center mt-3 bg-slate-50 border border-slate-100 rounded-lg p-2 w-fit">
+                  <span className="text-xs font-medium text-slate-500">PR Connection:</span>
+                  <span
+                    onClick={() => navigate(`/purchase_request_details/${prId}`)}
+                    className="cursor-pointer text-xs font-bold text-primary hover:underline hover:text-primary/85 flex items-center gap-1.5"
+                  >
+                    #{prNumber}
+                    <Badge variant="outline" className="bg-white text-[9px] py-0 px-1 uppercase border-slate-200">
+                      {rfq?.purchase_request?.status}
+                    </Badge>
+                  </span>
+                </div>
+              )}
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -1423,8 +1465,24 @@ export default function RFQDetails() {
                   <strong>{rfq.display_number || rfq.rfq_number}</strong>
                 </p>
               )}
-              {/* <p><span className="text-slate-400">PR Connected:</span> {safeText(rfq.purchase_request?.pr_number)}</p> */}
-              {/* <p><span className="text-slate-400">PR Status:</span> {safeText(rfq.purchase_request?.status)}</p> */}
+              {prNumber && prId && (
+                <>
+                  <p>
+                    <span className="text-slate-400">PR Connected:</span>{" "}
+                    <strong className="text-slate-800">
+                      <EntityLink type="purchase_request" id={prId}>
+                        #{prNumber}
+                      </EntityLink>
+                    </strong>
+                  </p>
+                  <p>
+                    <span className="text-slate-400">PR Status:</span>{" "}
+                    <Badge variant="outline" className="bg-slate-100/50 border-slate-200 px-2 py-0 text-[10px] capitalize font-medium text-slate-600 rounded">
+                      {safeText(rfq.purchase_request?.status)}
+                    </Badge>
+                  </p>
+                </>
+              )}
             </div>
           </div>
 

@@ -25,7 +25,7 @@ const getFirstCurrency = (currenciesObj) => {
   return { code, ...currenciesObj[code] };
 };
 
-export default function RFQGeneralInfo({ prData , isEdit}) {
+export default function RFQGeneralInfo({ prData , isEdit, prId, prNumber }) {
   const { register, control, setValue, watch, formState: { errors } } = useFormContext();
   const [isSupplierModalOpen, setIsSupplierModalOpen] = React.useState(false);
   const [newSupplierName, setNewSupplierName] = React.useState("");
@@ -313,6 +313,19 @@ export default function RFQGeneralInfo({ prData , isEdit}) {
               icon={<MapPin className="w-4 h-4 text-slate-400" />}
               disabled
             />
+          )}
+
+          {prNumber && prId && (
+            <div className="flex flex-col gap-2">
+              <Label className="font-normal text-secondary text-lg">
+                <span>Purchase Request</span>
+              </Label>
+              <div className="rounded-lg bg-input-bg p-6 flex items-center">
+                <EntityLink type="purchase_request" id={prId} className="font-bold">
+                  #{prNumber}
+                </EntityLink>
+              </div>
+            </div>
           )}
 
           {/* Selected Address Preview Card */}

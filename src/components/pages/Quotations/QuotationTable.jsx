@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import CustomTable from "../../shared/CustomTable";
 import { Badge } from "../../ui/badge";
-import { Eye, Edit, Trash2, FileText } from "lucide-react";
+import { Eye, Edit, Trash2, FileText, Download } from "lucide-react";
 import { Button } from "../../ui/button";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../../shared/Pagination";
@@ -34,6 +34,7 @@ export default function QuotationTable({
   selectedRowKeys,
   onSelectedRowKeysChange,
   data,
+  activeTab = "quotation",
   isLoading,
   page,
   setPage,
@@ -63,7 +64,10 @@ export default function QuotationTable({
       dataIndex: "quotation_number",
       key: "quotation_number",
       render: (val, row) => {
-        const displayVal = row?.status === 'proforma_invoice' ? val?.replace(/^QUO-?/, 'PI-') : val;
+        const displayVal =
+          row?.status === "proforma_invoice"
+            ? val?.replace(/^(QUO|QUC)-?/, "PI-")
+            : val;
         return <span className="font-bold text-slate-900">{displayVal}</span>;
       },
     },
@@ -109,9 +113,9 @@ export default function QuotationTable({
       render: (status) => {
         let displayStatus = status;
         if (status === "client_approval") {
-          displayStatus = "Manager Approval";
-        } else if (status === "sales_manager_approval") {
           displayStatus = "Client Approval";
+        } else if (status === "sales_manager_approval") {
+          displayStatus = "Manager Approval";
         } else {
           displayStatus = status?.replace(/_/g, " ");
         }
@@ -133,7 +137,9 @@ export default function QuotationTable({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => window.open(`/quotations/${row.id}/details`, '_blank')}
+              onClick={() =>
+                window.open(`/quotations/${row.id}/details`, "_blank")
+              }
             >
               <Eye className="w-4 h-4 text-slate-500" />
             </Button>
@@ -142,9 +148,26 @@ export default function QuotationTable({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => window.open(`/quotations/${row.id}/edit`, '_blank')}
+              onClick={() =>
+                window.open(`/quotations/${row.id}/edit`, "_blank")
+              }
             >
               <Edit className="w-4 h-4 text-slate-500" />
+            </Button>
+          )}
+          {row.status === "proforma_invoice" && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() =>
+                window.open(
+                  `/quotations/${row.id}/details?download=true`,
+                  "_blank",
+                )
+              }
+              title="Download PDF"
+            >
+              <Download className="w-4 h-4 text-slate-500" />
             </Button>
           )}
           {/* <Button
@@ -158,7 +181,9 @@ export default function QuotationTable({
           {row.status === "paid_payment" || row.status === "approved" ? (
             <Button
               variant="ghost"
-              onClick={() => window.open(`/create-delivery-note/${row.id}`, '_blank')}
+              onClick={() =>
+                window.open(`/create-delivery-note/${row.id}`, "_blank")
+              }
               className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 px-2"
             >
               Delivery Note
@@ -167,7 +192,7 @@ export default function QuotationTable({
           <Button
             variant="ghost"
             size=""
-            onClick={() => window.open(`/create-invoice/${row.id}`, '_blank')}
+            onClick={() => window.open(`/create-invoice/${row.id}`, "_blank")}
           >
             Create Invoice
           </Button>
@@ -178,12 +203,21 @@ export default function QuotationTable({
 
   if (isLoading) return <Loading />;
 
+  const filteredDataList =
+    data?.data?.filter((row) => {
+      if (activeTab === "proforma") {
+        return row.status === "proforma_invoice";
+      } else {
+        return row;
+      }
+    }) || [];
+
   return (
     <div className="space-y-4">
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <CustomTable
           columns={columns}
-          dataSource={data?.data || []}
+          dataSource={filteredDataList}
           rowKey="id"
           selectedRowKeys={selectedRowKeys}
           onSelectedRowKeysChange={onSelectedRowKeysChange}

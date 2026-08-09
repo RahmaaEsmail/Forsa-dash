@@ -55,3 +55,11 @@ export const handleGetAllPaymentTerms = async ({ signal, params }) => {
   });
   return response.data;
 }
+
+export const handleCreateQuotation = async ({ id, body = {}, signal }) => {
+  const response = await apiInstance.post(`${userEndpoints.get_purchase_request}/${id}/create-quotation`, body, {
+    signal
+  });
+  return response.data;
+}
+

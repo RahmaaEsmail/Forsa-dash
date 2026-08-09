@@ -61,7 +61,7 @@ export default function ActivityLogChat({
 
   const handleSaveEdit = () => {
     if (!editText.trim()) return;
-    onEdit(comment.id, editText);
+    onEdit(comment.id, editText, comment.attachment);
     setIsEditing(false);
   };
 
@@ -115,48 +115,46 @@ export default function ActivityLogChat({
               </Button>
             </div>
           ) : (
-            <>
-              <p className="text-slate-700 text-sm font-normal leading-relaxed break-words whitespace-pre-wrap">
-                {renderCommentContent(comment?.comment || comment?.message || comment?.description || '')}
-              </p>
-              
-              {comment?.attachment && (() => {
-                const attachmentUrl = typeof comment.attachment === 'string' ? comment.attachment : comment.attachment.url;
-                const getAbsoluteUrl = (url) => {
-                  if (!url) return '';
-                  if (url.startsWith('http://') || url.startsWith('https://')) return url;
-                  return `https://api.forsa.cloud/${url.replace(/^\//, '')}`;
-                };
-                const absoluteUrl = getAbsoluteUrl(attachmentUrl);
-                const fileName = typeof comment.attachment === 'string'
-                  ? comment.attachment.split('/').pop()
-                  : comment.attachment.name || 'Attachment';
-
-                return (
-                  <div className="mt-2.5 p-2 bg-white rounded-xl border border-slate-100 flex items-center justify-between gap-3 text-xs shadow-sm hover:border-slate-200 transition-colors">
-                    <div className="flex items-center gap-2 overflow-hidden">
-                      <div className="p-1.5 bg-primary/10 rounded text-primary shrink-0">
-                        <Paperclip size={12} />
-                      </div>
-                      <span className="truncate text-slate-700 font-semibold max-w-[150px]" title={fileName}>
-                        {fileName}
-                      </span>
-                    </div>
-                    {absoluteUrl && (
-                      <a
-                        href={absoluteUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[10px] font-bold bg-primary/10 hover:bg-primary/20 text-primary px-2.5 py-1 rounded-lg transition-colors shrink-0 cursor-pointer text-center"
-                      >
-                        View
-                      </a>
-                    )}
-                  </div>
-                );
-              })()}
-            </>
+            <p className="text-slate-700 text-sm font-normal leading-relaxed break-words whitespace-pre-wrap">
+              {renderCommentContent(comment?.comment || comment?.message || comment?.description || '')}
+            </p>
           )}
+
+          {comment?.attachment && (() => {
+            const attachmentUrl = typeof comment.attachment === 'string' ? comment.attachment : comment.attachment.url;
+            const getAbsoluteUrl = (url) => {
+              if (!url) return '';
+              if (url.startsWith('http://') || url.startsWith('https://')) return url;
+              return `https://api.forsa.cloud/${url.replace(/^\//, '')}`;
+            };
+            const absoluteUrl = getAbsoluteUrl(attachmentUrl);
+            const fileName = typeof comment.attachment === 'string'
+              ? comment.attachment.split('/').pop()
+              : comment.attachment.name || 'Attachment';
+
+            return (
+              <div className="mt-2.5 p-2 bg-white rounded-xl border border-slate-100 flex items-center justify-between gap-3 text-xs shadow-sm hover:border-slate-200 transition-colors">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <div className="p-1.5 bg-primary/10 rounded text-primary shrink-0">
+                    <Paperclip size={12} />
+                  </div>
+                  <span className="truncate text-slate-700 font-semibold max-w-[150px]" title={fileName}>
+                    {fileName}
+                  </span>
+                </div>
+                {absoluteUrl && (
+                  <a
+                    href={absoluteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] font-bold bg-primary/10 hover:bg-primary/20 text-primary px-2.5 py-1 rounded-lg transition-colors shrink-0 cursor-pointer text-center"
+                  >
+                    View
+                  </a>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Actions - Reply, Edit, Delete */}
           {!isEditing && (
@@ -180,13 +178,13 @@ export default function ActivityLogChat({
                     <Edit2 size={11} />
                     Edit
                   </button>
-                  <button
+                  {/* <button
                     onClick={() => onDelete(comment.id)}
                     className="flex items-center gap-1 text-[11px] font-bold text-red-500 hover:text-red-700"
                   >
                     <Trash2 size={11} />
                     Delete
-                  </button>
+                  </button> */}
                 </>
               )}
             </div>

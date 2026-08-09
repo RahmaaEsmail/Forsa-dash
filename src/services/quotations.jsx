@@ -45,6 +45,9 @@ export const handleUpdateQuotationStatus = async ({ id, status, body = {} }) => 
     case 'cancel':
       endpoint += 'cancel';
       break;
+    case 'step-back':
+      endpoint += 'step-back';
+      break;
     default:
       throw new Error(`Unsupported status update: ${status}`);
   }

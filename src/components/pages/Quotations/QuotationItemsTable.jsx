@@ -69,7 +69,7 @@ export default function QuotationItemsTable({
       ),
     },
     {
-      title: "Selling Price",
+      title: "Price",
       className: "px-4",
       render: (_, __, index) => (
         <div className="w-[100px]">

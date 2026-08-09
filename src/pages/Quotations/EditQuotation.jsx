@@ -19,11 +19,15 @@ import {
   FileText,
   Package,
   Truck,
+  Download,
+  ChevronRight,
+  Undo,
 } from "lucide-react";
 import Loading from "../../components/shared/Loading";
 import { useUpdateQuotationStatus } from "../../hooks/quotations/useUpdateQuotationStatus";
 import { useUpdateQuotationPrices } from "../../hooks/quotations/useUpdateQuotationPrices";
 import useListSettings from "../../hooks/Settings/useListSettings";
+import usePermission from "../../hooks/usePermission";
 import { Card } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import QuotationStatusTabs from "../../components/pages/Quotations/QuotationStatusTabs";
@@ -33,6 +37,7 @@ import CancelQuotationModal from "../../components/pages/Quotations/CancelQuotat
 export default function EditQuotation() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   const updateQuotation = useUpdateQuotation();
   const updatePrices = useUpdateQuotationPrices();
   const updateStatus = useUpdateQuotationStatus();
@@ -78,6 +83,15 @@ export default function EditQuotation() {
   });
 
   const quotation = quotationResponse?.data;
+  const rfqId = quotation?.purchase_request?.id;
+  const rfqNumber = quotation?.purchase_request?.display_number || quotation?.purchase_request?.rfq_number;
+  const prId =
+    quotation?.purchase_request?.id ||
+    quotation?.purchase_request?.purchase_request_id ||
+    quotation?.purchase_request?.purchase_request?.id;
+  const prNumber =
+    quotation?.purchase_request?.pr_number ||
+    quotation?.purchase_request?.purchase_request?.pr_number;
 
   console.log("quotation", quotation);
   useEffect(() => {
@@ -103,7 +117,7 @@ export default function EditQuotation() {
             item_name: item.item_name || item.item?.name,
             quantity: item.quantity,
             cost_price: item.cost_price,
-            selling_price: item.selling_price,
+            selling_price: item.selling_price !== undefined && item.selling_price !== null ? item.selling_price : item.cost_price,
             tax_rate:
               item.tax_rate !== undefined && item.tax_rate !== null
                 ? item.tax_rate
@@ -124,6 +138,15 @@ export default function EditQuotation() {
       delivery_days: Number(values.delivery_days) || 0,
       notes: values.notes || "",
       delivery_address: values.delivery_address || "",
+      items: (values.items || []).map((item) => ({
+        id: item.id || null,
+        rfq_item_id: Number(item.rfq_item_id),
+        quantity: Number(item.quantity),
+        selling_price: Number(item.selling_price) || 0,
+        cost_price: Number(item.cost_price) || 0,
+        tax_rate: Number(item.tax_rate) || 0,
+        available: !!item.available,
+      })),
     };
 
     updateQuotation.mutate(
@@ -157,6 +180,47 @@ export default function EditQuotation() {
   return (
     <FormProvider {...methods}>
       <div className="container mx-auto px-4 py-8 max-w-7xl animate-in fade-in duration-500">
+        {/* Breadcrumbs */}
+        <div className="flex items-center gap-2 text-xs text-slate-400 mb-6 font-medium">
+          <span
+            className="hover:text-primary cursor-pointer"
+            onClick={() => navigate("/quotations")}
+          >
+            Quotations
+          </span>
+          {prNumber && prId && (
+            <>
+              <ChevronRight className="w-3 h-3" />
+              <span
+                className="hover:text-primary cursor-pointer"
+                onClick={() => navigate(`/purchase_request_details/${prId}`)}
+              >
+                PR #{prNumber}
+              </span>
+            </>
+          )}
+          {rfqNumber && rfqId && (
+            <>
+              <ChevronRight className="w-3 h-3" />
+              <span
+                className="hover:text-primary cursor-pointer"
+                onClick={() => navigate(`/rfqs/${rfqId}/details`)}
+              >
+                RFQ #{rfqNumber}
+              </span>
+            </>
+          )}
+          <ChevronRight className="w-3 h-3" />
+          <span
+            className="hover:text-primary cursor-pointer"
+            onClick={() => navigate(`/quotations/${id}/details`)}
+          >
+            Quotation #{quotation?.quotation_number}
+          </span>
+          <ChevronRight className="w-3 h-3" />
+          <span className="text-slate-900">Edit</span>
+        </div>
+
         <PageHeader
           title={`Edit Quotation #${quotation?.quotation_number}`}
           subTitle="Modify quotation details"
@@ -183,6 +247,21 @@ export default function EditQuotation() {
           </div>
         </PageHeader>
 
+        {quotation?.purchase_request && prNumber && prId && (
+          <div className="flex gap-2 items-center mt-3 bg-slate-50 border border-slate-100 rounded-lg p-2 w-fit">
+            <span className="text-xs font-medium text-slate-500">PR Connection:</span>
+            <span
+              onClick={() => navigate(`/purchase_request_details/${prId}`)}
+              className="cursor-pointer text-xs font-bold text-primary hover:underline hover:text-primary/85 flex items-center gap-1.5"
+            >
+              #{prNumber}
+              <Badge variant="outline" className="bg-white text-[9px] py-0 px-1 uppercase border-slate-200">
+                {quotation?.purchase_request?.status}
+              </Badge>
+            </span>
+          </div>
+        )}
+
         {/* Status Stepper */}
         <Card className="border border-slate-100 shadow-sm bg-white rounded-2xl overflow-hidden px-8 py-4 mt-6">
           <div className="flex justify-between items-center mb-4 border-b pb-2">
@@ -195,9 +274,9 @@ export default function EditQuotation() {
                 className="bg-primary/10 text-primary border-none rounded-md px-2 uppercase text-[10px]"
               >
                 {quotation?.status === "client_approval"
-                  ? "Manager Approval"
+                  ? "Client Approval"
                   : quotation?.status === "sales_manager_approval"
-                    ? "Client Approval"
+                    ? "Manager Approval"
                     : quotation?.status?.replace("_", " ")}
               </Badge>
             </div>
@@ -210,6 +289,19 @@ export default function EditQuotation() {
           <span className="mr-auto text-xs font-bold text-slate-500 uppercase tracking-wider">
             Update Status:
           </span>
+
+          {quotation?.status !== "draft" &&
+            hasPermission("edit_quotations") && (
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => handleStatusAction("step-back")}
+                disabled={updateStatus.isPending}
+                className="h-11 px-6 rounded-xl border-amber-200 text-amber-700 font-bold hover:bg-amber-50 gap-2"
+              >
+                <Undo className="w-4 h-4" /> Step Back
+              </Button>
+            )}
 
           {quotation?.status !== "cancelled" &&
             quotation?.status !== "delivered" && (
@@ -227,7 +319,7 @@ export default function EditQuotation() {
           {quotation?.status === "draft" && (
             <Button
               type="button"
-              onClick={() => handleStatusAction("client-approve")}
+              onClick={() => handleStatusAction("manager-approve")}
               disabled={updateStatus.isPending}
               className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
             >
@@ -236,19 +328,19 @@ export default function EditQuotation() {
             </Button>
           )}
 
-          {quotation?.status === "client_approval" && (
+          {quotation?.status === "sales_manager_approval" && (
             <Button
               type="button"
-              onClick={() => handleStatusAction("manager-approve")}
+              onClick={() => handleStatusAction("client-approve")}
               disabled={updateStatus.isPending}
               className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
             >
-              <CheckCircle2 className="w-4 h-4" />
-              {updateStatus.isPending ? "Approving..." : "Approve as Manager"}
+              <Send className="w-4 h-4" />
+              {updateStatus.isPending ? "Sending..." : "Send to Client"}
             </Button>
           )}
 
-          {quotation?.status === "sales_manager_approval" && (
+          {quotation?.status === "client_approval" && (
             <Button
               type="button"
               onClick={() => handleStatusAction("proforma")}
@@ -261,15 +353,30 @@ export default function EditQuotation() {
           )}
 
           {quotation?.status === "proforma_invoice" && (
-            <Button
-              type="button"
-              onClick={() => setIsPaymentModalOpen(true)}
-              disabled={updateStatus.isPending}
-              className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
-            >
-              <CreditCard className="w-4 h-4" />
-              {updateStatus.isPending ? "Processing..." : "Record Payment"}
-            </Button>
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  window.open(
+                    `/quotations/${id}/details?download=true`,
+                    "_blank",
+                  )
+                }
+                className="h-11 px-6 rounded-xl border-slate-200 text-slate-700 gap-2 font-bold hover:bg-slate-50 transition-all shadow-sm"
+              >
+                <Download className="w-4 h-4 text-slate-500" /> Proforma Details
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setIsPaymentModalOpen(true)}
+                disabled={updateStatus.isPending}
+                className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
+              >
+                <CreditCard className="w-4 h-4" />
+                {updateStatus.isPending ? "Processing..." : "Record Payment"}
+              </Button>
+            </>
           )}
 
           {(quotation?.status === "paid_payment" ||

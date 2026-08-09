@@ -22,8 +22,15 @@ import CreateRFQModal from "./CreateRFQModal";
 import EntityLink from "../../shared/EntityLink";
 
 import usePermission from "../../../hooks/usePermission";
+import useCreateQuotationFromPR from "../../../hooks/purchaseRequest/useCreateQuotationFromPR";
 
-export default function PurchaseRequestTable({ page, setPage, purchase_data, selectedRowKeys, onSelectedRowKeysChange }) {
+export default function PurchaseRequestTable({
+  page,
+  setPage,
+  purchase_data,
+  selectedRowKeys,
+  onSelectedRowKeysChange,
+}) {
   const purchase_loading = !purchase_data;
   const {
     mutate: delete_purchase,
@@ -33,6 +40,28 @@ export default function PurchaseRequestTable({ page, setPage, purchase_data, sel
 
   const navigate = useNavigate();
   const { hasPermission } = usePermission();
+  const { mutate: createQuotationFromPR } = useCreateQuotationFromPR();
+  const [activeCreatingId, setActiveCreatingId] = useState(null);
+
+  const handleCreateQuotationClick = (id) => {
+    setActiveCreatingId(id);
+    createQuotationFromPR(
+      { id },
+      {
+        onSuccess: (res) => {
+          setActiveCreatingId(null);
+          if (res?.data?.id) {
+            navigate(`/quotations/${res.data.id}/details`);
+          } else {
+            navigate("/quotations");
+          }
+        },
+        onError: () => {
+          setActiveCreatingId(null);
+        },
+      },
+    );
+  };
 
   // stats
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -198,7 +227,9 @@ export default function PurchaseRequestTable({ page, setPage, purchase_data, sel
           <div className="flex gap-2">
             {hasPermission("edit_purchase_requests") && (
               <Button
-                onClick={() => window.open(`/edit_purchase_request/${row?.id}`, '_blank')}
+                onClick={() =>
+                  window.open(`/edit_purchase_request/${row?.id}`, "_blank")
+                }
                 title="Edit"
                 variant="ghost"
                 size="icon"
@@ -209,7 +240,9 @@ export default function PurchaseRequestTable({ page, setPage, purchase_data, sel
 
             {hasPermission("view_purchase_requests") && (
               <Button
-                onClick={() => window.open(`/purchase_request_details/${row?.id}`, '_blank')}
+                onClick={() =>
+                  window.open(`/purchase_request_details/${row?.id}`, "_blank")
+                }
                 title="View"
                 variant="ghost"
                 size="icon"
@@ -235,12 +268,27 @@ export default function PurchaseRequestTable({ page, setPage, purchase_data, sel
             {/* Removed Change Status from table per user request */}
 
             {["approved", "completed"].includes(row?.status) && (
-              <Button
-                onClick={() => window.open(`/purchase-requests/${row.id}/rfqs`, '_blank')}
-                className="text-[#00B69B] hover:text-[#00B69B] hover:bg-green-50 px-2"
-              >
-                RFQs
-              </Button>
+              <>
+                {hasPermission("create_quotations") && row?.status === "approved" && (
+                  <Button
+                    onClick={() => handleCreateQuotationClick(row.id)}
+                    disabled={activeCreatingId !== null}
+                    className="text-white  px-2 font-bold"
+                  >
+                    {activeCreatingId === row.id
+                      ? "Creating..."
+                      : "Create Quotation"}
+                  </Button>
+                )}
+                <Button
+                  onClick={() =>
+                    window.open(`/purchase-requests/${row.id}/rfqs`, "_blank")
+                  }
+                  className="text-white px-2"
+                >
+                  RFQs
+                </Button>
+              </>
             )}
           </div>
         );

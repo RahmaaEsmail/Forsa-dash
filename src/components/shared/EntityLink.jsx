@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 const ROUTES = {
   supplier: (id) => `/suppliers/${id}/details`,
   customer: (id) => `/customer-details/${id}`,
+  purchase_request: (id) => `/purchase_request_details/${id}`,
+  rfq: (id) => `/rfqs/${id}/details`,
 }
 
 /**

@@ -32,14 +32,17 @@ export const useActivityMentions = () => {
   });
 };
 
-export const useAddActivityLogComment = () => {
+export const useAddActivityLogComment = (modelType, modelId) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ body }) => handleAddComment({ body }),
-    onSuccess: (data, variables) => {
+    onSuccess: (data) => {
       toast.success(data?.message || "Comment added successfully");
       queryClient.invalidateQueries({
-        queryKey: ACTIVITY_LOG_QUERY_KEYS.list(variables.body.model_type, variables.body.model_id),
+        queryKey: ACTIVITY_LOG_QUERY_KEYS.list(modelType, modelId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: ACTIVITY_LOG_QUERY_KEYS.mentions(),
       });
     },
     onError: (error) => {
@@ -61,6 +64,9 @@ export const useUpdateActivityLogComment = (modelType, modelId) => {
       queryClient.invalidateQueries({
         queryKey: ACTIVITY_LOG_QUERY_KEYS.list(modelType, modelId),
       });
+      queryClient.invalidateQueries({
+        queryKey: ACTIVITY_LOG_QUERY_KEYS.mentions(),
+      });
     },
     onError: (error) => {
       toast.error(
@@ -80,6 +86,9 @@ export const useDeleteActivityLogComment = (modelType, modelId) => {
       toast.success(data?.message || "Comment deleted successfully");
       queryClient.invalidateQueries({
         queryKey: ACTIVITY_LOG_QUERY_KEYS.list(modelType, modelId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: ACTIVITY_LOG_QUERY_KEYS.mentions(),
       });
     },
     onError: (error) => {

@@ -42,13 +42,29 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ChangePurchaseStatusModal from '../../components/pages/PurchaseRequests/ChangePurchaseStatusModal';
 import { Button } from '../../components/ui/button';
+import usePermission from '../../hooks/usePermission';
+import useCreateQuotationFromPR from '../../hooks/purchaseRequest/useCreateQuotationFromPR';
 
 export default function PurchaseRequestDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
+  const { mutate: createQuotationFromPR, isPending: isCreatingQuotation } = useCreateQuotationFromPR();
   const { mutate, data, isPending } = usePurchaseDetails();
   const [isRFQModalOpen, setIsRFQModalOpen] = useState(false);
   const [openChangeStatus, setOpenChangeStatus] = useState(false);
+
+  const handleCreateQuotationClick = () => {
+    createQuotationFromPR({ id }, {
+      onSuccess: (res) => {
+        if (res?.data?.id) {
+          navigate(`/quotations/${res.data.id}/details`);
+        } else {
+          navigate('/quotations');
+        }
+      }
+    });
+  };
   const pr = data?.data;
 
   useEffect(() => {
@@ -120,14 +136,27 @@ export default function PurchaseRequestDetails() {
             )}
             
             {['approved', 'completed'].includes(pr?.status?.toLowerCase()) && (
-              <Button
-                type="button"
-                onClick={() => navigate(`/purchase-requests/${id}/rfqs`)}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-10 px-4 flex items-center gap-2"
-              >
-                <FilePlus className="w-4 h-4" />
-                RFQs & Quotations
-              </Button>
+              <>
+                {hasPermission("create_quotations") && pr?.status?.toLowerCase() === 'approved' && (
+                  <Button
+                    type="button"
+                    onClick={handleCreateQuotationClick}
+                    disabled={isCreatingQuotation}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-10 px-4 flex items-center gap-2"
+                  >
+                    <FilePlus className="w-4 h-4" />
+                    {isCreatingQuotation ? "Creating..." : "Create Quotation"}
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  onClick={() => navigate(`/purchase-requests/${id}/rfqs`)}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-10 px-4 flex items-center gap-2"
+                >
+                  <FilePlus className="w-4 h-4" />
+                  RFQs & Quotations
+                </Button>
+              </>
             )}
           </div>
         </div>
