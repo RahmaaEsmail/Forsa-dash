@@ -80,15 +80,7 @@ export default function Quotations() {
               : "Export Excel"}
           </Button>
 
-          {hasPermission("create_quotations") && (
-            <Button
-              onClick={() => navigate(`/create_quote`)}
-              className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
-            >
-              <Plus className="w-4 h-4" />
-              Create Quotation
-            </Button>
-          )}
+
         </div>
       </PageHeader>
 
