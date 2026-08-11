@@ -18,6 +18,16 @@ export default function useChangeDeliveryNoteStatus() {
           queryKey: ["delivery-note"],
           exact: false
         })
+        // Delivering (or stepping back) a note can move the parent quotation
+        // in/out of "delivered" server-side, so refetch quotation views too.
+        queryClient.invalidateQueries({
+          queryKey: ["quotations"],
+          exact: false
+        })
+        queryClient.invalidateQueries({
+          queryKey: ["quotation"],
+          exact: false
+        })
       }
     },
     onError: (res) => {
