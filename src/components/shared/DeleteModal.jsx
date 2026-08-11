@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { useEffect } from "react";
 
-export function DeleteModal({isLoading , isSuccess , open, setOpen, title, desc = "Are you sure you want to delete this item? This action cannot be undone.", onDelete }) {
+export function DeleteModal({isLoading , isSuccess , open, setOpen, title, desc = "Are you sure you want to delete this item? This action cannot be undone.", onDelete, confirmText = "Delete", loadingText = "Loading...." }) {
    
   useEffect(() => {
     if(isSuccess) {
@@ -34,7 +34,7 @@ export function DeleteModal({isLoading , isSuccess , open, setOpen, title, desc 
             <Button
             variant="default"
             onClick={onDelete}
-            type="submit">{isLoading ? "Loading...." :"Delete"}</Button>
+            type="submit">{isLoading ? loadingText : confirmText}</Button>
           </DialogFooter>
         </DialogContent>
     </Dialog>

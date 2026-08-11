@@ -42,12 +42,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ChangePurchaseStatusModal from '../../components/pages/PurchaseRequests/ChangePurchaseStatusModal';
 import { Button } from '../../components/ui/button';
-import usePermission from '../../hooks/usePermission';
 
 export default function PurchaseRequestDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { hasPermission } = usePermission();
   const { mutate, data, isPending } = usePurchaseDetails();
   const [isRFQModalOpen, setIsRFQModalOpen] = useState(false);
   const [openChangeStatus, setOpenChangeStatus] = useState(false);

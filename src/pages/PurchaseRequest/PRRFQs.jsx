@@ -13,14 +13,18 @@ import { handleGetAllQuotations } from '../../services/quotations'
 import QuotationTable from '../../components/pages/Quotations/QuotationTable'
 import useCreateQuotationFromPR from '../../hooks/purchaseRequest/useCreateQuotationFromPR'
 import { FilePlus } from 'lucide-react'
+import usePermission from '../../hooks/usePermission'
+import { DeleteModal } from '../../components/shared/DeleteModal'
 
 export default function PRRFQs() {
   const { prId } = useParams();
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   const { mutate: fetchPR, data: prData, isPending: isPRLoading } = usePurchaseDetails();
   const [activeView, setActiveView] = useState("rfq");
   const [filters, setFilters] = useState({});
   const [quotationPage, setQuotationPage] = useState(1);
+  const [confirmCreateQuotation, setConfirmCreateQuotation] = useState(false);
 
   const { data: quotationsData, isLoading: isQuotationsLoading } = useQuery({
     queryKey: ["quotations", prId, quotationPage],
@@ -28,7 +32,9 @@ export default function PRRFQs() {
     enabled: !!prId,
   });
 
-  const { mutate: createQuotationFromPR, isPending: isCreatingQuotation } = useCreateQuotationFromPR();
+  const existingQuotationCount = quotationsData?.meta?.total ?? quotationsData?.data?.length ?? 0;
+
+  const { mutate: createQuotationFromPR, isPending: isCreatingQuotation, isSuccess: isQuotationCreated } = useCreateQuotationFromPR();
 
   const handleCreateQuotationClick = () => {
     createQuotationFromPR(
@@ -43,6 +49,14 @@ export default function PRRFQs() {
         },
       }
     );
+  };
+
+  const handleCreateQuotationButtonClick = () => {
+    if (existingQuotationCount > 0) {
+      setConfirmCreateQuotation(true);
+    } else {
+      handleCreateQuotationClick();
+    }
   };
 
   useEffect(() => {
@@ -73,17 +87,17 @@ export default function PRRFQs() {
           >
             Back to PR Details
           </Button>
-          {activeView === 'quotations' && ['approved', 'completed'].includes(prData?.data?.status?.toLowerCase()) ? (
+          {activeView === 'quotations' && hasPermission("create_quotations") && ['approved', 'completed'].includes(prData?.data?.status?.toLowerCase()) ? (
             <Button
-              onClick={handleCreateQuotationClick}
+              onClick={handleCreateQuotationButtonClick}
               disabled={isCreatingQuotation}
               className={"font-bold flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"}
             >
               <FilePlus className="w-4 h-4" />
               {isCreatingQuotation ? "Creating..." : "Create Quotation"}
             </Button>
-          ) : activeView !== 'quotations' && prData?.data?.status?.toLowerCase() === 'approved' ? (
-            <Button 
+          ) : activeView !== 'quotations' && ['approved', 'completed'].includes(prData?.data?.status?.toLowerCase()) ? (
+            <Button
               onClick={() => navigate(`/purchase-requests/${prId}/create-rfq`)}
               className={"font-bold flex items-center gap-2"}>
               <Plus className="w-4 h-4" />
@@ -92,6 +106,18 @@ export default function PRRFQs() {
           ) : null}
         </div>
       </PageHeader>
+
+      <DeleteModal
+        open={confirmCreateQuotation}
+        setOpen={setConfirmCreateQuotation}
+        isLoading={isCreatingQuotation}
+        isSuccess={isQuotationCreated}
+        title="Create another quotation?"
+        desc={`This PR already has ${existingQuotationCount} quotation${existingQuotationCount === 1 ? "" : "s"}. Creating another will add a new revision.`}
+        onDelete={handleCreateQuotationClick}
+        confirmText="Create"
+        loadingText="Creating..."
+      />
 
       <RFQFilter onFilter={handleFilter} onReset={handleReset} filters={filters} />
 

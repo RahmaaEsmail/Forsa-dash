@@ -14,6 +14,9 @@ export default function useCreateQuotationFromPR() {
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.purchase_key,
       });
+      queryClient.invalidateQueries({
+        queryKey: ["quotations"],
+      });
     },
     onError: (error) => {
       toast.error(

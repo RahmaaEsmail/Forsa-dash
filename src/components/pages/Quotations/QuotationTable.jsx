@@ -1,15 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import CustomTable from "../../shared/CustomTable";
 import { Badge } from "../../ui/badge";
-import { Eye, Edit, Trash2, FileText, Download } from "lucide-react";
+import { Eye, Edit, FileText, Download } from "lucide-react";
 import { Button } from "../../ui/button";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../../shared/Pagination";
 import Loading from "../../shared/Loading";
-import { DeleteModal } from "../../shared/DeleteModal";
-import { useDeleteQuotation } from "../../../hooks/quotations/useDeleteQuotation";
 import EntityLink from "../../shared/EntityLink";
-// import { useDeleteQuotation } from '../../hooks/quotations/useDeleteQuotation';
 
 const statusVariants = {
   draft: "bg-blue-100 text-blue-700 hover:bg-blue-100 border-none",
@@ -41,22 +38,6 @@ export default function QuotationTable({
 }) {
   const navigate = useNavigate();
   const { hasPermission } = usePermission();
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
-  const deleteQuotation = useDeleteQuotation();
-
-  const handleDelete = (id) => {
-    setSelectedId(id);
-    setDeleteOpen(true);
-  };
-
-  const confirmDelete = () => {
-    deleteQuotation.mutate(selectedId, {
-      onSuccess: () => {
-        setDeleteOpen(false);
-      },
-    });
-  };
 
   const columns = [
     {
@@ -170,14 +151,6 @@ export default function QuotationTable({
               <Download className="w-4 h-4 text-slate-500" />
             </Button>
           )}
-          {/* <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => handleDelete(row.id)}
-            className="text-red-500 hover:text-red-600 hover:bg-red-50"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button> */}
           {row.status === "paid_payment" || row.status === "approved" ? (
             <Button
               variant="ghost"
@@ -234,16 +207,6 @@ export default function QuotationTable({
           />
         </div>
       )}
-
-      <DeleteModal
-        open={deleteOpen}
-        setOpen={setDeleteOpen}
-        title="Delete Quotation"
-        desc="Are you sure you want to delete this quotation? This action cannot be undone."
-        isLoading={deleteQuotation.isPending}
-        isSuccess={deleteQuotation.isSuccess}
-        onDelete={confirmDelete}
-      />
     </div>
   );
 }

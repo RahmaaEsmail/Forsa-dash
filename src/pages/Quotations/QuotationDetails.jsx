@@ -714,20 +714,17 @@ import {
   CreditCard,
   FileText,
   XCircle,
-  Trash2,
   Truck,
   Undo,
 } from "lucide-react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useQuotationDetails } from "../../hooks/quotations/useQuotationDetails";
 import { useUpdateQuotationStatus } from "../../hooks/quotations/useUpdateQuotationStatus";
-import { useDeleteQuotation } from "../../hooks/quotations/useDeleteQuotation";
 import Loading from "../../components/shared/Loading";
 import { Button } from "../../components/ui/button";
 import useListSettings from "../../hooks/Settings/useListSettings";
 import { Card, CardContent } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
-import { DeleteModal } from "../../components/shared/DeleteModal";
 import { downloadAsPDF } from "../../utils/downloadPDF";
 import { format } from "date-fns";
 import { pdf } from "@react-pdf/renderer";
@@ -749,10 +746,8 @@ export default function QuotationDetails() {
 
   const { data: quotationResponse, isLoading } = useQuotationDetails(id);
   const updateStatus = useUpdateQuotationStatus();
-  const deleteQuotation = useDeleteQuotation();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [shouldDownloadPDF, setShouldDownloadPDF] = useState(false);
 
   const { data: settingsData } = useListSettings();
@@ -850,14 +845,6 @@ export default function QuotationDetails() {
         },
       },
     );
-  };
-
-  const handleDelete = () => {
-    deleteQuotation.mutate(id, {
-      onSuccess: () => {
-        navigate("/quotations");
-      },
-    });
   };
 
   const isProforma = ["proforma_invoice", "paid_payment", "delivered"].includes(
@@ -1184,16 +1171,6 @@ export default function QuotationDetails() {
                   className="rounded-xl border-slate-200 text-slate-700 gap-2 font-bold hover:bg-slate-50 h-11 px-6 transition-all shadow-sm"
                 >
                   <Download className="w-4 h-4 text-slate-500" /> Download PDF
-                </Button>
-              )}
-              {hasPermission("delete_quotations") && (
-                <Button
-                  variant="outline"
-                  onClick={() => setIsDeleteModalOpen(true)}
-                  disabled={deleteQuotation.isPending}
-                  className="rounded-xl border-red-200 text-primary gap-2 font-bold hover:bg-red-50 h-11 px-6"
-                >
-                  <Trash2 className="w-4 h-4" /> Delete
                 </Button>
               )}
               <Button
@@ -1534,15 +1511,6 @@ export default function QuotationDetails() {
         }
       />
 
-      <DeleteModal
-        open={isDeleteModalOpen}
-        setOpen={setIsDeleteModalOpen}
-        title="Delete Quotation"
-        desc="Are you sure you want to delete this quotation? This action cannot be undone."
-        isLoading={deleteQuotation.isPending}
-        isSuccess={deleteQuotation.isSuccess}
-        onDelete={handleDelete}
-      />
     </FormProvider>
   );
 }
