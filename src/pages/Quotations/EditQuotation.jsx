@@ -29,6 +29,8 @@ import useListSettings from "../../hooks/Settings/useListSettings";
 import usePermission from "../../hooks/usePermission";
 import { Card } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
+import { pdf } from "@react-pdf/renderer";
+import { QuotationPDF } from "./QuotationPDF";
 import QuotationStatusTabs from "../../components/pages/Quotations/QuotationStatusTabs";
 import PaymentReceivedModal from "../../components/pages/Quotations/PaymentReceivedModal";
 import CancelQuotationModal from "../../components/pages/Quotations/CancelQuotationModal";
@@ -113,6 +115,33 @@ export default function EditQuotation() {
   const prNumber =
     quotation?.purchase_request?.pr_number ||
     quotation?.purchase_request?.purchase_request?.pr_number;
+
+  const baseNumber = quotation?.quotation_number || "";
+
+  const handleDownloadPDF = async (isProforma) => {
+    const doc = (
+      <QuotationPDF
+        quotation={quotation}
+        isProforma={isProforma}
+        settings={settingsData}
+      />
+    );
+    const blob = await pdf(doc).toBlob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    const computedNumber = isProforma
+      ? baseNumber.replace(/^(QUO|QUC)-?/, "PI-")
+      : baseNumber;
+    const formattedName = computedNumber.startsWith("PI-")
+      ? computedNumber.replace(/^PI-/, "PI_")
+      : computedNumber;
+    link.download = `${formattedName}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   console.log("quotation", quotation);
   useEffect(() => {
@@ -341,28 +370,36 @@ export default function EditQuotation() {
           )}
 
           {quotation?.status === "proforma_invoice" && (
+            <Button
+              type="button"
+              onClick={() => setIsPaymentModalOpen(true)}
+              disabled={updateStatus.isPending}
+              className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
+            >
+              <CreditCard className="w-4 h-4" />
+              {updateStatus.isPending ? "Processing..." : "Record Payment"}
+            </Button>
+          )}
+
+          {["proforma_invoice", "paid_payment", "delivered"].includes(
+            quotation?.status,
+          ) && (
             <>
               <Button
                 type="button"
                 variant="outline"
-                onClick={() =>
-                  window.open(
-                    `/quotations/${id}/details?download=true`,
-                    "_blank",
-                  )
-                }
+                onClick={() => handleDownloadPDF(true)}
                 className="h-11 px-6 rounded-xl border-slate-200 text-slate-700 gap-2 font-bold hover:bg-slate-50 transition-all shadow-sm"
               >
-                <Download className="w-4 h-4 text-slate-500" /> Proforma Details
+                <Download className="w-4 h-4 text-slate-500" /> Download Proforma
               </Button>
               <Button
                 type="button"
-                onClick={() => setIsPaymentModalOpen(true)}
-                disabled={updateStatus.isPending}
-                className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-lg shadow-primary/20"
+                variant="outline"
+                onClick={() => handleDownloadPDF(false)}
+                className="h-11 px-6 rounded-xl border-slate-200 text-slate-700 gap-2 font-bold hover:bg-slate-50 transition-all shadow-sm"
               >
-                <CreditCard className="w-4 h-4" />
-                {updateStatus.isPending ? "Processing..." : "Record Payment"}
+                <Download className="w-4 h-4 text-slate-500" /> Download Quotation
               </Button>
             </>
           )}
