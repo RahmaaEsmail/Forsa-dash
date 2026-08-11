@@ -4,15 +4,13 @@ import CustomTable from "../../shared/CustomTable";
 import { Input } from "../../ui/input";
 import { Card, CardContent } from "../../ui/card";
 import { Button } from "../../ui/button";
-import { Trash2, Info, CreditCard } from "lucide-react";
+import { Trash2, Info } from "lucide-react";
 import { Badge } from "../../ui/badge";
 import { Checkbox } from "../../ui/checkbox";
 
 export default function QuotationItemsTable({
   items,
   isReadOnly = false,
-  onUpdatePrices,
-  isUpdatingPrices,
 }) {
   const { control, register, watch, setValue } = useFormContext();
   const { fields, remove } = useFieldArray({
@@ -178,20 +176,6 @@ export default function QuotationItemsTable({
             </Badge>
             Quotation Items List
           </h3>
-
-          {onUpdatePrices && !isReadOnly && (
-            <Button
-              onClick={onUpdatePrices}
-              disabled={isUpdatingPrices}
-              variant="outline"
-              className="h-9 px-4 rounded-xl border-blue-200 text-blue-600 font-bold hover:bg-blue-50 gap-2 text-xs"
-            >
-              <CreditCard className="w-3.5 h-3.5" />
-              {isUpdatingPrices
-                ? "Updating Prices..."
-                : "Update Selling Prices"}
-            </Button>
-          )}
         </div>
         <CardContent className="p-0">
           <CustomTable

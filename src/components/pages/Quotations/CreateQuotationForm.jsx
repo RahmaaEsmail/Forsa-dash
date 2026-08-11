@@ -24,8 +24,6 @@ const getFirstCurrency = (currenciesObj) => {
 export default function CreateQuotationForm({
   isReadOnly = false,
   isEdit = false,
-  onUpdatePrices,
-  isUpdatingPrices,
 }) {
   const {
     register,
@@ -233,12 +231,7 @@ export default function CreateQuotationForm({
         </div>
       </Card>
 
-      <QuotationItemsTable
-        items={items}
-        isReadOnly={isReadOnly}
-        onUpdatePrices={onUpdatePrices}
-        isUpdatingPrices={isUpdatingPrices}
-      />
+      <QuotationItemsTable items={items} isReadOnly={isReadOnly} />
     </div>
   );
 }

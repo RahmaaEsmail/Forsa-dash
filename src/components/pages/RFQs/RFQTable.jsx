@@ -8,10 +8,21 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Loading from '../../shared/Loading'
 import { Badge } from '../../ui/badge'
+import Pagination from '../../shared/Pagination'
 import { toast } from 'sonner'
 import EntityLink from '../../shared/EntityLink'
 
 import usePermission from '../../../hooks/usePermission';
+
+const statusVariants = {
+  draft: "bg-blue-100 text-blue-700 hover:bg-blue-100 border-none",
+  rfq_sent: "bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-none",
+  buyer_approval: "bg-indigo-100 text-indigo-700 hover:bg-indigo-100 border-none",
+  price_gathering_approval: "bg-purple-100 text-purple-700 hover:bg-purple-100 border-none",
+  po_approval: "bg-orange-100 text-orange-700 hover:bg-orange-100 border-none",
+  purchase_ordered: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none",
+  cancelled: "bg-slate-100 text-slate-700 hover:bg-slate-100 border-none",
+};
 
 export default function RFQTable({ prId, view = "rfq", filters = {}, onDataLoaded, selectedRowKeys, onSelectedRowKeysChange }) {
   const navigate = useNavigate();
@@ -107,8 +118,10 @@ export default function RFQTable({ prId, view = "rfq", filters = {}, onDataLoade
     {
       title: "Status",
       render: (_, row) => (
-        <Badge variant="outline" className="capitalize">
-          {row.status?.replace('_', ' ')}
+        <Badge
+          className={`capitalize px-3 py-1 rounded-full ${statusVariants[row.status] || "bg-slate-100 text-slate-700"}`}
+        >
+          {row.status?.replace(/_/g, ' ')}
         </Badge>
       ),
     },
@@ -169,49 +182,31 @@ export default function RFQTable({ prId, view = "rfq", filters = {}, onDataLoade
 
   return (
     <div className="space-y-4">
-      <CustomTable 
-        columns={columns}
-        dataSource={rfqsData?.data || []}
-        rowKey="id"
-        selectedRowKeys={selectedRowKeys}
-        onSelectedRowKeysChange={onSelectedRowKeysChange}
-      />
-      
-      <CancelRFQModal 
-        open={isCancelModalOpen} 
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <CustomTable
+          columns={columns}
+          dataSource={rfqsData?.data || []}
+          rowKey="id"
+          selectedRowKeys={selectedRowKeys}
+          onSelectedRowKeysChange={onSelectedRowKeysChange}
+        />
+      </div>
+
+      <CancelRFQModal
+        open={isCancelModalOpen}
         onOpenChange={setIsCancelModalOpen}
         onConfirm={handleConfirmCancel}
         isLoading={cancelMutation.isPending}
       />
 
-      {rfqsData?.meta && (
-        <div className="flex justify-between items-center px-4 py-4 bg-white border-t border-slate-100 rounded-b-xl">
-          <p className="text-sm text-slate-500 font-medium">
-            Showing <span className="text-slate-900">{rfqsData.meta.from || 0}</span> to <span className="text-slate-900">{rfqsData.meta.to || 0}</span> of <span className="text-slate-900">{rfqsData.meta.total}</span> entries
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="rounded-lg h-9"
-            >
-              Previous
-            </Button>
-            <div className="flex items-center px-4 bg-slate-50 rounded-lg text-sm font-bold text-primary">
-              {page}
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(p => p + 1)}
-              disabled={page === rfqsData.meta.last_page}
-              className="rounded-lg h-9"
-            >
-              Next
-            </Button>
-          </div>
+      {rfqsData?.meta && rfqsData.meta.last_page > 1 && (
+        <div className="px-4 py-2">
+          <Pagination
+            page={rfqsData.meta.current_page}
+            per_page={rfqsData.meta.per_page}
+            total={rfqsData.meta.total}
+            onPageChange={setPage}
+          />
         </div>
       )}
     </div>

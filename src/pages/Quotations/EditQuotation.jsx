@@ -25,7 +25,6 @@ import {
 } from "lucide-react";
 import Loading from "../../components/shared/Loading";
 import { useUpdateQuotationStatus } from "../../hooks/quotations/useUpdateQuotationStatus";
-import { useUpdateQuotationPrices } from "../../hooks/quotations/useUpdateQuotationPrices";
 import useListSettings from "../../hooks/Settings/useListSettings";
 import usePermission from "../../hooks/usePermission";
 import { Card } from "../../components/ui/card";
@@ -39,7 +38,6 @@ export default function EditQuotation() {
   const navigate = useNavigate();
   const { hasPermission } = usePermission();
   const updateQuotation = useUpdateQuotation();
-  const updatePrices = useUpdateQuotationPrices();
   const updateStatus = useUpdateQuotationStatus();
   const { data: quotationResponse, isLoading } = useQuotationDetails(id);
 
@@ -56,9 +54,32 @@ export default function EditQuotation() {
       : 15;
   }, [settingsData]);
 
+  function buildQuotationPayload(values) {
+    return {
+      valid_until: values.valid_until
+        ? format(values.valid_until, "yyyy-MM-dd")
+        : null,
+      payment_days: Number(values.payment_days) || 0,
+      delivery_days: Number(values.delivery_days) || 0,
+      notes: values.notes || "",
+      items: (values.items || []).map((item) => ({
+        id: item.id,
+        quantity: Number(item.quantity),
+        selling_price: Number(item.selling_price) || 0,
+        cost_price: Number(item.cost_price) || 0,
+        tax_rate: Number(item.tax_rate) || 0,
+        available: !!item.available,
+      })),
+    };
+  }
+
+  // Status-changing actions save the current form state first, then
+  // transition — a single request, so sales edits made right before
+  // sending for approval aren't lost.
   const handleStatusAction = (status, body = {}, onSuccess) => {
+    const payload = { ...buildQuotationPayload(methods.getValues()), ...body };
     updateStatus.mutate(
-      { id, status, body },
+      { id, status, body: payload },
       {
         onSuccess: () => {
           if (onSuccess) onSuccess();
@@ -130,47 +151,14 @@ export default function EditQuotation() {
   }, [quotation, methods, defaultTaxSetting]);
 
   function onSubmit(values) {
-    const payload = {
-      valid_until: values.valid_until
-        ? format(values.valid_until, "yyyy-MM-dd")
-        : null,
-      payment_days: Number(values.payment_days) || 0,
-      delivery_days: Number(values.delivery_days) || 0,
-      notes: values.notes || "",
-      delivery_address: values.delivery_address || "",
-      items: (values.items || []).map((item) => ({
-        id: item.id || null,
-        rfq_item_id: Number(item.rfq_item_id),
-        quantity: Number(item.quantity),
-        selling_price: Number(item.selling_price) || 0,
-        cost_price: Number(item.cost_price) || 0,
-        tax_rate: Number(item.tax_rate) || 0,
-        available: !!item.available,
-      })),
-    };
-
     updateQuotation.mutate(
-      { id, body: payload },
+      { id, body: buildQuotationPayload(values) },
       {
         onSuccess: () => {
           navigate("/quotations");
         },
       },
     );
-  }
-
-  function handleUpdatePrices() {
-    const values = methods.getValues();
-    const payload = {
-      items: (values.items || []).map((item) => ({
-        id: item.id,
-        selling_price: Number(item.selling_price) || 0,
-        tax_rate: Number(item.tax_rate) || 0,
-        available: !!item.available,
-      })),
-    };
-
-    updatePrices.mutate({ id, body: payload });
   }
 
   if (isLoading) {
@@ -411,11 +399,7 @@ export default function EditQuotation() {
         </div>
 
         <form onSubmit={methods.handleSubmit(onSubmit)} className="mt-8">
-          <CreateQuotationForm
-            isEdit={true}
-            onUpdatePrices={handleUpdatePrices}
-            isUpdatingPrices={updatePrices.isPending}
-          />
+          <CreateQuotationForm isEdit={true} />
         </form>
       </div>
 

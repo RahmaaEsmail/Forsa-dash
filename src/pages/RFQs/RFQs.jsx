@@ -82,27 +82,23 @@ export default function RFQs() {
           </TabsList>
 
           <TabsContent value="rfq" className="mt-0">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-              <RFQTable
-                view="rfq"
-                filters={filters}
-                onDataLoaded={setRfqData}
-                selectedRowKeys={selectedRowKeys}
-                onSelectedRowKeysChange={setSelectedRowKeys}
-              />
-            </div>
+            <RFQTable
+              view="rfq"
+              filters={filters}
+              onDataLoaded={setRfqData}
+              selectedRowKeys={selectedRowKeys}
+              onSelectedRowKeysChange={setSelectedRowKeys}
+            />
           </TabsContent>
 
           <TabsContent value="po" className="mt-0">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-              <RFQTable
-                view="po"
-                filters={filters}
-                onDataLoaded={setPoData}
-                selectedRowKeys={selectedRowKeys}
-                onSelectedRowKeysChange={setSelectedRowKeys}
-              />
-            </div>
+            <RFQTable
+              view="po"
+              filters={filters}
+              onDataLoaded={setPoData}
+              selectedRowKeys={selectedRowKeys}
+              onSelectedRowKeysChange={setSelectedRowKeys}
+            />
           </TabsContent>
         </Tabs>
       </div>

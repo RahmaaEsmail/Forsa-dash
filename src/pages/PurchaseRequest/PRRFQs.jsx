@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/ta
 import { useQuery } from '@tanstack/react-query'
 import { handleGetAllQuotations } from '../../services/quotations'
 import QuotationTable from '../../components/pages/Quotations/QuotationTable'
+import QuotationFilter from '../../components/pages/Quotations/QuotationFilter'
 import useCreateQuotationFromPR from '../../hooks/purchaseRequest/useCreateQuotationFromPR'
 import { FilePlus } from 'lucide-react'
 import usePermission from '../../hooks/usePermission'
@@ -23,12 +24,19 @@ export default function PRRFQs() {
   const { mutate: fetchPR, data: prData, isPending: isPRLoading } = usePurchaseDetails();
   const [activeView, setActiveView] = useState("rfq");
   const [filters, setFilters] = useState({});
+  const [quotationFilters, setQuotationFilters] = useState({});
   const [quotationPage, setQuotationPage] = useState(1);
   const [confirmCreateQuotation, setConfirmCreateQuotation] = useState(false);
 
   const { data: quotationsData, isLoading: isQuotationsLoading } = useQuery({
-    queryKey: ["quotations", prId, quotationPage],
-    queryFn: ({ signal }) => handleGetAllQuotations({ purchase_request_id: prId, page: quotationPage, per_page: 15, signal }),
+    queryKey: ["quotations", prId, quotationPage, quotationFilters],
+    queryFn: ({ signal }) => handleGetAllQuotations({
+      purchase_request_id: prId,
+      page: quotationPage,
+      per_page: 15,
+      ...quotationFilters,
+      signal,
+    }),
     enabled: !!prId,
   });
 
@@ -71,13 +79,23 @@ export default function PRRFQs() {
     setFilters({});
   };
 
+  const handleQuotationFilterChange = (patch) => {
+    setQuotationFilters((prev) => ({ ...prev, ...patch }));
+    setQuotationPage(1);
+  };
+
+  const handleQuotationFilterReset = () => {
+    setQuotationFilters({});
+    setQuotationPage(1);
+  };
+
   if (isPRLoading) return <Loading />;
 
   return (
     <div className="flex pb-6 flex-col gap-8">
       <PageHeader 
-        title={`RFQs for PR #${prData?.data?.pr_number || prId}`}
-        subTitle="Manage requests for quotation and purchase orders related to this purchase request"
+        title={`RFQs & Quotations for PR #${prData?.data?.pr_number || prId}`}
+        subTitle="Manage RFQs, purchase orders, and quotations related to this purchase request"
       >
         <div className='flex gap-2 items-center'>
           <Button 
@@ -91,7 +109,7 @@ export default function PRRFQs() {
             <Button
               onClick={handleCreateQuotationButtonClick}
               disabled={isCreatingQuotation}
-              className={"font-bold flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"}
+              className={"font-bold flex items-center gap-2"}
             >
               <FilePlus className="w-4 h-4" />
               {isCreatingQuotation ? "Creating..." : "Create Quotation"}
@@ -119,7 +137,15 @@ export default function PRRFQs() {
         loadingText="Creating..."
       />
 
-      <RFQFilter onFilter={handleFilter} onReset={handleReset} filters={filters} />
+      {activeView === 'quotations' ? (
+        <QuotationFilter
+          filters={quotationFilters}
+          onFilterChange={handleQuotationFilterChange}
+          onReset={handleQuotationFilterReset}
+        />
+      ) : (
+        <RFQFilter onFilter={handleFilter} onReset={handleReset} filters={filters} />
+      )}
 
       <div className="px-5">
         <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
@@ -145,15 +171,11 @@ export default function PRRFQs() {
           </TabsList>
 
           <TabsContent value="rfq" className="mt-0">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-              <RFQTable prId={prId} view="rfq" filters={filters} />
-            </div>
+            <RFQTable prId={prId} view="rfq" filters={filters} />
           </TabsContent>
 
           <TabsContent value="po" className="mt-0">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-              <RFQTable prId={prId} view="po" filters={filters} />
-            </div>
+            <RFQTable prId={prId} view="po" filters={filters} />
           </TabsContent>
 
           <TabsContent value="quotations" className="mt-0">
