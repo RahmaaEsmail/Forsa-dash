@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/ta
 import { useQuery } from '@tanstack/react-query'
 import { handleGetAllQuotations } from '../../services/quotations'
 import QuotationTable from '../../components/pages/Quotations/QuotationTable'
+import useCreateQuotationFromPR from '../../hooks/purchaseRequest/useCreateQuotationFromPR'
+import { FilePlus } from 'lucide-react'
 
 export default function PRRFQs() {
   const { prId } = useParams();
@@ -25,6 +27,23 @@ export default function PRRFQs() {
     queryFn: ({ signal }) => handleGetAllQuotations({ purchase_request_id: prId, page: quotationPage, per_page: 15, signal }),
     enabled: !!prId,
   });
+
+  const { mutate: createQuotationFromPR, isPending: isCreatingQuotation } = useCreateQuotationFromPR();
+
+  const handleCreateQuotationClick = () => {
+    createQuotationFromPR(
+      { id: prId },
+      {
+        onSuccess: (res) => {
+          if (res?.data?.id) {
+            navigate(`/quotations/${res.data.id}/details`);
+          } else {
+            navigate("/quotations");
+          }
+        },
+      }
+    );
+  };
 
   useEffect(() => {
     if (prId) fetchPR({ id: prId });
@@ -54,12 +73,23 @@ export default function PRRFQs() {
           >
             Back to PR Details
           </Button>
-          <Button 
-            onClick={() => navigate(`/purchase-requests/${prId}/create-rfq`)}
-            className={"font-bold flex items-center gap-2"}>
-            <Plus className="w-4 h-4" />
-            Create RFQ
-          </Button>
+          {activeView === 'quotations' && ['approved', 'completed'].includes(prData?.data?.status?.toLowerCase()) ? (
+            <Button
+              onClick={handleCreateQuotationClick}
+              disabled={isCreatingQuotation}
+              className={"font-bold flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"}
+            >
+              <FilePlus className="w-4 h-4" />
+              {isCreatingQuotation ? "Creating..." : "Create Quotation"}
+            </Button>
+          ) : activeView !== 'quotations' && prData?.data?.status?.toLowerCase() === 'approved' ? (
+            <Button 
+              onClick={() => navigate(`/purchase-requests/${prId}/create-rfq`)}
+              className={"font-bold flex items-center gap-2"}>
+              <Plus className="w-4 h-4" />
+              Create RFQ
+            </Button>
+          ) : null}
         </div>
       </PageHeader>
 

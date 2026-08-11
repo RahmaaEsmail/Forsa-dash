@@ -22,7 +22,6 @@ import CreateRFQModal from "./CreateRFQModal";
 import EntityLink from "../../shared/EntityLink";
 
 import usePermission from "../../../hooks/usePermission";
-import useCreateQuotationFromPR from "../../../hooks/purchaseRequest/useCreateQuotationFromPR";
 
 export default function PurchaseRequestTable({
   page,
@@ -40,28 +39,6 @@ export default function PurchaseRequestTable({
 
   const navigate = useNavigate();
   const { hasPermission } = usePermission();
-  const { mutate: createQuotationFromPR } = useCreateQuotationFromPR();
-  const [activeCreatingId, setActiveCreatingId] = useState(null);
-
-  const handleCreateQuotationClick = (id) => {
-    setActiveCreatingId(id);
-    createQuotationFromPR(
-      { id },
-      {
-        onSuccess: (res) => {
-          setActiveCreatingId(null);
-          if (res?.data?.id) {
-            navigate(`/quotations/${res.data.id}/details`);
-          } else {
-            navigate("/quotations");
-          }
-        },
-        onError: () => {
-          setActiveCreatingId(null);
-        },
-      },
-    );
-  };
 
   // stats
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -268,27 +245,14 @@ export default function PurchaseRequestTable({
             {/* Removed Change Status from table per user request */}
 
             {["approved", "completed"].includes(row?.status) && (
-              <>
-                {hasPermission("create_quotations") && row?.status === "approved" && (
-                  <Button
-                    onClick={() => handleCreateQuotationClick(row.id)}
-                    disabled={activeCreatingId !== null}
-                    className="text-white  px-2 font-bold"
-                  >
-                    {activeCreatingId === row.id
-                      ? "Creating..."
-                      : "Create Quotation"}
-                  </Button>
-                )}
-                <Button
-                  onClick={() =>
-                    window.open(`/purchase-requests/${row.id}/rfqs`, "_blank")
-                  }
-                  className="text-white px-2"
-                >
-                  RFQs
-                </Button>
-              </>
+              <Button
+                onClick={() =>
+                  window.open(`/purchase-requests/${row.id}/rfqs`, "_blank")
+                }
+                className="text-white px-2"
+              >
+                RFQs & Quotations
+              </Button>
             )}
           </div>
         );
