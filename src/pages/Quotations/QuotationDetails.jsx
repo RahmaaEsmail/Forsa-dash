@@ -701,7 +701,7 @@
 //   )
 // }
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -714,7 +714,6 @@ import {
   CreditCard,
   FileText,
   XCircle,
-  Truck,
   Undo,
 } from "lucide-react";
 import { useForm, FormProvider } from "react-hook-form";
@@ -723,12 +722,13 @@ import { useUpdateQuotationStatus } from "../../hooks/quotations/useUpdateQuotat
 import Loading from "../../components/shared/Loading";
 import { Button } from "../../components/ui/button";
 import useListSettings from "../../hooks/Settings/useListSettings";
-import { Card, CardContent } from "../../components/ui/card";
+import { Card } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
-import { downloadAsPDF } from "../../utils/downloadPDF";
 import { format } from "date-fns";
 import { pdf } from "@react-pdf/renderer";
-import { QuotationPDF, DownloadQuotationButton } from "./QuotationPDF";
+import { QuotationPDF } from "./QuotationPDF";
+import { buildQuotationModel } from "@/pdf/quotationModel";
+import QuotationSheet from "./QuotationSheet";
 
 // Components
 import QuotationStatusTabs from "../../components/pages/Quotations/QuotationStatusTabs";
@@ -751,64 +751,6 @@ export default function QuotationDetails() {
   const [shouldDownloadPDF, setShouldDownloadPDF] = useState(false);
 
   const { data: settingsData } = useListSettings();
-  const getSetting = (key) => {
-    const val = settingsData?.data?.find((s) => s.key === key)?.value;
-    return val === "null" || !val ? null : val;
-  };
-
-  const companyPhone =
-    getSetting("phone") || getSetting("company_phone") || "+966 55 598 0730";
-  const companyEmail =
-    getSetting("email") ||
-    getSetting("company_email") ||
-    "Sales@forsageneraltrading.com";
-  const companyVat =
-    getSetting("vat") ||
-    getSetting("vat_number") ||
-    getSetting("company_tax_number") ||
-    "300123456700003";
-  const companyAddress =
-    getSetting("address") || getSetting("company_address") || "Cairo, Egypt";
-  const companyName =
-    getSetting("company_name") ||
-    getSetting("name") ||
-    "BRKZ International Information Technology Company | شركة بي ار كيه زد العالمية لتقنية المعلومات";
-  const companyCrn =
-    getSetting("company_crn") ||
-    getSetting("crn") ||
-    getSetting("company_registration_number") ||
-    getSetting("commercial_register") ||
-    "311411370400003";
-
-  const getSettingFileUrl = (value) => {
-    if (!value || typeof value !== "string") return "";
-    if (value.startsWith("http://") || value.startsWith("https://"))
-      return value;
-    return `https://api.forsa.cloud/${value.replace(/^\//, "")}`;
-  };
-
-  const bankOneName =
-    getSetting("bank_one_name") ||
-    "Saudi National Bank | البنك الأهلي السعودي (SNB)";
-  const bankOneHolder =
-    getSetting("bank_one_account_holder") ||
-    "Company B.R.K.Z. Alalamiyyah for Information Technology";
-  const bankOneIban = getSetting("bank_one_iban") || "SA6610000020000000249108";
-  const bankOneImage = getSetting("bank_one_image")
-    ? getSettingFileUrl(getSetting("bank_one_image"))
-    : "/images/snb-logo.png";
-
-  const bankTwoName =
-    getSetting("bank_two_name") || "Alrajhi Bank | مصرف الراجحي";
-  const bankTwoHolder = getSetting("bank_two_account_holder") || "BRKZ IT CO";
-  const bankTwoIban = getSetting("bank_two_iban") || "SA8380000611608010256585";
-  const bankTwoImage = getSetting("bank_two_image")
-    ? getSettingFileUrl(getSetting("bank_two_image"))
-    : "/images/alrajhi-logo.png";
-
-  const termsAndConditionsText =
-    getSetting("rfq_terms_and_conditions") ||
-    getSetting("terms_and_conditions");
 
   const quotation = quotationResponse?.data;
   const rfqId = quotation?.purchase_request?.id;
@@ -851,10 +793,15 @@ export default function QuotationDetails() {
     quotation?.status,
   );
   const baseNumber = quotation?.quotation_number || "";
-  const number = isProforma
-    ? baseNumber.replace(/^(QUO|QUC)-?/, "PI-")
-    : baseNumber;
-  const documentTitle = isProforma ? "Proforma Invoice" : "Quotation";
+
+  // The preview sheet below and the downloadable PDF read the same derived
+  // model, so the two can't say different things about the same quotation.
+  const doc = useMemo(
+    () => buildQuotationModel(quotation, settingsData, isProforma),
+    [quotation, settingsData, isProforma],
+  );
+  const number = doc.number;
+  const documentTitle = doc.title;
 
   const handlePrint = () => {
     const originalTitle = document.title;
@@ -871,14 +818,14 @@ export default function QuotationDetails() {
       ? customIsProforma 
       : isProforma;
 
-    const doc = (
+    const element = (
       <QuotationPDF
         quotation={quotation}
         isProforma={isProf}
         settings={settingsData}
       />
     );
-    const blob = await pdf(doc).toBlob();
+    const blob = await pdf(element).toBlob();
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -914,13 +861,6 @@ export default function QuotationDetails() {
   }, [isLoading, quotation, searchParams]);
 
   if (isLoading) return <Loading />;
-
-  // Formatting numeric strings securely
-  const formatAmount = (val) =>
-    parseFloat(val || 0).toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
 
   return (
     <FormProvider {...methods}>
@@ -1175,6 +1115,13 @@ export default function QuotationDetails() {
               )}
               <Button
                 variant="outline"
+                onClick={handlePrint}
+                className="rounded-xl border-slate-200 text-slate-700 gap-2 font-bold hover:bg-slate-50 h-11 px-6 transition-all shadow-sm"
+              >
+                <Printer className="w-4 h-4 text-slate-500" /> Print
+              </Button>
+              <Button
+                variant="outline"
                 className="rounded-xl border-slate-200 text-slate-600 gap-2 font-bold hover:bg-slate-50 h-11 px-6"
                 onClick={() => navigate("/quotations")}
               >
@@ -1189,307 +1136,9 @@ export default function QuotationDetails() {
         </div>
       </div>
 
-      {/* DYNAMIC HIGH-FIDELITY QUOTATION DESIGN WITH CORRECT ID WRAPPER STRATEGY */}
-      <div id="printable-quotation-area-wrapper" className="bg-white py-6">
-        <div
-          className="max-w-[850px] mx-auto bg-white shadow-md p-12 border border-slate-200 rounded-sm"
-          id="printable-quotation-area"
-          ref={printRef}
-        >
-          {/* Header Section */}
-          <div className="flex justify-between items-start border-b-2 border-primary pb-6 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="mx-8.75 flex justify-center items-center">
-                  <img
-                    src="/images/LOGO.svg"
-                    className="h-22 w-39.25 object-cover"
-                    alt="Logo"
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="text-right text-xs text-slate-500 space-y-1">
-              <h2 className="font-extrabold text-[11px] text-slate-900 tracking-wide">
-                {companyName}
-              </h2>
-              <p>
-                {companyAddress} | VAT: {companyVat}
-              </p>
-              <p className="pt-1">
-                📞 {companyPhone} &nbsp;|&nbsp; ✉️ {companyEmail}
-              </p>
-            </div>
-          </div>
+      <QuotationSheet doc={doc} isProforma={isProforma} sheetRef={printRef} />
 
-          <h3 className="text-2xl font-bold text-primary mb-6 tracking-tight">
-            {documentTitle}
-          </h3>
 
-          {/* Cards Meta Section */}
-          <div className="grid grid-cols-2 gap-6 mb-8">
-            {/* Bill To */}
-            <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-5 text-xs text-slate-600 space-y-2">
-              <h4 className="text-primary font-bold text-sm mb-2">Bill To</h4>
-              <p className="text-slate-900 font-extrabold text-base">
-                {quotation?.customer?.company_name || "ABC Construction Co."}
-              </p>
-              <p>📍 King Abdullah Road, Al Khobar</p>
-              <p>
-                <span className="text-slate-400">Project:</span> Al Khobar
-                Commercial Complex
-              </p>
-              <p>
-                <span className="text-slate-400">Vendor:</span> Eng. Ahmed
-                Al-Sayed
-              </p>
-            </div>
-
-            {/* Quote Details */}
-            <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-5 text-xs text-slate-600">
-              <h4 className="text-primary font-bold text-sm mb-3">
-                {isProforma ? "Invoice Details" : "Quote Details"}
-              </h4>
-              <div className="grid grid-cols-2 gap-y-3">
-                <div>
-                  <span className="text-slate-400 block mb-0.5">
-                    {isProforma ? "Proforma Invoice No:" : "Quotation No:"}
-                  </span>
-                  <span className="text-slate-900 font-bold">{number}</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block mb-0.5">Date:</span>
-                  <span className="text-slate-900 font-bold">
-                    {quotation?.quotation_date
-                      ? format(new Date(quotation.quotation_date), "dd/MM/yyyy")
-                      : "N/A"}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block mb-0.5">Validity:</span>
-                  <span className="text-slate-900 font-bold">15 Days</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block mb-0.5">Currency:</span>
-                  <span className="text-slate-900 font-bold">
-                    {quotation?.currency?.code || "SAR"} (
-                    {quotation?.currency?.name || "Saudi Riyal"})
-                  </span>
-                </div>
-              </div>
-              <div className="mt-3 pt-3 border-t border-slate-200/60">
-                <span className="text-slate-400 block mb-0.5">
-                  Payment Terms:
-                </span>
-                <span className="text-slate-900 font-medium">
-                  50% Advance, 50% on Delivery
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Line Items Table Container */}
-          <table className="w-full text-left border-collapse mb-6">
-            <thead>
-              <tr className="border-b border-slate-200 text-xs font-bold text-slate-800 uppercase tracking-wider">
-                <th className="py-3 px-2 w-12 text-center">No.</th>
-                <th className="py-3 px-4">Description</th>
-                <th className="py-3 px-4 text-center">Qty</th>
-                <th className="py-3 px-4 text-center">Unit</th>
-                <th className="py-3 px-4 text-right">Unit Price</th>
-                <th className="py-3 px-4 text-right">Total</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
-              {quotation?.items?.map((item, index) => (
-                <tr key={item.id || index} className="align-top">
-                  <td className="py-4 px-2 text-center text-slate-400 font-medium">
-                    {index + 1}
-                  </td>
-                  <td className="py-4 px-4">
-                    <span className="font-bold text-slate-900 block mb-1">
-                      {item.item_name || "Steel Rebar"}
-                    </span>
-                    <span className="text-slate-400 text-[11px] block italic">
-                      {item.item?.name || "حديد تسليح"}
-                    </span>
-                  </td>
-                  <td className="py-4 px-4 text-center font-medium">
-                    {parseInt(item.quantity)}
-                  </td>
-                  <td className="py-4 px-4 text-center text-slate-500">
-                    {item.unit?.name || "Pcs"}
-                  </td>
-                  <td className="py-4 px-4 text-right font-medium">
-                    {formatAmount(item.selling_price)}
-                  </td>
-                  <td className="py-4 px-4 text-right font-bold text-slate-900">
-                    {formatAmount(item.line_total)}
-                  </td>
-                </tr>
-              )) || (
-                <tr>
-                  <td colSpan="6" className="py-8 text-center text-slate-400">
-                    No items available in this quotation.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-
-          {/* Totals Box Layout */}
-          <div className="flex justify-end mb-10">
-            <div className="w-80 space-y-2 text-xs border-t border-slate-100 pt-4">
-              <div className="flex justify-between text-slate-500 px-2">
-                <span>Subtotal</span>
-                <span className="font-semibold text-slate-900">
-                  {formatAmount(quotation?.subtotal)}{" "}
-                  <span className="text-[10px] text-slate-400 font-normal">
-                    SAR
-                  </span>
-                </span>
-              </div>
-              <div className="flex justify-between text-slate-500 px-2">
-                <span>VAT (15%)</span>
-                <span className="font-semibold text-slate-900">
-                  {formatAmount(quotation?.tax_amount)}{" "}
-                  <span className="text-[10px] text-slate-400 font-normal">
-                    SAR
-                  </span>
-                </span>
-              </div>
-              <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100 text-slate-900 mt-2">
-                <span className="font-bold text-primary text-sm">
-                  Grand Total
-                </span>
-                <span className="font-black text-base text-primary">
-                  {formatAmount(quotation?.total_amount)}{" "}
-                  <span className="text-[11px] font-bold">SAR</span>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Terms & Conditions */}
-          <div className="border-t border-slate-100 pt-6 text-[11px] text-slate-500 mb-6">
-            <div className="bg-slate-50/60 p-4 rounded-xl border border-slate-100 space-y-2 text-slate-600">
-              <h5 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
-                Terms & Conditions
-              </h5>
-              {termsAndConditionsText ? (
-                <div className="text-[10px] leading-relaxed text-slate-500 font-medium whitespace-pre-line">
-                  {termsAndConditionsText}
-                </div>
-              ) : (
-                <ul className="list-disc pl-4 space-y-1 text-[10px] leading-relaxed text-slate-500 font-medium">
-                  <li>
-                    Prices are valid for 15 Days from the date of quotation.
-                  </li>
-                  <li>
-                    Delivery within 3-5 working days from PO confirmation.
-                  </li>
-                  <li>
-                    Goods once sold cannot be returned unless manufacturing
-                    defect.
-                  </li>
-                  <li>All disputes subject to Riyadh jurisdiction.</li>
-                </ul>
-              )}
-            </div>
-          </div>
-
-          {/* Signatures Layout */}
-          <div className="grid grid-cols-3 gap-4 text-center text-xs font-bold text-slate-700 pt-8 border-t border-slate-100/70">
-            <div className="space-y-12">
-              <div className="h-px bg-slate-200 mx-4"></div>
-              <p>Received By</p>
-            </div>
-            <div>
-              <div className="border border-red-200 bg-red-50/30 text-primary py-2 px-4 rounded-xl inline-block uppercase tracking-wider text-[10px] font-black">
-                Forsa Approved
-              </div>
-            </div>
-            <div className="space-y-12">
-              <div className="h-px bg-slate-200 mx-4"></div>
-              <p>Authorized Signature</p>
-            </div>
-          </div>
-
-          {/* Full-width Teal Footer Banner */}
-          <div className="print-footer bg-[#C94544] text-white text-center py-2.5 mt-8 mx-[-48px] mb-[-48px] text-[10px] space-y-2 font-bold leading-normal">
-            {/* Bank Transfer Details */}
-            <div className="px-8 text-left">
-              <p className="text-[10px] font-black uppercase text-center tracking-wide text-white/95 mb-2">
-                For bank transfer process please use one of the following bank
-                accounts
-              </p>
-              <div className="grid grid-cols-2 gap-4 text-[9px] font-medium leading-relaxed opacity-95">
-                {/* Bank 1 */}
-                {(bankOneName || bankOneIban) && (
-                  <div className="bg-white/10 p-2.5 rounded-lg border border-white/15 flex items-center gap-3">
-                    {bankOneImage && (
-                      <img
-                        src={bankOneImage}
-                        alt="Bank 1 Logo"
-                        className="w-10 h-10 object-contain bg-white p-1 rounded shrink-0"
-                      />
-                    )}
-                    <div className="space-y-0.5 min-w-0">
-                      <p className="font-extrabold text-white text-[10px] truncate">
-                        {bankOneName}
-                      </p>
-                      <p className="truncate">
-                        <span className="text-white/60">Name:</span>{" "}
-                        {bankOneHolder}
-                      </p>
-                      <p className="font-bold truncate">
-                        <span className="text-white/60 font-normal">IBAN:</span>{" "}
-                        {bankOneIban}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Bank 2 */}
-                {(bankTwoName || bankTwoIban) && (
-                  <div className="bg-white/10 p-2.5 rounded-lg border border-white/15 flex items-center gap-3">
-                    {bankTwoImage && (
-                      <img
-                        src={bankTwoImage}
-                        alt="Bank 2 Logo"
-                        className="w-10 h-10 object-contain bg-white p-1 rounded shrink-0"
-                      />
-                    )}
-                    <div className="space-y-0.5 min-w-0">
-                      <p className="font-extrabold text-white text-[10px] truncate">
-                        {bankTwoName}
-                      </p>
-                      <p className="truncate">
-                        <span className="text-white/60">Name:</span>{" "}
-                        {bankTwoHolder}
-                      </p>
-                      <p className="font-bold truncate">
-                        <span className="text-white/60 font-normal">IBAN:</span>{" "}
-                        {bankTwoIban}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Divider line */}
-            <div className="border-t border-white/15 mx-6"></div>
-
-            <div className="space-y-1">
-              <p>{companyName}</p>
-              <p className="opacity-90 font-normal text-[9px]">
-                VAT No. {companyVat} &nbsp;&nbsp;&nbsp;&nbsp; CRN. {companyCrn}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <PaymentReceivedModal
         open={isPaymentModalOpen}

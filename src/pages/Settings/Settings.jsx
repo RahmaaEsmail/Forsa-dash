@@ -359,7 +359,16 @@ export default function Settings() {
         }
         if (formValues[key].type === "file") {
           if (formValues[key].value instanceof File) {
-            formData.append(`settings[${index}][value]`, formValues[key].value);
+            // The upload has to go in a TOP-LEVEL field named after the
+            // setting key — SettingController reads it with
+            // `$request->hasFile($settingData['key'])`. Nesting it under
+            // `settings[i][value]` (as this used to) means the backend never
+            // sees a file, silently keeps the old value and reports success,
+            // which is why bank logos could never be changed.
+            formData.append(key, formValues[key].value);
+            // Keep the array entry a plain string so validation stays happy;
+            // the controller ignores it for file-type settings anyway.
+            formData.append(`settings[${index}][value]`, "");
           } else {
             formData.append(
               `settings[${index}][value]`,
