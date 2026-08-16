@@ -54,4 +54,9 @@ export const handleDeleteGRNAttachment = async({id, documentId}) => {
   return response.data;
 }
 
+export const handleStepBackGRN = async({id}) => {
+  const response = await apiInstance.post(`${userEndpoints.grns}/${id}/step-back`);
+  return response.data;
+}
+
 

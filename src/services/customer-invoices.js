@@ -46,3 +46,8 @@ export const handleCancelCustomerInvoice = async ({ id, body = {}, signal }) => 
   return response.data;
 }
 
+export const handleStepBackCustomerInvoice = async ({ id, signal }) => {
+  const response = await apiInstance.post(`${userEndpoints.get_customer_invoices}/${id}/step-back`, {}, { signal });
+  return response.data;
+}
+

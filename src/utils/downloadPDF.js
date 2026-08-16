@@ -1,23 +1,34 @@
 import html2pdf from "html2pdf.js";
 import html2canvas from "html2canvas";
 
+// Cache unique color conversions to prevent thousands of redundant canvas lookups
+const colorCache = new Map();
+
 /**
  * Converts any CSS color string (including oklch) to rgb/rgba by painting it
  * onto a 1×1 canvas and reading back the pixel. This works because the browser
  * supports oklch natively in Canvas 2D fillStyle but html2canvas does not.
  */
 function colorToRgb(color) {
+  const trimmed = color.trim();
+  if (colorCache.has(trimmed)) {
+    return colorCache.get(trimmed);
+  }
   try {
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = 1;
     const ctx = canvas.getContext("2d");
     ctx.fillStyle = "rgb(0,0,0)";
-    ctx.fillStyle = color.trim();
+    ctx.fillStyle = trimmed;
     ctx.fillRect(0, 0, 1, 1);
     const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
-    if (a < 255) return `rgba(${r},${g},${b},${(a / 255).toFixed(3)})`;
-    return `rgb(${r},${g},${b})`;
+    const result = a < 255 
+      ? `rgba(${r},${g},${b},${(a / 255).toFixed(3)})`
+      : `rgb(${r},${g},${b})`;
+    colorCache.set(trimmed, result);
+    return result;
   } catch {
+    colorCache.set(trimmed, color);
     return color;
   }
 }
@@ -33,7 +44,11 @@ function getSanitizedStyles() {
       const rules = sheet.cssRules || sheet.rules;
       if (rules) {
         Array.from(rules).forEach((rule) => {
-          cssText += rule.cssText + "\n";
+          try {
+            cssText += rule.cssText + "\n";
+          } catch (ruleError) {
+            // Ignore single rule errors (e.g. cross-origin rules) and proceed
+          }
         });
       }
     } catch (e) {
@@ -149,32 +164,32 @@ export async function downloadAsPDF(element, options = {}) {
             clonedDoc.head.appendChild(style);
           }
 
-          // 3. Convert any computed oklch colors on elements directly to inline RGB/RGBA
+          // 3. Convert any inline oklch/oklab colors on elements directly to inline RGB/RGBA
+          // This avoids layout thrashing / reflow by bypassing getComputedStyle()
           const allElements = clonedDoc.querySelectorAll("*");
-          const view = clonedDoc.defaultView || window;
           allElements.forEach((el) => {
             try {
-              const style = view.getComputedStyle(el);
-              const properties = [
-                "color",
-                "backgroundColor",
-                "borderColor",
-                "borderTopColor",
-                "borderRightColor",
-                "borderBottomColor",
-                "borderLeftColor",
-                "fill",
-                "stroke",
-              ];
-              properties.forEach((prop) => {
-                const val = style[prop];
-                if (val && (val.includes("oklch") || val.includes("oklab"))) {
-                  const rgbVal = colorToRgb(val);
-                  el.style[prop] = rgbVal;
-                }
-              });
+              // 3a. Sanitize inline style attribute strings directly
+              const styleAttr = el.getAttribute("style");
+              if (styleAttr && (styleAttr.includes("oklch") || styleAttr.includes("oklab"))) {
+                const sanitizedStyle = styleAttr.replace(/(oklch|oklab)\([^)]+\)/g, (match) => {
+                  return colorToRgb(match);
+                });
+                el.setAttribute("style", sanitizedStyle);
+              }
+
+              // 3b. Sanitize SVG presentation attributes
+              const fill = el.getAttribute("fill");
+              if (fill && (fill.includes("oklch") || fill.includes("oklab"))) {
+                el.setAttribute("fill", colorToRgb(fill));
+              }
+
+              const stroke = el.getAttribute("stroke");
+              if (stroke && (stroke.includes("oklch") || stroke.includes("oklab"))) {
+                el.setAttribute("stroke", colorToRgb(stroke));
+              }
             } catch (e) {
-              // Ignore errors on hidden or unstyled nodes
+              // Ignore errors on unsupported elements
             }
           });
 

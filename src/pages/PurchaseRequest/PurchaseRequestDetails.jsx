@@ -37,11 +37,13 @@ import PurchaseDetailsAdministrative from '../../components/pages/PurchaseReques
 import PurchaseDetailsStats from '../../components/pages/PurchaseRequests/PurchaseDetails/PurchaseDetailsStats';
 import PurchaseDetailsTimeline from '../../components/pages/PurchaseRequests/PurchaseDetails/PurchaseDetailsTimeline';
 import CreateRFQModal from '../../components/pages/PurchaseRequests/CreateRFQModal';
-import { FilePlus } from 'lucide-react';
+import { FilePlus, Undo } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ChangePurchaseStatusModal from '../../components/pages/PurchaseRequests/ChangePurchaseStatusModal';
 import { Button } from '../../components/ui/button';
+import usePermission from '../../hooks/usePermission';
+import useChangePurchaseStatus from '../../hooks/purchaseRequest/useChangePurchaseStatus';
 
 export default function PurchaseRequestDetails() {
   const { id } = useParams();
@@ -50,6 +52,23 @@ export default function PurchaseRequestDetails() {
   const [isRFQModalOpen, setIsRFQModalOpen] = useState(false);
   const [openChangeStatus, setOpenChangeStatus] = useState(false);
   const pr = data?.data;
+
+  const { hasPermission } = usePermission();
+  const { mutate: changeStatus, isPending: isChangingStatus } = useChangePurchaseStatus();
+
+  const handleStepBack = () => {
+    if (window.confirm("Are you sure you want to step back this purchase request?")) {
+      changeStatus({
+        id,
+        status: 'step-back',
+        body: {}
+      }, {
+        onSuccess: () => {
+          mutate({ id });
+        }
+      });
+    }
+  };
 
   useEffect(() => {
     if (id) mutate({ id });
@@ -108,6 +127,18 @@ export default function PurchaseRequestDetails() {
             pr={pr}
           />
           <div className="flex gap-2 items-center">
+            {hasPermission("edit_purchase_requests") && (pr?.can_step_back || ['submitted', 'pending', 'approved', 'completed', 'cancelled'].includes(pr?.status?.toLowerCase())) && (
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isChangingStatus}
+                className="rounded-xl border-amber-200 text-amber-700 font-bold hover:bg-amber-50 h-10 px-4 gap-2 flex items-center"
+                onClick={() => handleStepBack()}
+              >
+                <Undo className="w-4 h-4" /> Step Back
+              </Button>
+            )}
+
             {pr?.status && pr?.status?.toLowerCase() !== 'cancelled' && pr?.status?.toLowerCase() !== 'rejected' && (
               <Button
                 type="button" 

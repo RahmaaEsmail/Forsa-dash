@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 export default function useChangeDeliveryNoteStatus() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ status , id}) => handleChangeDeliveryStatus({ status , id}),
+    mutationFn: ({ status , id, body}) => handleChangeDeliveryStatus({ status , id, body}),
     onSuccess: (res) => {
       if (res?.data?.success || res?.success) {
         toast.success(res?.data?.meta?.message || res?.meta?.message);

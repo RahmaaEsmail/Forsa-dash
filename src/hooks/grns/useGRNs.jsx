@@ -8,7 +8,8 @@ import {
   handleApproveGRN,
   handleRejectGRN,
   handleUploadGRNAttachment,
-  handleDeleteGRNAttachment
+  handleDeleteGRNAttachment,
+  handleStepBackGRN
 } from "../../services/GRNS";
 import { toast } from "sonner";
 
@@ -132,5 +133,20 @@ export const useDeleteGRNAttachment = () => {
     onError: (error) => {
       toast.error(error.response?.data?.message || error.response?.data?.error?.message || "Failed to delete attachment");
     }
+  });
+};
+
+export const useStepBackGRN = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }) => handleStepBackGRN({ id }),
+    onSuccess: (data, variables) => {
+      toast.success(data?.message || "GRN stepped back successfully");
+      queryClient.invalidateQueries({ queryKey: GRN_QUERY_KEYS.details(variables.id) });
+      queryClient.invalidateQueries({ queryKey: ["grns"] });
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || error.response?.data?.error?.message || "Failed to step back GRN");
+    },
   });
 };

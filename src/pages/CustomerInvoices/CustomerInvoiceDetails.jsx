@@ -494,6 +494,7 @@ import {
   UserCheck,
   CalendarCheck2,
   Printer,
+  Undo,
 } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
@@ -506,6 +507,7 @@ import useDeleteCustomerInvoice from "../../hooks/customer-invoices/useDeleteCus
 import useApproveCustomerInvoice from "../../hooks/customer-invoices/useApproveCustomerInvoice";
 import useMarkPaidCustomerInvoice from "../../hooks/customer-invoices/useMarkPaidCustomerInvoice";
 import useCancelCustomerInvoice from "../../hooks/customer-invoices/useCancelCustomerInvoice";
+import useStepBackCustomerInvoice from "../../hooks/customer-invoices/useStepBackCustomerInvoice";
 import CancelInvoiceModal from "../../components/pages/CustomerInvoices/CancelInvoiceModal";
 import useListSettings from "../../hooks/Settings/useListSettings";
 import MarkPaidModal from "../../components/pages/CustomerInvoices/MarkPaidModal";
@@ -522,6 +524,7 @@ export default function CustomerInvoiceDetails() {
   const approveMutation = useApproveCustomerInvoice();
   const markPaidMutation = useMarkPaidCustomerInvoice();
   const cancelMutation = useCancelCustomerInvoice();
+  const stepBackMutation = useStepBackCustomerInvoice();
 
   const { data: settingsData } = useListSettings();
   const getSetting = (key) => {
@@ -822,6 +825,22 @@ export default function CustomerInvoiceDetails() {
           >
             <Printer className="w-4 h-4 text-slate-500" /> Download/Print PDF
           </Button>
+
+          {hasPermission("edit_customer_invoices") && (invoice?.can_step_back || isApproved || isPaid || isCancelled) && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (window.confirm("Are you sure you want to step back this invoice?")) {
+                  stepBackMutation.mutate({ id });
+                }
+              }}
+              disabled={stepBackMutation.isPending}
+              className="h-11 px-6 rounded-xl border-amber-200 text-amber-700 font-bold hover:bg-amber-50 gap-2 transition-all shadow-sm cursor-pointer"
+            >
+              <Undo className="w-4 h-4" />
+              Step Back
+            </Button>
+          )}
 
           {isDraft && (
             <>

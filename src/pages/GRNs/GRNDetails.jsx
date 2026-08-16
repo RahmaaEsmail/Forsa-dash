@@ -6,6 +6,7 @@ import {
   useGRNDetails,
   useApproveGRN,
   useRejectGRN,
+  useStepBackGRN,
 } from "../../hooks/grns/useGRNs";
 import useListSettings from "../../hooks/Settings/useListSettings";
 import Loading from "../../components/shared/Loading";
@@ -20,6 +21,7 @@ import {
   XCircle,
   Printer,
   Package,
+  Undo,
 } from "lucide-react";
 import {
   Dialog,
@@ -58,6 +60,7 @@ export default function GRNDetails() {
   const { data: settingsData } = useListSettings();
   const approveGRN = useApproveGRN();
   const rejectGRN = useRejectGRN();
+  const stepBackGRN = useStepBackGRN();
   const [rejectReason, setRejectReason] = React.useState("");
   const [isRejectOpen, setIsRejectOpen] = React.useState(false);
 
@@ -237,6 +240,22 @@ export default function GRNDetails() {
             >
               <Printer className="w-4 h-4" /> Download PDF
             </Button>
+
+            {hasPermission("edit_grns") && (grn?.can_step_back || grn?.status?.toLowerCase() === "rejected") && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (window.confirm("Are you sure you want to step back this GRN?")) {
+                    stepBackGRN.mutate({ id });
+                  }
+                }}
+                disabled={stepBackGRN.isPending}
+                className="h-11 px-6 rounded-xl border-amber-200 text-amber-700 font-bold hover:bg-amber-50 gap-2 transition-all shadow-sm cursor-pointer"
+              >
+                <Undo className="w-4 h-4" />
+                Step Back
+              </Button>
+            )}
 
             {grn?.status === "draft" && hasPermission("edit_grns") && (
               <>

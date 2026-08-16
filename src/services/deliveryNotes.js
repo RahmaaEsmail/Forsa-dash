@@ -39,8 +39,8 @@ export const handleDeleteDeliveryNotes = async({id}) => {
   return response.data;
 }
 
-export const handleChangeDeliveryStatus = async({id , status}) => {
-  const response = await apiInstance.post(`${userEndpoints.delivery_notes}/${id}/${status}`);
+export const handleChangeDeliveryStatus = async({id , status, body = {}}) => {
+  const response = await apiInstance.post(`${userEndpoints.delivery_notes}/${id}/${status}`, body);
   return response.data;
 }
 export const handleGetDeliveryNoteDetails = async({id}) => {

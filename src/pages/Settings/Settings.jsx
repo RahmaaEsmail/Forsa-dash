@@ -260,7 +260,7 @@ const GROUP_CONFIG = {
   tax: { label: "Taxation", icon: Percent },
   company: { label: "Company Profile", icon: Building2 },
   system: { label: "System Settings", icon: SettingsIcon },
-  notification: { label: "Notifications", icon: BellRing },
+  // notification: { label: "Notifications", icon: BellRing },
   rfq: { label: "RFQ Terms & Conditions", icon: FileText },
   bank: { label: "Bank Accounts", icon: CreditCard },
   general: { label: "General Settings", icon: Globe },
@@ -292,7 +292,7 @@ export default function Settings() {
     if (!settingsData?.data) return {};
 
     // Explicitly made sure 'rfq' is not inside this array
-    const HIDDEN_GROUPS = ["general", "credit", "orders"];
+    const HIDDEN_GROUPS = ["general", "credit", "orders", "notification"];
 
     return settingsData.data.reduce((acc, setting) => {
       const group = setting.group || "general";

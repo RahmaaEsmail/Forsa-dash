@@ -14,7 +14,8 @@ import { toast } from 'sonner'
 import { format } from 'date-fns'
 import CancelRFQModal from '../../components/pages/RFQs/CancelRFQModal'
 import ActivityLog from '../../layout/ActivityLog/ActivityLog'
-import { Printer, MessageSquare, AlertCircle, X, ChevronRight, Package } from 'lucide-react'
+import { Printer, MessageSquare, AlertCircle, X, ChevronRight, Package, Undo } from 'lucide-react'
+import usePermission from '../../hooks/usePermission'
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,8 @@ export default function CreateRFQ() {
   const { prId, rfqId } = useParams();
   const navigate = useNavigate();
   const isEdit = !!rfqId;
+
+  const { hasPermission } = usePermission();
 
   const { mutate: fetchPR, data: prData, isPending: isPRLoading } = usePurchaseDetails();
   const [isLoadingRFQ, setIsLoadingRFQ] = useState(isEdit);
@@ -254,7 +257,7 @@ export default function CreateRFQ() {
       })
         .then(statusRes => {
           if (statusRes?.success) {
-            toast.success(`RFQ ${status === "cancel" ? "canceled" : "status updated"} successfully!`);
+            toast.success(`RFQ ${status === "cancel" ? "canceled" : status === "step-back" ? "stepped back" : "status updated"} successfully!`);
             setIsCancelModalOpen(false);
             loadRFQDetails();
           }
@@ -369,6 +372,22 @@ export default function CreateRFQ() {
                   title="Activity Chat Log"
                 >
                   <MessageSquare className="w-4 h-4" />
+                </Button>
+              )}
+
+              {isEdit && rfqStatus !== 'draft' && hasPermission("edit_rfqs") && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-xl border-amber-200 text-amber-700 font-bold hover:bg-amber-50 h-10 px-4 gap-2 flex items-center"
+                  onClick={() => {
+                    if (window.confirm("Are you sure you want to step back this RFQ?")) {
+                      handleStatusChange("step-back");
+                    }
+                  }}
+                  disabled={isUpdatingStatus}
+                >
+                  <Undo className="w-4 h-4" /> Step Back
                 </Button>
               )}
 

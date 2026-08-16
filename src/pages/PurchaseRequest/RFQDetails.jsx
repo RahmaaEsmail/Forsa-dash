@@ -932,9 +932,11 @@ import {
   Info,
   MessageSquare,
   ChevronRight,
+  Undo,
 } from "lucide-react";
 
-import { useRFQDetails } from "../../hooks/rfqs/useRFQs";
+import { useRFQDetails, useChangeRFQStatus } from "../../hooks/rfqs/useRFQs";
+import usePermission from "../../hooks/usePermission";
 import useListSettings from "../../hooks/Settings/useListSettings";
 import { useActivityLogsList } from "../../hooks/activity-logs/useActivityLogs";
 import useListUsers from "../../hooks/Users/useListUsers";
@@ -1092,6 +1094,19 @@ export default function RFQDetails() {
   const { rfqId } = useParams();
   const navigate = useNavigate();
   const printRef = useRef(null);
+
+  const { hasPermission } = usePermission();
+  const changeStatus = useChangeRFQStatus();
+
+  const handleStepBack = () => {
+    if (window.confirm("Are you sure you want to step back this RFQ?")) {
+      changeStatus.mutate({
+        id: rfqId,
+        status: 'step-back',
+        body: {}
+      });
+    }
+  };
 
   const { data: settingsData } = useListSettings();
   const getSetting = (key) => {
@@ -1280,6 +1295,16 @@ export default function RFQDetails() {
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
+            {hasPermission("edit_rfqs") && (rfq?.can_step_back || ['rfq_sent', 'buyer_approval', 'price_gathering_approval', 'po_approval', 'purchase_ordered', 'cancelled'].includes(rfq?.status?.toLowerCase())) && (
+              <Button
+                variant="outline"
+                disabled={changeStatus.isPending}
+                className="rounded-2xl border-amber-200 text-amber-700 font-bold hover:bg-amber-50 h-10 px-4 gap-2 flex items-center"
+                onClick={handleStepBack}
+              >
+                <Undo className="w-4 h-4" /> Step Back
+              </Button>
+            )}
             <Button
               variant="outline"
               onClick={handleDownloadPDF}

@@ -14,7 +14,8 @@ import useChangePurchaseStatus from '../../hooks/purchaseRequest/useChangePurcha
 import Loading from '../../components/shared/Loading'
 import ChangePurchaseStatusModal from '../../components/pages/PurchaseRequests/ChangePurchaseStatusModal'
 import { useState } from 'react'
-import { FilePlus } from 'lucide-react'
+import { FilePlus, Undo } from 'lucide-react'
+import usePermission from '../../hooks/usePermission'
 
 export default function EditPurchaseRequest() {
   const { id } = useParams();
@@ -25,6 +26,23 @@ export default function EditPurchaseRequest() {
   const { mutate: updatePR, isPending: isUpdating } = useUpdatePurchaseRequest();
   
   const [openChangeStatus, setOpenChangeStatus] = useState(false);
+
+  const { hasPermission } = usePermission();
+  const { mutate: changeStatus, isPending: isChangingStatus } = useChangePurchaseStatus();
+
+  const handleStepBack = () => {
+    if (window.confirm("Are you sure you want to step back this purchase request?")) {
+      changeStatus({
+        id,
+        status: 'step-back',
+        body: {}
+      }, {
+        onSuccess: () => {
+          fetchDetails({ id });
+        }
+      });
+    }
+  };
 
   const method = useForm({
     defaultValues: {
@@ -121,11 +139,23 @@ export default function EditPurchaseRequest() {
     <div className="flex pb-6 flex-col gap-10">
       <PageHeader title={"Edit Purchase Request"} subTitle={`Updating PR #${prData?.data?.pr_number || id}`}>
         <div className='flex gap-2 items-center'>
+          {hasPermission("edit_purchase_requests") && (prData?.data?.can_step_back || ['submitted', 'pending', 'approved', 'completed', 'cancelled'].includes(prData?.data?.status?.toLowerCase())) && (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isChangingStatus}
+              className="rounded-xl border-amber-200 text-amber-700 font-bold hover:bg-amber-50 h-10 px-4 gap-2 flex items-center"
+              onClick={() => handleStepBack()}
+            >
+              <Undo className="w-4 h-4" /> Step Back
+            </Button>
+          )}
+
           {prData?.data?.status && prData?.data?.status?.toLowerCase() !== 'cancelled' && prData?.data?.status?.toLowerCase() !== 'rejected' && (
             <Button 
               type="button" 
               variant="outline" 
-              className="border-primary text-primary hover:bg-primary/10 font-bold" 
+              className="border-primary text-primary hover:bg-primary/10 font-bold h-10" 
               onClick={() => setOpenChangeStatus(true)}
             >
               Change Status

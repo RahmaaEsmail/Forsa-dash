@@ -206,6 +206,7 @@ import {
   Truck,
   CheckCircle2,
   XCircle,
+  Undo,
 } from "lucide-react";
 import { downloadAsPDF } from "../../utils/downloadPDF";
 import useChangeDeliveryNoteStatus from "../../hooks/delivery-notes/useChangeDeliveryNotesStatus";
@@ -368,6 +369,22 @@ export default function DeliveryNoteDetails() {
             >
               <Printer className="w-4 h-4 text-slate-500" /> Print PDF
             </Button>
+
+            {hasPermission("edit_delivery_orders") && (dn?.can_step_back || ['pending', 'delivered', 'cancelled'].includes(dn?.status?.toLowerCase())) && (
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  if (window.confirm("Are you sure you want to step back this delivery note?")) {
+                    handleStatusChange('step-back');
+                  }
+                }}
+                disabled={changeStatus.isPending}
+                className="h-11 px-6 rounded-xl border-amber-200 text-amber-700 font-bold hover:bg-amber-50 gap-2 transition-all shadow-sm cursor-pointer"
+              >
+                <Undo className="w-4 h-4" />
+                Step Back
+              </Button>
+            )}
 
             {dn?.status === 'draft' && hasPermission("edit_delivery_orders") && (
               <>
