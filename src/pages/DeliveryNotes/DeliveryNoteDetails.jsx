@@ -299,6 +299,11 @@ export default function DeliveryNoteDetails() {
                 {record.item.name}
               </span>
             )}
+          {record.specifications && (
+            <span className="text-slate-500 text-xs mt-0.5 whitespace-pre-line">
+              {record.specifications}
+            </span>
+          )}
         </div>
       ),
     },
@@ -677,6 +682,11 @@ export default function DeliveryNoteDetails() {
                           {item.item.name}
                         </span>
                       )}
+                    {item.specifications && (
+                      <span className="text-slate-500 text-[11px] block whitespace-pre-line">
+                        {item.specifications}
+                      </span>
+                    )}
                   </td>
                   <td className="py-4 px-4 text-center font-medium text-slate-600">
                     {formatNumber(item.quantity)}

@@ -196,6 +196,11 @@ export default function QuotationSheet({ doc, isProforma, sheetRef }) {
                         {altName}
                       </span>
                     )}
+                    {item.specifications && (
+                      <span className="text-slate-500 text-[11px] block mt-0.5 whitespace-pre-line">
+                        {item.specifications}
+                      </span>
+                    )}
                     {item.notes && (
                       <span className="text-slate-400 text-[10px] block mt-0.5">
                         {item.notes}

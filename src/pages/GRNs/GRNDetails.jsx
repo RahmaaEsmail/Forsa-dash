@@ -116,6 +116,11 @@ export default function GRNDetails() {
       render: (_, record) => (
         <div className="text-left font-medium text-slate-900">
           {record.item?.name || record.item_name || "Item"}
+          {record.specifications && (
+            <p className="text-xs text-slate-500 font-normal mt-0.5 whitespace-pre-line">
+              {record.specifications}
+            </p>
+          )}
           {record.sku && (
             <p className="text-[10px] text-slate-400 font-normal uppercase tracking-wider mt-0.5">
               {record.sku}
@@ -599,6 +604,11 @@ export default function GRNDetails() {
                     <span className="font-bold text-slate-900 block">
                       {item.item?.name || item.item_name}
                     </span>
+                    {item.specifications && (
+                      <span className="text-[10px] text-slate-500 block whitespace-pre-line">
+                        {item.specifications}
+                      </span>
+                    )}
                     {item.sku && (
                       <span className="text-[9px] text-slate-400 font-mono block uppercase">
                         SKU: {item.sku}

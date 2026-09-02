@@ -34,6 +34,12 @@ const s = StyleSheet.create({
     marginTop: 0.5,
     textAlign: "left",
   },
+  itemSpec: {
+    fontSize: size.tiny,
+    color: color.body,
+    marginTop: 1,
+    textAlign: "left",
+  },
   itemNote: {
     fontSize: size.micro,
     color: color.faint,
@@ -152,6 +158,11 @@ export function QuotationPDF({ quotation, isProforma, settings }) {
                     {item.item_name || altName || "—"}
                   </AutoText>
                   {showAlt && <AutoText style={s.itemAlt}>{altName}</AutoText>}
+                  {!!item.specifications && (
+                    <AutoText style={s.itemSpec}>
+                      {item.specifications}
+                    </AutoText>
+                  )}
                   {!!item.notes && (
                     <AutoText style={s.itemNote}>{item.notes}</AutoText>
                   )}

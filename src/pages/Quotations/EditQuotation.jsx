@@ -165,6 +165,7 @@ export default function EditQuotation() {
             id: item.id,
             rfq_item_id: item.rfq_item_id,
             item_name: item.item_name || item.item?.name,
+            specifications: item.specifications || "",
             quantity: item.quantity,
             cost_price: item.cost_price,
             selling_price: item.selling_price !== undefined && item.selling_price !== null ? item.selling_price : item.cost_price,

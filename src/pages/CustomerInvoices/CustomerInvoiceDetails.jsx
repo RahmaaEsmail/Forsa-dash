@@ -661,6 +661,11 @@ export default function CustomerInvoiceDetails() {
                 {arabicName}
               </span>
             )}
+            {record.specifications && (
+              <span className="text-xs text-slate-500 mt-0.5 whitespace-pre-line">
+                {record.specifications}
+              </span>
+            )}
             {record.sku && (
               <span className="text-xs text-slate-400 mt-0.5">
                 SKU: {record.sku}
@@ -1218,6 +1223,11 @@ export default function CustomerInvoiceDetails() {
                     {item.item?.name && item.item_name !== item.item?.name && (
                       <span className="text-slate-400 text-[11px] block italic mb-1">
                         {item.item.name}
+                      </span>
+                    )}
+                    {item.specifications && (
+                      <span className="text-slate-500 text-[11px] block mb-1 whitespace-pre-line">
+                        {item.specifications}
                       </span>
                     )}
                     {item.sku && (

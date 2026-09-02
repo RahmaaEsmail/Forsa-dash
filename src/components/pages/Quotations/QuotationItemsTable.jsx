@@ -30,6 +30,11 @@ export default function QuotationItemsTable({
           <span className="text-sm font-medium text-slate-900">
             {record.item_name}
           </span>
+          {record.specifications && (
+            <p className="text-xs text-slate-500 mt-0.5 whitespace-pre-line">
+              {record.specifications}
+            </p>
+          )}
           <div className="text-[10px] text-slate-400">
             ID: {record.rfq_item_id}
           </div>
