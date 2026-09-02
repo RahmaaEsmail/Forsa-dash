@@ -100,6 +100,7 @@ export default function CreateRFQ() {
               id: item.id,
               purchase_request_item_id: item.purchase_request_item_id,
               item_name: item.item_name || item.item?.name?.en,
+              specifications: item.specifications || "",
               quantity: item.quantity,
               unit_name: item.unit?.name?.en || item.unit?.name,
               target_price: item.target_price || 0,
@@ -133,6 +134,7 @@ export default function CreateRFQ() {
         methods.setValue("items", pr.items.map(item => ({
           purchase_request_item_id: item.id,
           item_name: item.item_name || item.item?.name?.en,
+          specifications: item.specifications || "",
           quantity: item.remaining_quantity || item.quantity,
           unit_name: item.unit?.name?.en,
           target_price: item.target_price || 0,
@@ -165,6 +167,7 @@ export default function CreateRFQ() {
             return {
               item_name: item.item_name,
               unit_name: item.unit_name,
+              specifications: item.specifications || null,
               supplier_id: Number(values.supplier_id),
               unit_price: Number(item.unit_price) || 0,
               target_price: Number(item.target_price) || 0,
@@ -174,6 +177,7 @@ export default function CreateRFQ() {
           return {
             id: item.id,
             supplier_id: Number(values.supplier_id),
+            specifications: item.specifications || null,
             unit_price: Number(item.unit_price) || 0,
             target_price: Number(item.target_price) || 0,
             tax_rate: Number(item.tax_rate) || 15
@@ -201,6 +205,7 @@ export default function CreateRFQ() {
             }
             return {
               purchase_request_item_id: item.purchase_request_item_id,
+              specifications: item.specifications || null,
               quantity: Number(item.quantity)
             };
           })

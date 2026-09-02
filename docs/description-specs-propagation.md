@@ -117,6 +117,31 @@ The `@react-pdf` document. Two changes:
    `renderRow`. Uses `AutoText` (not `Text`) so Arabic specs get RTL handling
    like the surrounding item name.
 
+### Create / Edit RFQ
+
+**`src/pages/PurchaseRequest/CreateRFQ.jsx`** — lines 103, 137, 170, 180, 208
+
+`RFQItemsTable.jsx` already had a **"Description"** column bound to
+`items.${index}.specifications`, and already populated it when a PR product is
+picked manually from the dropdown (line 137 of that file). But the two mappings
+that seed the rows on page load both omitted the field, so the column rendered
+empty:
+
+- Line 137 — the create path, seeding rows from `pr.items` when you open
+  `/purchase-requests/:id/create-rfq`.
+- Line 103 — the edit path, seeding rows from an existing RFQ's items.
+
+Both now map `specifications: item.specifications || ""`.
+
+Three payload builders also now send the field, so text typed into that column
+actually persists instead of being silently dropped:
+
+- Line 208 — create payload (PR-derived line).
+- Line 180 — edit payload (existing line).
+- Line 170 — edit payload (custom line).
+
+`RFQItemsTable.jsx` itself needed no change.
+
 ### Delivery Note
 
 **`src/pages/DeliveryNotes/DeliveryNoteDetails.jsx`** — lines 302 and 685
@@ -192,3 +217,16 @@ the text too, not just newly created ones.
 
 Until it runs, the API omits the field, every guard evaluates falsy, and all
 these pages render exactly as they did before.
+
+The **Create/Edit RFQ** fix is the exception — it needs no migration, because
+`specifications` already existed on `purchase_request_items` and `rfq_items`.
+It works as soon as the frontend is deployed. It does pair with three small
+backend changes so a typed value is accepted rather than stripped by
+validation:
+
+- `RfqController::createFromPurchaseRequest` — added the
+  `items.*.specifications` validation rule.
+- `UpdateRfqRequest` — same rule, so `$request->validated()` stops dropping it.
+- `RfqService::createRfqFromPurchaseRequest` — uses
+  `$itemData['specifications'] ?? $prItem->specifications`, so an edited value
+  wins and an absent one still falls back to the PR line.
