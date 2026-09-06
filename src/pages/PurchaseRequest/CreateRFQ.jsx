@@ -105,6 +105,7 @@ export default function CreateRFQ() {
               unit_name: item.unit?.name?.en || item.unit?.name,
               target_price: item.target_price || 0,
               unit_price: Number(item.unit_price) || 0,
+              discount_percentage: Number(item.discount_percentage) || 0,
               tax_rate: item.tax_rate || 15,
               selected: true,
               is_custom: false
@@ -139,6 +140,7 @@ export default function CreateRFQ() {
           unit_name: item.unit?.name?.en,
           target_price: item.target_price || 0,
           unit_price: 0,
+          discount_percentage: 0,
           tax_rate: 15,
           selected: true,
           is_custom: false
@@ -171,6 +173,7 @@ export default function CreateRFQ() {
               supplier_id: Number(values.supplier_id),
               unit_price: Number(item.unit_price) || 0,
               target_price: Number(item.target_price) || 0,
+              discount_percentage: Number(item.discount_percentage) || 0,
               tax_rate: Number(item.tax_rate) || 15
             };
           }
@@ -180,6 +183,7 @@ export default function CreateRFQ() {
             specifications: item.specifications || null,
             unit_price: Number(item.unit_price) || 0,
             target_price: Number(item.target_price) || 0,
+            discount_percentage: Number(item.discount_percentage) || 0,
             tax_rate: Number(item.tax_rate) || 15
           };
         })
@@ -196,17 +200,26 @@ export default function CreateRFQ() {
         items: values.items
           .filter(item => item.selected)
           .map(item => {
+            const pricing = {
+              unit_price: Number(item.unit_price) || 0,
+              target_price: Number(item.target_price) || 0,
+              discount_percentage: Number(item.discount_percentage) || 0,
+              tax_rate: Number(item.tax_rate) || 0
+            };
+
             if (item.is_custom) {
               return {
                 item_name: item.item_name,
                 unit_name: item.unit_name,
-                quantity: Number(item.quantity)
+                quantity: Number(item.quantity),
+                ...pricing
               };
             }
             return {
               purchase_request_item_id: item.purchase_request_item_id,
               specifications: item.specifications || null,
-              quantity: Number(item.quantity)
+              quantity: Number(item.quantity),
+              ...pricing
             };
           })
       };

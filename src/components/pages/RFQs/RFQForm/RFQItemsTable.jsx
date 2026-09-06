@@ -234,13 +234,15 @@ export default function RFQItemsTable({ items, isEdit = false, prData }) {
       ),
     },
     {
-      title: "Discounts",
+      title: "Discount %",
       className: "px-4",
       render: (_, __, index) => (
         <div className="w-[80px]">
           <Input
             type="number"
-            {...register(`items.${index}.discount`, { valueAsNumber: true })}
+            {...register(`items.${index}.discount_percentage`, {
+              valueAsNumber: true,
+            })}
             className="h-8 bg-transparent border-none text-center"
             placeholder="0.00"
           />
@@ -301,10 +303,13 @@ export default function RFQItemsTable({ items, isEdit = false, prData }) {
     return acc + qty * price;
   }, 0);
 
-  const discountTotal = watchItems.reduce(
-    (acc, item) => acc + (Number(item.discount) || 0),
-    0,
-  );
+  // Line discounts are percentages (matches the backend's discount_percentage).
+  const discountTotal = watchItems.reduce((acc, item) => {
+    const qty = Number(item.quantity) || 0;
+    const price = Number(item.unit_price) || 0;
+    const pct = Number(item.discount_percentage) || 0;
+    return acc + qty * price * (pct / 100);
+  }, 0);
   const totalAfterDiscount = subtotalTotal - discountTotal;
   const vatTotal = totalAfterDiscount * 0.15;
   const grandTotal = totalAfterDiscount + vatTotal;
@@ -347,7 +352,7 @@ export default function RFQItemsTable({ items, isEdit = false, prData }) {
                       unit_name: "",
                       unit_price: "",
                       target_price: "",
-                      discount: "",
+                      discount_percentage: "",
                       tax_rate: 15,
                       selected: true,
                       is_custom: false,
